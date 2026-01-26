@@ -13,13 +13,12 @@
             --text-color: #ffffff;
             --gray: #b0b0b0;
             --free: #27ae60;
-            --busy: #c0392b; /* Vermelho para Ocupado */
+            --busy: #c0392b;
             --hover: #219150;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
         /* HERO */
@@ -40,29 +39,34 @@
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* AGENDA */
-        .agenda-box { background: #1a1a1a; padding: 20px; border-radius: 15px; max-width: 900px; margin: auto; border: 1px solid #333; }
-        .duration-selector { margin-bottom: 30px; }
-        .duration-title { font-size: 1.1rem; color: #ccc; margin-bottom: 15px; }
+        /* AGENDA DIÁRIA */
+        .agenda-box { background: #1a1a1a; padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; }
         
-        .btn-duration { background: #333; color: white; border: 1px solid #555; padding: 10px 25px; margin: 5px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; }
-        .btn-duration.active { background: var(--primary); border-color: var(--primary); color: black; transform: scale(1.1); }
-        
-        .custom-time-box { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .custom-input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #555; background: #222; color: white; text-align: center; font-weight: bold; }
+        /* Controles de Navegação (Dia) */
+        .day-navigation { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #222; padding: 10px; border-radius: 10px; }
+        .nav-btn { background: none; border: none; color: var(--primary); font-size: 1.5rem; cursor: pointer; padding: 0 15px; }
+        .nav-btn:hover { color: white; transform: scale(1.2); }
+        .current-date-display { font-size: 1.1rem; font-weight: bold; color: white; text-transform: capitalize; }
 
-        .schedule-wrapper { overflow-x: auto; padding-bottom: 10px; }
-        .schedule-grid { display: grid; grid-template-columns: 50px repeat(7, minmax(90px, 1fr)); gap: 5px; min-width: 700px; }
+        .duration-selector { margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        .duration-title { font-size: 1rem; color: #ccc; margin-bottom: 10px; }
         
-        .header-day { font-size: 0.9rem; font-weight: bold; color: var(--primary); padding: 10px 0; }
-        .time-label { font-size: 0.8rem; color: #777; display: flex; align-items: center; justify-content: center; }
+        .btn-duration { background: #333; color: white; border: 1px solid #555; padding: 8px 15px; margin: 2px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.9rem; }
+        .btn-duration.active { background: var(--primary); border-color: var(--primary); color: black; }
         
-        .slot { background-color: var(--free); color: white; border: none; padding: 12px 2px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; width: 100%; transition: 0.2s; }
-        .slot:hover { background-color: var(--hover); transform: translateY(-2px); }
+        .custom-time-box { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
+        .custom-input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #555; background: #222; color: white; text-align: center; font-weight: bold; }
 
-        /* BLOQUEADO */
+        /* GRID DIÁRIO (1 Coluna) */
+        .schedule-grid { display: grid; grid-template-columns: 60px 1fr; gap: 10px; }
+        
+        .time-label { font-size: 0.9rem; color: #777; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        
+        .slot { background-color: var(--free); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1rem; width: 100%; transition: 0.2s; display: flex; justify-content: space-between; padding-left: 20px; padding-right: 20px; }
+        .slot:hover { background-color: var(--hover); transform: scale(1.02); }
+        .slot span:last-child { font-weight: bold; }
+
         .slot.busy { background-color: var(--busy); opacity: 0.6; cursor: not-allowed; pointer-events: none; }
-        .slot.busy:hover { transform: none; box-shadow: none; }
 
         /* RESTANTE */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
@@ -94,27 +98,29 @@
         <h2 class="section-title">Agendamento</h2>
         
         <div class="agenda-box">
+            <div class="day-navigation">
+                <button class="nav-btn" onclick="mudarDia(-1)">&#10094;</button>
+                <div class="current-date-display" id="dateDisplay">Carregando data...</div>
+                <button class="nav-btn" onclick="mudarDia(1)">&#10095;</button>
+            </div>
+
             <div class="duration-selector">
-                <p class="duration-title">1. Quantas horas você quer jogar?</p>
-                <div>
+                <p class="duration-title">Tempo de jogo:</p>
+                <div style="display:flex; justify-content:center; flex-wrap:wrap;">
                     <button class="btn-duration active" onclick="setDuracao(1, this)">1h</button>
+                    <button class="btn-duration" onclick="setDuracao(1.5, this)">1h30</button>
                     <button class="btn-duration" onclick="setDuracao(2, this)">2h</button>
-                    <button class="btn-duration" onclick="setDuracao(3, this)">3h</button>
-                    <button class="btn-duration" onclick="setDuracao(4, this)">4h</button>
                 </div>
                 <div class="custom-time-box">
-                    <label style="color:#ccc; font-size:0.9rem;">Ou digite:</label>
+                    <label style="color:#777;">Outro:</label>
                     <input type="number" id="customInput" class="custom-input" placeholder="0" oninput="usarPersonalizado(this.value)">
-                    <span style="color:#ccc;">horas</span>
+                    <span style="color:#777;">h</span>
                 </div>
             </div>
 
-            <p class="duration-title">2. Escolha o horário de <strong style="color:var(--primary)">INÍCIO</strong>:</p>
-            <div id="loading" class="loading-msg">Sincronizando com a agenda...</div>
-            <div class="schedule-wrapper">
-                <div class="schedule-grid" id="grid"></div>
-            </div>
-            <p style="margin-top:15px; font-size:0.8rem; color:#777;">🟥 Vermelho = Horário já reservado.</p>
+            <div id="loading" class="loading-msg">Atualizando agenda...</div>
+            <div class="schedule-grid" id="grid">
+                </div>
         </div>
     </div>
 
@@ -147,94 +153,129 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
-        // --- SEU LINK CONECTADO ---
+        // LINK DA PLANILHA
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         
         const whatsappNumber = "5588993127830";
         let duracaoSelecionada = 1; 
-        const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        // Ajuste: Horários das 6h às 22h
+        
+        // Configuração de Dias e Horas
+        const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         const horas = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+
+        // Estado Atual (Dia que está sendo mostrado)
+        let dataVisualizada = new Date(); // Começa com "Hoje"
+
+        // Função para formatar data (Ex: Segunda, 26/01)
+        function formatarDataHeader(date) {
+            // Ajuste do dia da semana (JS: 0=Dom, 1=Seg... Meu array: 0=Seg, 6=Dom)
+            let diaSemanaJS = date.getDay(); 
+            let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1;
+            
+            let dia = String(date.getDate()).padStart(2, '0');
+            let mes = String(date.getMonth() + 1).padStart(2, '0');
+            
+            return {
+                texto: `${diasSemana[diaIndex]} (${dia}/${mes})`,
+                index: diaIndex // 0 a 6 para usar na lógica da planilha
+            };
+        }
 
         function setDuracao(horas, btn) {
             duracaoSelecionada = horas;
             document.getElementById('customInput').value = ""; 
             document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
+            renderizarAgenda(); // Atualiza os links do whats
         }
 
         function usarPersonalizado(valor) {
             if(valor && valor > 0) {
                 duracaoSelecionada = parseFloat(valor);
                 document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
+                renderizarAgenda();
             }
         }
 
-        // --- GERAÇÃO DA GRADE ---
-        const grid = document.getElementById('grid');
-        grid.appendChild(document.createElement('div')); 
-        
-        dias.forEach(d => {
-            const el = document.createElement('div');
-            el.className = 'header-day';
-            el.innerText = d;
-            grid.appendChild(el);
-        });
+        // Navegar entre dias
+        function mudarDia(delta) {
+            dataVisualizada.setDate(dataVisualizada.getDate() + delta);
+            renderizarAgenda();
+            lerPlanilha(); // Recarrega status de ocupado
+        }
 
-        horas.forEach((h) => {
-            const label = document.createElement('div');
-            label.className = 'time-label';
-            label.innerText = `${h}:00`;
-            grid.appendChild(label);
+        // --- RENDERIZAR AGENDA DO DIA ---
+        function renderizarAgenda() {
+            const grid = document.getElementById('grid');
+            const dateDisplay = document.getElementById('dateDisplay');
+            
+            grid.innerHTML = ''; // Limpa tudo
+            
+            // Pega info do dia atual
+            const infoDia = formatarDataHeader(dataVisualizada);
+            dateDisplay.innerText = infoDia.texto;
 
-            dias.forEach((d, dIndex) => {
+            horas.forEach(h => {
+                // Coluna Hora
+                const label = document.createElement('div');
+                label.className = 'time-label';
+                label.innerText = `${h}:00`;
+                grid.appendChild(label);
+
+                // Coluna Slot (Botão)
                 const btn = document.createElement('button');
                 btn.className = 'slot';
-                btn.innerHTML = `Livre`;
-                // ID para cruzar com a planilha (coluna-0=Segunda, hora=h)
-                btn.id = `slot-${dIndex}-${h}`; 
+                // ID Crucial: slot-{diaIndex}-{hora} -> Ex: slot-0-18 (Segunda 18h)
+                // Isso mantém a compatibilidade com a planilha!
+                btn.id = `slot-${infoDia.index}-${h}`;
+                
+                let fim = h + duracaoSelecionada;
+                let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
+                
+                btn.innerHTML = `<span>Livre</span> <span>+</span>`; // + Ícone visual
                 
                 btn.onclick = () => {
-                    if(!duracaoSelecionada || duracaoSelecionada <= 0) return alert("Selecione o tempo primeiro.");
-                    let fim = h + duracaoSelecionada;
-                    let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
                     let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
-                    const msg = `Olá! Gostaria de agendar na Arena Vitale:\n🗓️ *${d}-feira*\n⏰ *${h}:00 às ${horaFimTexto}*\n⏳ Duração: ${txtDuracao}`;
+                    if(duracaoSelecionada === 1.5) txtDuracao = "1h 30min";
+
+                    const msg = `Olá! Gostaria de agendar na Arena Vitale:\n🗓️ *${infoDia.texto}*\n⏰ *${h}:00 às ${horaFimTexto}*\n⏳ Duração: ${txtDuracao}`;
                     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
                 };
+                
                 grid.appendChild(btn);
             });
-        });
+        }
 
-        // --- LER PLANILHA ---
+        // --- LER PLANILHA E BLOQUEAR ---
+        // Essa função não mudou muito, ela procura pelos IDs (slot-0-18) na tela.
+        // Como só renderizamos os slots do dia, ela só vai pintar os slots visíveis.
         async function lerPlanilha() {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
 
             try {
-                const response = await fetch(SHEET_URL);
+                // Adiciona timestamp para evitar cache
+                const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(','));
 
                 rows.forEach((row, rowIndex) => {
-                    if (rowIndex === 0) return; // Pula cabeçalho
-                    
-                    const horaDaLinha = parseInt(row[0]); // Coluna A = Hora
+                    if (rowIndex === 0) return; 
+                    const horaDaLinha = parseInt(row[0]); 
                     
                     if (!isNaN(horaDaLinha)) {
-                        // Dias da semana estão nas colunas 1 a 7 (B a H)
                         for (let col = 1; col <= 7; col++) {
-                            // Limpa espaços e aspas extras que o CSV pode trazer
                             let cellValue = row[col] ? row[col].replace(/[\r\n"]/g, '').trim() : "";
                             
                             if (cellValue.length > 0) {
-                                // O site usa índice 0 para Segunda, a planilha usa coluna 1. Então: col - 1
+                                // Tenta achar o botão. Se ele não estiver na tela (pq é outro dia), ignora.
                                 const btnId = `slot-${col - 1}-${horaDaLinha}`;
                                 const btn = document.getElementById(btnId);
                                 if (btn) {
                                     btn.classList.add('busy');
-                                    btn.innerHTML = "Ocupado";
+                                    btn.innerHTML = `<span>Ocupado</span> <span>🔒</span>`;
                                     btn.title = "Reservado";
+                                    btn.onclick = null; // Remove o clique
                                 }
                             }
                         }
@@ -248,6 +289,8 @@
             }
         }
 
+        // Inicializa
+        renderizarAgenda();
         lerPlanilha();
 
         // --- TIMES ---
