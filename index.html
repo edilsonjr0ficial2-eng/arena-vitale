@@ -74,4 +74,229 @@
 
         .btn-main:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 30px
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.7);
+        }
+
+        /* --- MODALIDADES (Cards) --- */
+        .section { padding: 60px 20px; text-align: center; }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+        
+        .card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
+        
+        /* --- GERADOR DE TIMES --- */
+        .team-generator {
+            background-color: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+            border: 1px solid #333;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .teams-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #252525;
+            border-radius: 10px;
+            display: none; 
+            text-align: left;
+        }
+
+        .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
+        .team-box strong { color: var(--primary); font-size: 1.1rem; }
+
+        /* --- MAPA E LOCALIZAÇÃO --- */
+        .map-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .map-btn:hover { background: var(--primary); color: white; }
+
+        /* --- WHATSAPP FLUTUANTE --- */
+        .wa-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .wa-float img { width: 35px; height: 35px; }
+        .wa-float:hover { transform: scale(1.1); }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: black;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>Arena <span>Vitale</span></h1>
+        <p>A maior estrutura de Beach Tennis de Russas e região. Jogue, divirta-se e conecte-se.</p>
+        
+        <a href="https://wa.me/5588993127830?text=Olá,%20gostaria%20de%20agendar%20um%20horário!" class="btn-main">
+            📅 AGENDAR MEU HORÁRIO
+        </a>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Nossas Modalidades</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <h3>🎾 Beach Tennis</h3>
+                <p>Quadras oficiais com areia tratada e iluminação LED profissional.</p>
+            </div>
+            <div class="card">
+                <h3>🏐 Vôlei de Praia</h3>
+                <p>Espaço perfeito para reunir a galera e fazer aquele set disputado.</p>
+            </div>
+            <div class="card">
+                <h3>⚽ Futevôlei</h3>
+                <p>Treine suas habilidades ou jogue casualmente com amigos.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section" style="background-color: #161616;">
+        <h2 class="section-title">Gerador de Times ⚡</h2>
+        <p style="margin-bottom: 20px; color: #999;">Chega de briga para escolher as duplas!</p>
+        
+        <div class="team-generator">
+            <div class="input-group">
+                <label>Nome dos Jogadores (separe por vírgula):</label>
+                <input type="text" id="playerNames" placeholder="Ex: João, Maria, Pedro, Ana...">
+            </div>
+            
+            <button class="btn-main" style="width: 100%; font-size: 1rem;" onclick="gerarTimes()">
+                🎲 SORTEAR DUPLAS
+            </button>
+
+            <div id="resultArea" class="teams-result">
+                </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Onde Estamos</h2>
+        
+        <p style="font-size: 1.1rem; margin-bottom: 10px;">
+            📍 Av. Cel Antônio Cordeiro, N°2261<br>
+            Tabuleiro do Catavento, Russas - Ceará
+        </p>
+        
+        <a href="https://www.google.com/maps/search/?api=1&query=Av.+Cel+Antônio+Cordeiro,+2261,+Russas+Ceará" target="_blank" class="map-btn">
+            🗺️ Abrir no Google Maps
+        </a>
+    </div>
+
+    <footer>
+        <p>© 2026 Arena Vitale. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5588993127830" class="wa-float" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    </a>
+
+    <script>
+        function gerarTimes() {
+            const input = document.getElementById('playerNames').value;
+            const resultArea = document.getElementById('resultArea');
+            
+            if (!input.trim()) {
+                alert("Digite os nomes dos jogadores!");
+                return;
+            }
+
+            // Pega os nomes e mistura
+            let players = input.split(',').map(name => name.trim()).filter(name => name !== "");
+            
+            if (players.length < 2) {
+                alert("Precisa de pelo menos 2 jogadores!");
+                return;
+            }
+
+            // Algoritmo de embaralhar
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
+            }
+
+            let html = "";
+            let teamCount = 1;
+            
+            for (let i = 0; i < players.length; i += 2) {
+                let p1 = players[i];
+                let p2 = players[i+1] || "(Sozinho/Revezamento)";
+                
+                html += `<div class="team-box">
+                            <strong>Time ${teamCount}:</strong> ${p1} e ${p2}
+                         </div>`;
+                teamCount++;
+            }
+
+            resultArea.innerHTML = html;
+            resultArea.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
