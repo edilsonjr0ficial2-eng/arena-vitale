@@ -170,7 +170,7 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
-        // LINK DA SUA PLANILHA (MANTIDO)
+        // LINK DA SUA PLANILHA
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const whatsappNumber = "5588993127830";
         
@@ -208,7 +208,7 @@
             document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Recarrega agenda (limpa e busca de novo)
+            // Recarrega agenda
             renderizarAgenda();
             lerPlanilha();
         }
@@ -220,6 +220,8 @@
             if(btn) btn.classList.add('active');
             atualizarPrecoDisplay();
             renderizarAgenda(); 
+            // IMPORTANTE: Ler a planilha de novo para bloquear os horários
+            lerPlanilha();
         }
 
         function usarPersonalizado(valor) {
@@ -228,6 +230,7 @@
                 document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
                 atualizarPrecoDisplay();
                 renderizarAgenda();
+                lerPlanilha();
             }
         }
 
@@ -253,15 +256,17 @@
 
                 const btn = document.createElement('button');
                 btn.className = 'slot';
-                // ID agora depende só da hora/dia, o status de ocupado é pintado depois
+                // ID para controle interno
                 btn.id = `slot-${infoDia.index}-${h}`;
                 
                 let fim = h + duracaoSelecionada;
                 let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
                 let valorTotal = duracaoSelecionada * PRECO_HORA;
                 
+                // Texto padrão "Livre"
                 btn.innerHTML = `<span>Livre</span> <span>R$${valorTotal}</span>`; 
                 
+                // FUNÇÃO DE CLIQUE DO WHATSAPP
                 btn.onclick = () => {
                     let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
                     const msg = `Olá! Gostaria de agendar na Arena Vitale:\n🏟️ *${nomeQuadra}*\n🗓️ *${infoDia.texto}*\n⏰ *${h}:00 às ${horaFimTexto}*\n⏳ Duração: ${txtDuracao}\n💰 Valor: R$ ${valorTotal},00`;
@@ -276,29 +281,17 @@
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
 
-            // Remove todos os 'busy' antes de aplicar o novo filtro da quadra
-            document.querySelectorAll('.slot').forEach(el => {
-                el.classList.remove('busy');
-                // Restaura texto padrão
-                let valorTotal = duracaoSelecionada * PRECO_HORA;
-                el.innerHTML = `<span>Livre</span> <span>R$${valorTotal}</span>`;
-                el.onclick = function() { /* reativar clique (simplificado no render) */ };
-                // Como removemos o onclick no busy, melhor chamar renderizarAgenda() antes desse loop.
-                // Mas ok, o renderizarAgenda já rodou antes dessa funcao.
-            });
+            // AQUI ESTAVA O ERRO: Não precisamos "limpar" os botões aqui, pois o renderizarAgenda já fez isso.
+            // Apenas aplicamos o status 'busy' nos que estiverem ocupados.
 
             try {
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(','));
 
-                // LÓGICA DE COLUNAS DA PLANILHA
-                // Se Quadra 1 (Chicashoes): Colunas B a H (Indices 1 a 7)
-                // Se Quadra 2 (Panificadora): Colunas J a P (Indices 9 a 15)
-                
                 let colOffset = 0;
                 if (quadraSelecionada === 2) {
-                    colOffset = 8; // Pula 8 colunas para chegar no bloco da Quadra 2
+                    colOffset = 8; // Pula colunas se for a segunda quadra
                 }
 
                 rows.forEach((row, rowIndex) => {
@@ -306,9 +299,7 @@
                     const horaDaLinha = parseInt(row[0]); 
                     
                     if (!isNaN(horaDaLinha)) {
-                        // Varre os 7 dias da semana
                         for (let dia = 1; dia <= 7; dia++) {
-                            // Calcula a coluna real na planilha
                             let colunaReal = dia + colOffset; 
                             
                             let cellValue = row[colunaReal] ? row[colunaReal].replace(/[\r\n"]/g, '').trim() : "";
@@ -321,7 +312,7 @@
                                     btn.classList.add('busy');
                                     btn.innerHTML = `<span>Ocupado</span> <span>🔒</span>`;
                                     btn.title = "Reservado";
-                                    btn.onclick = null;
+                                    btn.onclick = null; // Remove o clique SÓ do botão ocupado
                                 }
                             }
                         }
