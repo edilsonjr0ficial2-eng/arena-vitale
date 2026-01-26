@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arena Vitale | Beach Sports</title>
+    <title>Arena Vitale | Beach Tennis</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,6 +11,7 @@
             --card-color: #1e1e1e;
             --primary: #ff9900;
             --text-color: #ffffff;
+            --gray: #b0b0b0;
             --free: #27ae60;
             --hover: #219150;
         }
@@ -18,7 +19,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
 
         /* HERO SECTION */
         .hero {
@@ -30,22 +36,26 @@
         }
         .hero h1 { font-size: 3.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         .hero h1 span { color: var(--primary); }
-        .hero p { font-size: 1.2rem; color: #b0b0b0; margin-bottom: 30px; max-width: 600px; }
+        .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
-        /* BOTÃO PRINCIPAL */
         .btn-main { background-color: var(--primary); color: white; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 153, 0, 0.4); }
         .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 153, 0, 0.7); }
 
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* --- SISTEMA DE AGENDA (Adicionado) --- */
+        /* --- AGENDA --- */
         .agenda-box { background: #1a1a1a; padding: 20px; border-radius: 15px; max-width: 900px; margin: auto; border: 1px solid #333; }
         
         .duration-selector { margin-bottom: 30px; }
         .duration-title { font-size: 1.1rem; color: #ccc; margin-bottom: 15px; }
-        .btn-duration { background: #333; color: white; border: 1px solid #555; padding: 10px 20px; margin: 5px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        
+        .btn-duration { background: #333; color: white; border: 1px solid #555; padding: 10px 25px; margin: 5px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; }
         .btn-duration.active { background: var(--primary); border-color: var(--primary); color: black; transform: scale(1.1); }
+        
+        /* Input customizado */
+        .custom-time-box { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .custom-input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #555; background: #222; color: white; text-align: center; font-weight: bold; }
 
         .schedule-wrapper { overflow-x: auto; padding-bottom: 10px; }
         .schedule-grid { display: grid; grid-template-columns: 50px repeat(7, minmax(90px, 1fr)); gap: 5px; min-width: 700px; }
@@ -56,15 +66,15 @@
         .slot { background-color: var(--free); color: white; border: none; padding: 12px 2px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; width: 100%; transition: 0.2s; }
         .slot:hover { background-color: var(--hover); transform: translateY(-2px); }
 
-        /* CARDS GERAIS */
+        /* CARDS */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
         .card:hover { transform: translateY(-10px); border-color: var(--primary); }
-        .card h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.5rem; }
-
+        .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
+        
         /* GERADOR DE TIMES */
         .team-generator { background-color: #1a1a1a; border-radius: 20px; padding: 30px; max-width: 500px; margin: auto; border: 1px solid #333; }
-        input { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; margin: 10px 0; }
+        input[type="text"] { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; margin: 10px 0; }
         .teams-result { margin-top: 20px; padding: 15px; background: #252525; border-radius: 10px; display: none; text-align: left; }
         .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
         .team-box strong { color: var(--primary); font-size: 1.1rem; }
@@ -74,18 +84,15 @@
         .map-btn:hover { background: var(--primary); color: white; }
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25d366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; }
         .wa-float:hover { transform: scale(1.1); }
-        footer { margin-top: 50px; padding: 20px; background-color: black; color: #777; font-size: 0.9rem; text-align: center;}
+        footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; }
     </style>
 </head>
 <body>
 
     <div class="hero">
         <h1>Arena <span>Vitale</span></h1>
-        <p>A maior estrutura de Beach Tennis de Russas e região.</p>
-        
-        <a href="#agenda-section" class="btn-main">
-            🔍 VERIFICAR HORÁRIOS
-        </a>
+        <p>A nova experiência do Beach Tennis de Russas e região. Jogue, divirta-se e conecte-se.</p>
+        <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
     </div>
 
     <div id="agenda-section" class="section">
@@ -93,10 +100,20 @@
         
         <div class="agenda-box">
             <div class="duration-selector">
-                <p class="duration-title">1. Quanto tempo você quer jogar?</p>
-                <button class="btn-duration active" onclick="setDuracao(1, this)">1 Hora</button>
-                <button class="btn-duration" onclick="setDuracao(1.5, this)">1h 30min</button>
-                <button class="btn-duration" onclick="setDuracao(2, this)">2 Horas</button>
+                <p class="duration-title">1. Quantas horas você quer jogar?</p>
+                
+                <div>
+                    <button class="btn-duration active" onclick="setDuracao(1, this)">1h</button>
+                    <button class="btn-duration" onclick="setDuracao(2, this)">2h</button>
+                    <button class="btn-duration" onclick="setDuracao(3, this)">3h</button>
+                    <button class="btn-duration" onclick="setDuracao(4, this)">4h</button>
+                </div>
+
+                <div class="custom-time-box">
+                    <label style="color:#ccc; font-size:0.9rem;">Ou digite:</label>
+                    <input type="number" id="customInput" class="custom-input" placeholder="0" oninput="usarPersonalizado(this.value)">
+                    <span style="color:#ccc;">horas</span>
+                </div>
             </div>
 
             <p class="duration-title">2. Escolha o horário de <strong style="color:var(--primary)">INÍCIO</strong>:</p>
@@ -110,9 +127,9 @@
     <div class="section">
         <h2 class="section-title">Nossas Modalidades</h2>
         <div class="grid-cards">
-            <div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada.</p></div>
-            <div class="card"><h3>🏐 Vôlei de Praia</h3><p>Espaço perfeito para o set disputado.</p></div>
-            <div class="card"><h3>⚽ Futevôlei</h3><p>Treine suas habilidades com amigos.</p></div>
+            <div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada e iluminação LED profissional.</p></div>
+            <div class="card"><h3>🏐 Vôlei de Praia</h3><p>Espaço perfeito para reunir a galera e fazer aquele set disputado.</p></div>
+            <div class="card"><h3>⚽ Futevôlei</h3><p>Treine suas habilidades ou jogue casualmente com amigos.</p></div>
         </div>
     </div>
 
@@ -128,32 +145,41 @@
 
     <div class="section">
         <h2 class="section-title">Onde Estamos</h2>
-        <p style="font-size: 1.1rem; margin-bottom: 10px;">📍 Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p>
+        <p style="font-size: 1.1rem; margin-bottom: 10px;">Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p>
         <a href="https://maps.app.goo.gl/9z1hF99WNx5mbjXq8" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a>
     </div>
 
     <footer><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
-    <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35"></a>
+    <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
         // --- LÓGICA DO AGENDAMENTO ---
         const whatsappNumber = "5588993127830";
-        let duracaoSelecionada = 1; // Padrão 1 hora
+        let duracaoSelecionada = 1; // Começa com 1h
         const dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
         const horas = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
-        // Atualiza a duração escolhida
+        // Função Botões Fixos (1h, 2h, 3h, 4h)
         function setDuracao(horas, btn) {
             duracaoSelecionada = horas;
+            document.getElementById('customInput').value = ""; // Limpa o campo manual
             document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            if(btn) btn.classList.add('active');
         }
 
-        // Gera a Grade de Horários
+        // Função Digitar Horas (Personalizado)
+        function usarPersonalizado(valor) {
+            if(valor && valor > 0) {
+                duracaoSelecionada = parseFloat(valor);
+                // Remove seleção dos botões
+                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
+            }
+        }
+
+        // Gera a Grade
         const grid = document.getElementById('grid');
-        grid.appendChild(document.createElement('div')); // Canto Vazio
+        grid.appendChild(document.createElement('div')); 
         
-        // Cabeçalho (Dias)
         dias.forEach(d => {
             const el = document.createElement('div');
             el.className = 'header-day';
@@ -161,7 +187,6 @@
             grid.appendChild(el);
         });
 
-        // Linhas (Horas)
         horas.forEach(h => {
             const label = document.createElement('div');
             label.className = 'time-label';
@@ -174,33 +199,6 @@
                 btn.innerHTML = `Livre`;
                 
                 btn.onclick = () => {
-                    let fim = h + duracaoSelecionada;
-                    let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
-                    let duracaoTexto = duracaoSelecionada === 1 ? "1 hora" : (duracaoSelecionada === 1.5 ? "1h 30min" : `${duracaoSelecionada} horas`);
-
-                    const msg = `Olá! Gostaria de agendar na Arena Vitale:\n🗓️ *${d}-feira*\n⏰ *${h}:00 às ${horaFimTexto}*\n⏳ Duração: ${duracaoTexto}`;
-                    
-                    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
-                };
-                grid.appendChild(btn);
-            });
-        });
-
-        // --- LÓGICA DO SORTEIO ---
-        function gerarTimes() {
-            const input = document.getElementById('playerNames').value;
-            const res = document.getElementById('resultArea');
-            if (!input.trim()) return alert("Digite nomes!");
-            let p = input.split(',').map(n => n.trim()).filter(n => n);
-            if (p.length < 2) return alert("Mínimo 2 jogadores!");
-            for (let i = p.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
-            let html = ""; let c = 1;
-            for (let i = 0; i < p.length; i += 2) {
-                let p2 = p[i+1] || "(Revezamento)";
-                html += `<div class="team-box"><strong>Time ${c++}:</strong> ${p[i]} e ${p2}</div>`;
-            }
-            res.innerHTML = html; res.style.display = "block";
-        }
-    </script>
-</body>
-</html>
+                    if(!duracaoSelecionada || duracaoSelecionada <= 0) {
+                        alert("Por favor, selecione quantas horas quer jogar primeiro.");
+                        return
