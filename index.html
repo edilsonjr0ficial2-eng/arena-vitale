@@ -3,217 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda - Arena Vitale</title>
+    <title>Arena Vitale | Beach Sports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #27ae60;
-            --busy: #e74c3c;
-            --light: #f4f4f4;
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --primary: #ff9900; /* Laranja Energético */
+            --text-color: #ffffff;
+            --gray: #b0b0b0;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f9f9f9;
-            color: #333;
-            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
         }
-        header {
+
+        /* --- HERO SECTION (Topo com Imagem) --- */
+        .hero {
+            height: 90vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); /* Foto de Beach Tennis */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .hero h1 span { color: var(--primary); }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .btn-main {
             background-color: var(--primary);
             color: white;
-            padding: 20px 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
         }
-        h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
-        .subtitle { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.7);
+        }
+
+        /* --- MODALIDADES (Cards) --- */
+        .section { padding: 60px 20px; text-align: center; }
         
-        /* Container da Agenda */
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .dot { height: 12px; width: 12px; display: inline-block; border-radius: 50%; margin-right: 5px; }
-        .green { background-color: var(--accent); }
-        .red { background-color: var(--busy); }
-
-        /* Grid da Agenda */
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: 60px repeat(7, 1fr); /* Coluna hora + 7 dias */
-            gap: 5px;
-            overflow-x: auto; /* Rolagem no celular */
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
             padding-bottom: 10px;
         }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
         
-        /* Cabeçalho dos Dias */
-        .day-header {
-            font-weight: bold;
-            background-color: var(--primary);
-            color: white;
-            padding: 10px 5px;
-            border-radius: 4px;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-        .empty-corner { background: transparent; }
-
-        /* Células de Hora */
-        .time-label {
-            font-size: 12px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        /* Botões de Agendamento */
-        .slot {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 2px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            transition: 0.2s;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .slot:hover { transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
         
-        /* Estilo Ocupado */
-        .slot.busy {
-            background-color: var(--busy);
-            cursor: not-allowed;
-            opacity: 0.6;
+        /* --- GERADOR DE TIMES (Igual ao site referência) --- */
+        .team-generator {
+            background-color: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+            border: 1px solid #333;
         }
-        .slot.busy:hover { transform: none; box-shadow: none; }
 
-        /* Rodapé */
-        .footer { margin-top: 30px; font-size: 12px; color: #888; padding-bottom: 20px; }
-        .whatsapp-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #25d366;
+        .input-group { margin-bottom: 15px; }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #444;
             color: white;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .teams-result {
+            margin-top: 20px;
             padding: 15px;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-decoration: none;
-            font-weight: bold;
+            background: #252525;
+            border-radius: 10px;
+            display: none; /* Escondido até gerar */
+            text-align: left;
         }
 
-        /* Ajuste Mobile */
-        @media (max-width: 600px) {
-            .schedule-grid {
-                grid-template-columns: 50px repeat(7, 100px); /* Dias mais largos no mobile para caber */
-            }
-            .container { margin: 10px; }
+        .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
+        .team-box strong { color: var(--primary); font-size: 1.1rem; }
+
+        /* --- WHATSAPP FLUTUANTE --- */
+        .wa-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            text-decoration: none;
+            transition: 0.3s;
         }
+        .wa-float img { width: 35px; height: 35px; }
+        .wa-float:hover { transform: scale(1.1); }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: black;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>ARENA VITALE 🎾</h1>
-        <div class="subtitle">Toque no horário para reservar</div>
-    </header>
+    <div class="hero">
+        <h1>Arena <span>Vitale</span></h1>
+        <p>A maior estrutura de Beach Tennis da região chegou. Jogue, divirta-se e conecte-se.</p>
+        
+        <a href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20agendar%20um%20horário!" class="btn-main">
+            📅 AGENDAR MEU HORÁRIO
+        </a>
+    </div>
 
-    <div class="container">
-        <div class="legend">
-            <span><span class="dot green"></span>Livre</span>
-            <span><span class="dot red"></span>Ocupado/Reservado</span>
-        </div>
-
-        <div class="schedule-grid" id="grid">
+    <div class="section">
+        <h2 class="section-title">Nossas Modalidades</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <h3>🎾 Beach Tennis</h3>
+                <p>Quadras oficiais com areia tratada e iluminação LED profissional.</p>
             </div>
+            <div class="card">
+                <h3>🏐 Vôlei de Praia</h3>
+                <p>Espaço perfeito para reunir a galera e fazer aquele set disputado.</p>
+            </div>
+            <div class="card">
+                <h3>⚽ Futevôlei</h3>
+                <p>Treine suas habilidades ou jogue casualmente com amigos.</p>
+            </div>
+        </div>
     </div>
 
-    <div class="footer">
-        <p>Arena Vitale - Beach Tennis & Lifestyle</p>
+    <div class="section" style="background-color: #161616;">
+        <h2 class="section-title">Gerador de Times ⚡</h2>
+        <p style="margin-bottom: 20px; color: #999;">Chega de briga para escolher as duplas!</p>
+        
+        <div class="team-generator">
+            <div class="input-group">
+                <label>Nome dos Jogadores (separe por vírgula):</label>
+                <input type="text" id="playerNames" placeholder="Ex: João, Maria, Pedro, Ana...">
+            </div>
+            
+            <button class="btn-main" style="width: 100%; font-size: 1rem;" onclick="gerarTimes()">
+                🎲 SORTEAR DUPLAS
+            </button>
+
+            <div id="resultArea" class="teams-result">
+                </div>
+        </div>
     </div>
+
+    <div class="section">
+        <h2 class="section-title">Onde Estamos</h2>
+        <p>Rua Exemplo, 123 - Centro (Ao lado do Shopping)</p>
+        <div style="margin-top: 20px; opacity: 0.7;">
+            <img src="https://via.placeholder.com/800x300/333/666?text=MAPA+DA+ARENA+VITALE" style="width: 100%; border-radius: 10px;">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Arena Vitale. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5511999999999" class="wa-float" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    </a>
 
     <script>
-        // --- SEU PAINEL DE CONTROLE MANUAL ---
-        // Para bloquear um horário, adicione na lista abaixo seguindo o exemplo: "DIA-HORA"
-        // Dias: seg, ter, qua, qui, sex, sab, dom
-        // Horas: apenas o número (ex: 18, 19, 20)
-        
-        const horariosOcupados = [
-            "seg-18", "seg-19",      // Segunda ocupada às 18h e 19h
-            "qua-20",                // Quarta ocupada às 20h
-            "sex-19", "sex-20",      // Sexta bombando
-            "sab-09", "sab-10"       // Sábado de manhã cheio
-        ];
+        function gerarTimes() {
+            const input = document.getElementById('playerNames').value;
+            const resultArea = document.getElementById('resultArea');
+            
+            if (!input.trim()) {
+                alert("Digite os nomes dos jogadores!");
+                return;
+            }
 
-        // Configurações
-        const diasSemana = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
-        const nomesDias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-        const horaInicio = 7;  // Abre às 07h
-        const horaFim = 22;    // Fecha às 22h
-        const telefoneWhatsApp = "5511999999999"; // COLOQUE SEU NÚMERO AQUI
+            // Pega os nomes e mistura (embaralha)
+            let players = input.split(',').map(name => name.trim()).filter(name => name !== "");
+            
+            if (players.length < 2) {
+                alert("Precisa de pelo menos 2 jogadores!");
+                return;
+            }
 
-        const grid = document.getElementById('grid');
+            // Algoritmo de embaralhar (Fisher-Yates)
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
+            }
 
-        // 1. Criar Cabeçalho (Dias)
-        const emptyCorner = document.createElement('div');
-        emptyCorner.className = 'empty-corner';
-        grid.appendChild(emptyCorner);
-
-        nomesDias.forEach(dia => {
-            const header = document.createElement('div');
-            header.className = 'day-header';
-            header.innerText = dia;
-            grid.appendChild(header);
-        });
-
-        // 2. Criar as Linhas de Horário
-        for (let hora = horaInicio; hora <= horaFim; hora++) {
-            // Coluna da Hora
-            const label = document.createElement('div');
-            label.className = 'time-label';
-            label.innerText = `${hora}:00`;
-            grid.appendChild(label);
-
-            // Células dos Dias
-            diasSemana.forEach((diaKey, index) => {
-                const btn = document.createElement('button');
-                const idSlot = `${diaKey}-${hora}`;
+            // Monta o HTML do resultado
+            let html = "";
+            let teamCount = 1;
+            
+            // Cria duplas
+            for (let i = 0; i < players.length; i += 2) {
+                let p1 = players[i];
+                let p2 = players[i+1] || "(Sozinho/Revezamento)";
                 
-                // Verifica se está ocupado
-                if (horariosOcupados.includes(idSlot)) {
-                    btn.className = 'slot busy';
-                    btn.innerText = "X";
-                    btn.disabled = true;
-                } else {
-                    btn.className = 'slot';
-                    btn.innerText = "Livre";
-                    
-                    // Ação de Clique
-                    btn.onclick = function() {
-                        const texto = `Olá! Gostaria de agendar na Arena Vitale: ${nomesDias[index]}-feira às ${hora}:00.`;
-                        const link = `https://wa.me/${telefoneWhatsApp}?text=${encodeURIComponent(texto)}`;
-                        window.open(link, '_blank');
-                    };
-                }
-                grid.appendChild(btn);
-            });
+                html += `<div class="team-box">
+                            <strong>Time ${teamCount}:</strong> ${p1} e ${p2}
+                         </div>`;
+                teamCount++;
+            }
+
+            resultArea.innerHTML = html;
+            resultArea.style.display = "block";
         }
     </script>
 
