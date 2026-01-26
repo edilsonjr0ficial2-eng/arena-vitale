@@ -63,25 +63,34 @@
         .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
         .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
 
-        /* MODAL CADASTRO (NOVO) */
+        /* MODAL CADASTRO */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: #1e1e1e; padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 1px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-        
         .form-group { margin-bottom: 10px; }
         .form-group label { font-size: 0.9rem; color: #ccc; display: block; margin-bottom: 5px; }
         .modal-content input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; }
-        
-        /* Box de Termos */
         .terms-box { background: #111; padding: 10px; border: 1px solid #444; border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #aaa; line-height: 1.4; }
         .terms-box strong { color: #fff; }
-        
         .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
         .checkbox-container input { width: auto; }
-
         .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .btn-cancel { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
         .btn-confirm { background: var(--free); color: white; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
+
+        /* PLACAR VIRTUAL (NOVO CSS) */
+        .scoreboard-container { background: #1a1a1a; padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 1px solid #333; position: relative; }
+        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .team-score { flex: 1; text-align: center; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; }
+        .team-score input { width: 100%; background: transparent; border: none; color: white; text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
+        .btn-point { background: #333; color: white; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+        .btn-point:hover { background: var(--primary); color: black; border-color: var(--primary); }
+        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+        .games-count { font-size: 1.5rem; color: white; font-weight: bold; }
+        .reset-btn { margin-top: 20px; background: transparent; border: 1px solid #c0392b; color: #c0392b; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .reset-btn:hover { background: #c0392b; color: white; }
 
         /* RESTANTE */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
@@ -107,6 +116,37 @@
         <h1>Arena <span>Vitale</span></h1>
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
+    </div>
+
+    <div class="section" style="background-color: #161616;">
+        <h2 class="section-title">Placar Virtual ⚡</h2>
+        <div class="scoreboard-container">
+            <div class="mode-switch">
+                <button class="btn-duration active" onclick="mudarModo('beach')" id="btnBeach">Beach Tennis</button>
+                <button class="btn-duration" onclick="mudarModo('volei')" id="btnVolei">Vôlei / Fute</button>
+            </div>
+
+            <div class="score-box">
+                <div class="team-score">
+                    <input type="text" value="Dupla A">
+                    <div class="points-display" id="scoreA" onclick="addPonto('A')">0</div>
+                    <button class="btn-point" onclick="addPonto('A')">+</button>
+                    <div class="games-display">Games: <span class="games-count" id="gameA">0</span></div>
+                </div>
+
+                <div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div>
+
+                <div class="team-score">
+                    <input type="text" value="Dupla B">
+                    <div class="points-display" id="scoreB" onclick="addPonto('B')">0</div>
+                    <button class="btn-point" onclick="addPonto('B')">+</button>
+                    <div class="games-display">Games: <span class="games-count" id="gameB">0</span></div>
+                </div>
+            </div>
+            
+            <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
+        </div>
+        <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
     </div>
 
     <div id="agenda-section" class="section">
@@ -240,14 +280,86 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
+        // CONFIGURAÇÕES
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const whatsappNumber = "5588993127830";
         const PRECO_HORA = 50; 
         
+        // --- LOGICA PLACAR ---
+        let modoJogo = 'beach'; // 'beach' ou 'volei'
+        let pA = 0, pB = 0; // Pontos (índice ou número)
+        let gA = 0, gB = 0; // Games/Sets
+        
+        // Pontuação Beach: 0 -> 15 -> 30 -> 40 -> GAME
+        const beachPoints = [0, 15, 30, 40];
+
+        function mudarModo(modo) {
+            modoJogo = modo;
+            document.getElementById('btnBeach').classList.remove('active');
+            document.getElementById('btnVolei').classList.remove('active');
+            
+            if(modo === 'beach') {
+                document.getElementById('btnBeach').classList.add('active');
+            } else {
+                document.getElementById('btnVolei').classList.add('active');
+            }
+            zerarPlacar();
+        }
+
+        function addPonto(time) {
+            if(modoJogo === 'beach') {
+                // Lógica Beach Tennis
+                if(time === 'A') {
+                    if(pA < 3) {
+                        pA++;
+                    } else {
+                        // Ganhou o game
+                        gA++;
+                        pA = 0; pB = 0;
+                    }
+                } else {
+                    if(pB < 3) {
+                        pB++;
+                    } else {
+                        // Ganhou o game
+                        gB++;
+                        pA = 0; pB = 0;
+                    }
+                }
+                atualizarTelaBeach();
+
+            } else {
+                // Lógica Vôlei (Pontos corridos)
+                if(time === 'A') gA++; // Aqui usamos o contador de games como pontos diretos
+                else gB++;
+                
+                document.getElementById('scoreA').innerText = gA;
+                document.getElementById('scoreB').innerText = gB;
+                document.getElementById('gameA').innerText = "-"; // Sem games no volei, so sets (simplificado)
+                document.getElementById('gameB').innerText = "-";
+            }
+        }
+
+        function atualizarTelaBeach() {
+            document.getElementById('scoreA').innerText = beachPoints[pA];
+            document.getElementById('scoreB').innerText = beachPoints[pB];
+            document.getElementById('gameA').innerText = gA;
+            document.getElementById('gameB').innerText = gB;
+        }
+
+        function zerarPlacar() {
+            pA = 0; pB = 0; gA = 0; gB = 0;
+            if(modoJogo === 'beach') atualizarTelaBeach();
+            else {
+                document.getElementById('scoreA').innerText = 0;
+                document.getElementById('scoreB').innerText = 0;
+            }
+        }
+
+        // --- LÓGICA AGENDA ---
         let duracaoSelecionada = 1; 
         let quadraSelecionada = 1; 
         let nomeQuadra = "Quadra Chicashoes";
-        // Agora armazena objetos: { hora: 8, nome: "João" }
         let horariosOcupadosDoDia = [];
         let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
         
@@ -299,7 +411,6 @@
             carregarDadosDoDia();
         }
 
-        // --- FUNÇÕES DO MODAL ---
         function abrirModal(hora, fim, infoDia, valor) {
             tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor;
             document.getElementById('modalCadastro').style.display = 'flex';
@@ -327,8 +438,6 @@
             }
 
             let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
-            
-            // FORMATA A DATA DE NASCIMENTO (YYYY-MM-DD para DD/MM/YYYY)
             let nascParts = nascimento.split('-');
             let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
 
@@ -348,12 +457,10 @@
             fecharModal();
         }
 
-        // --- LÓGICA DA PLANILHA (NOMES) ---
         async function carregarDadosDoDia() {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
             document.getElementById('grid').innerHTML = ''; 
-
             const infoDia = formatarDataHeader(dataVisualizada);
             document.getElementById('dateDisplay').innerText = infoDia.texto;
 
@@ -365,7 +472,7 @@
                 let colOffset = 0;
                 if (quadraSelecionada === 2) colOffset = 8; 
 
-                horariosOcupadosDoDia = []; // Reseta a lista
+                horariosOcupadosDoDia = [];
 
                 rows.forEach((row, rowIndex) => {
                     if (rowIndex === 0) return; 
@@ -377,7 +484,6 @@
                         let cellValue = row[colunaReal] ? row[colunaReal].replace(/[\r\n"]/g, '').trim() : "";
                         
                         if (cellValue.length > 0) {
-                            // GUARDA O NOME DA PESSOA OU O CÓDIGO (X)
                             horariosOcupadosDoDia.push({
                                 hora: horaDaLinha,
                                 nome: cellValue
@@ -410,27 +516,20 @@
                 
                 let estaOcupado = false;
                 let motivo = "";
-                let nomeNoHorario = "Ocupado"; // Padrão
-                
+                let nomeNoHorario = "Ocupado";
                 let blocosNecessarios = Math.ceil(duracaoSelecionada);
                 
                 for (let i = 0; i < blocosNecessarios; i++) {
-                    // Procura se esse horário está na lista de ocupados
                     let ocupacao = horariosOcupadosDoDia.find(item => item.hora === (h + i));
-                    
                     if (ocupacao) {
                         estaOcupado = true;
-                        
-                        // Se for a hora exata de inicio, pega o nome
                         if ((h + i) === h) {
                             motivo = "busy";
-                            // Se na planilha estiver 'x', 'X' ou 'ok', mostra "Ocupado"
-                            // Se tiver um nome (Ex: João), mostra "João"
                             let nomeLimpo = ocupacao.nome.toLowerCase();
                             if(nomeLimpo === 'x' || nomeLimpo === 'ok' || nomeLimpo === 'ocupado') {
                                 nomeNoHorario = "Ocupado";
                             } else {
-                                nomeNoHorario = ocupacao.nome; // Mostra o nome real (Ex: João)
+                                nomeNoHorario = ocupacao.nome;
                             }
                         } else {
                             motivo = "conflict";
@@ -442,7 +541,6 @@
                 if (estaOcupado) {
                     if (motivo === "busy") {
                         btn.className = 'slot busy';
-                        // AQUI MOSTRA O NOME
                         btn.innerHTML = `<span>${nomeNoHorario}</span> <span>🔒</span>`;
                     } else {
                         btn.className = 'slot partial';
@@ -452,9 +550,7 @@
                     let fim = h + duracaoSelecionada;
                     let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
                     let valorTotal = duracaoSelecionada * PRECO_HORA;
-                    
                     btn.innerHTML = `<span>Livre</span> <span>R$${valorTotal}</span>`; 
-                    
                     btn.onclick = () => {
                         abrirModal(h, horaFimTexto, infoDia.texto, valorTotal);
                     };
