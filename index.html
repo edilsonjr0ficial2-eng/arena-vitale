@@ -8,30 +8,35 @@
     <style>
         /* --- PALETA DE CORES PRETO E AMARELO --- */
         :root {
-            --bg-color: #000000;      /* Fundo Preto Puro */
-            --card-color: #111111;    /* Cartões Quase Preto */
-            --primary: #FFD700;       /* Amarelo Vibrante (Gold) */
-            --text-color: #ffffff;    /* Texto Branco */
-            --gray: #b0b0b0;          /* Texto Cinza Claro */
+            --bg-color: #000000;
+            --card-color: #111111;
+            --primary: #FFD700;
+            --text-color: #ffffff;
+            --gray: #b0b0b0;
             
-            /* Estados */
-            --free: #FFD700;          /* Livre agora é AMARELO */
-            --busy: #333333;          /* Ocupado agora é Cinza Escuro */
-            --partial: #555555;       /* Indisponível Cinza Médio */
-            --hover: #E6C300;         /* Amarelo um pouco mais escuro para hover */
+            --free: #FFD700;
+            --busy: #333333;
+            --partial: #555555;
+            --hover: #E6C300;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
-        /* HERO */
-        .hero { height: 90vh; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        /* HERO - FOTO DE FUNDO PRINCIPAL */
+        /* Para mudar a foto de fundo, troque o link dentro de url('') */
+        .hero { 
+            height: 90vh; 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
+                        url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); 
+            background-size: cover; background-position: center; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
+        }
         .hero h1 { font-size: 3.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         .hero h1 span { color: var(--primary); }
         .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
-        /* Botão Principal (Amarelo com texto Preto) */
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
         .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); background-color: var(--hover); }
 
@@ -60,23 +65,43 @@
 
         .price-display { margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: var(--primary); background: #222; padding: 10px; border-radius: 8px; border: 1px solid var(--primary); display: block; }
 
-        /* MENU DE HORÁRIOS */
         .time-selector-container { margin-top: 20px; text-align: left; }
         .time-select { width: 100%; padding: 15px; font-size: 1rem; background: #222; color: white; border: 1px solid #555; border-radius: 10px; margin-top: 5px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23FFD700" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px top 50%; }
         .time-select:focus { border-color: var(--primary); outline: none; }
         .time-select option { background: #1a1a1a; color: white; padding: 10px; }
-        /* Estilo para opções desabilitadas no select */
         .time-select option:disabled { color: var(--primary); background: var(--busy); font-style: italic; opacity: 0.7; }
 
-        /* BOTÃO AGENDAR FINAL (Agora Amarelo) */
         .btn-agendar-final { margin-top: 20px; background: var(--primary); color: black; padding: 15px; width: 100%; font-weight: 900; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
         .btn-agendar-final:hover { transform: scale(1.02); background: var(--hover); }
+
+        /* GALERIA DE FOTOS (NOVO) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        .gallery-item {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+            filter: grayscale(30%);
+        }
+        .gallery-item:hover {
+            filter: grayscale(0%);
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
 
         /* PARCEIROS */
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
         .partner-link { text-decoration: none; display: inline-block; }
         .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
-        .partner-logo:hover { filter: grayscale(0%) sepia(1) hue-rotate(5deg) saturate(500%); /* Efeito amarelado no hover */ opacity: 1; transform: scale(1.1); }
+        .partner-logo:hover { filter: grayscale(0%) sepia(1) hue-rotate(5deg) saturate(500%); opacity: 1; transform: scale(1.1); }
 
         /* MODAL CADASTRO */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
@@ -113,24 +138,17 @@
         .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
         .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
         .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
-        
-        /* Seções com fundo diferenciado (Agora usando a var card-color) */
         .section-dark { background-color: var(--card-color); }
-
         .team-generator { background-color: #222; border-radius: 20px; padding: 30px; max-width: 500px; margin: auto; border: 1px solid #444; }
         input[type="text"] { width: 100%; padding: 12px; background: #333; border: 1px solid #555; color: white; border-radius: 8px; margin: 10px 0; }
         input[type="text"]:focus { border-color: var(--primary); outline: none; }
         .teams-result { margin-top: 20px; padding: 15px; background: #333; border-radius: 10px; display: none; text-align: left; border: 1px solid var(--primary); }
         .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
         .team-box strong { color: var(--primary); font-size: 1.1rem; }
-        
         .map-btn { margin-top: 15px; padding: 10px 20px; border: 2px solid var(--primary); color: var(--primary); text-decoration: none; border-radius: 8px; display: inline-block; transition: 0.3s; font-weight: bold; }
         .map-btn:hover { background: var(--primary); color: black; }
-        
-        /* WhatsApp Amarelo */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: var(--primary); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; }
         .wa-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-        
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
     </style>
@@ -247,6 +265,16 @@
         </div>
     </div>
 
+    <div class="section">
+        <h2 class="section-title">Conheça a Arena</h2>
+        <div class="gallery-grid">
+            <img src="foto1.jpg" alt="Arena Vitale" class="gallery-item">
+            <img src="foto2.jpg" alt="Quadra de Beach Tennis" class="gallery-item">
+            <img src="foto3.jpg" alt="Lounge" class="gallery-item">
+            <img src="foto4.jpg" alt="Iluminação Noturna" class="gallery-item">
+        </div>
+    </div>
+
     <div class="section section-dark">
         <h2 class="section-title">Gerador de Times ⚡</h2>
         <div class="team-generator">
@@ -307,7 +335,7 @@
                 <img src="vitale.jpg" alt="Arena Vitale" class="partner-logo">
             </a>
             <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link">
-                <img src="https://placehold.co/150x80/222/fff?text=PARCEIRO+4" alt="Parceiro 4" class="partner-logo">
+                <img src="foto4.jpg" alt="Parceiro 4" class="partner-logo">
             </a>
         </div>
     </div>
