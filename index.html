@@ -205,7 +205,16 @@
             </div>
 
             <div class="time-selector-container">
-                <p class="duration-title" style="color:white;">2. Selecione um horário disponível:</p>
+                <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
+                <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
+                    <option value="45" selected>Pix - R$ 45,00/h</option>
+                    <option value="40">Espécie - R$ 40,00/h</option>
+                    <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
+                </select>
+            </div>
+
+            <div class="time-selector-container">
+                <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
                 
                 <div id="loading" class="loading-msg">Carregando disponibilidade...</div>
                 
@@ -308,9 +317,7 @@
                     <button class="btn-point" onclick="addPonto('A')">+</button>
                     <div class="games-display">Games: <span class="games-count" id="gameA">0</span></div>
                 </div>
-
                 <div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div>
-
                 <div class="team-score">
                     <input type="text" value="Dupla B">
                     <div class="points-display" id="scoreB" onclick="addPonto('B')">0</div>
@@ -318,7 +325,6 @@
                     <div class="games-display">Games: <span class="games-count" id="gameB">0</span></div>
                 </div>
             </div>
-            
             <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
         </div>
         <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
@@ -369,9 +375,10 @@
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        const SCRIPT_URL = "COLE_AQUI_A_URL_DO_APP_DA_WEB_QUE_VOCE_CRIOU"; // Link do Google Apps Script
+        const SCRIPT_URL = "COLE_AQUI_A_URL_DO_APP_DA_WEB_QUE_VOCE_CRIOU"; 
         const whatsappNumber = "5588993127830";
-        const PRECO_HORA = 45; // AJUSTADO PARA 45
+        let PRECO_HORA = 45; // Inicial com Pix
+        let nomePagamento = "Pix";
         
         let duracaoSelecionada = 1; 
         let quadraSelecionada = 1; 
@@ -380,7 +387,7 @@
         let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
         
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-        const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]; // AJUSTADO 7h as 23h
+        const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
         let dataVisualizada = new Date(); 
 
         // --- PLACAR ---
@@ -401,11 +408,9 @@
         function addPonto(time) {
             if(modoJogo === 'beach') {
                 if(time === 'A') {
-                    if(pA < 3) pA++;
-                    else { gA++; pA = 0; pB = 0; }
+                    if(pA < 3) pA++; else { gA++; pA = 0; pB = 0; }
                 } else {
-                    if(pB < 3) pB++;
-                    else { gB++; pA = 0; pB = 0; }
+                    if(pB < 3) pB++; else { gB++; pA = 0; pB = 0; }
                 }
                 atualizarTelaBeach();
             } else {
@@ -442,9 +447,18 @@
             return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex };
         }
 
+        // ATUALIZADA PARA O NOVO SISTEMA DE PREÇO
         function atualizarPrecoDisplay() {
             const total = duracaoSelecionada * PRECO_HORA;
             document.getElementById('priceDisplay').innerText = `Valor: R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        // NOVA FUNÇÃO DE PAGAMENTO
+        function mudarPagamento() {
+            const select = document.getElementById('selectPagamento');
+            PRECO_HORA = parseInt(select.value); // Atualiza o preço global
+            nomePagamento = select.options[select.selectedIndex].text.split(' - ')[0]; // Pega só o nome (ex: Pix)
+            atualizarPrecoDisplay();
         }
 
         function mudarQuadra(id, btn) {
@@ -461,7 +475,7 @@
             document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
             atualizarPrecoDisplay();
-            carregarDadosDoDia(); // Recarrega o menu para validar novas durações
+            carregarDadosDoDia(); 
         }
 
         function usarPersonalizado(valor) {
@@ -532,7 +546,6 @@
                 let valor = h;
                 let disabled = false;
 
-                // Verificação de Ocupado/Conflito
                 let estaOcupado = false;
                 let motivo = "";
                 let nomeNoHorario = "";
@@ -619,7 +632,6 @@
                 return;
             }
 
-            // Envia para o Google Sheets (se configurado)
             if(SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 const dados = { nome: nomeCompleto, sobrenome: "", telefone: telefone };
                 fetch(SCRIPT_URL, {
@@ -633,6 +645,7 @@
             let nascParts = nascimento.split('-');
             let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
 
+            // Inclui a forma de pagamento na mensagem
             const msg = `*NOVO PEDIDO DE AGENDAMENTO*\n` +
                         `👤 *Cliente:* ${nomeCompleto}\n` +
                         `🎂 *Nasc:* ${nascFormatada}\n` +
@@ -643,9 +656,9 @@
                         `🗓️ *${tempInfoDia}*\n` +
                         `⏰ *${tempHora}:00 às ${tempFim}*\n` +
                         `⏳ Duração: ${txtDuracao}\n` +
-                        `💰 Valor: R$ ${tempValor},00`;
+                        `💰 Pagamento: ${nomePagamento}\n` +
+                        `💵 Valor Total: R$ ${tempValor},00`;
 
-            // CORREÇÃO EMOJIS: Usando api.whatsapp.com em vez de wa.me
             window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
             fecharModal();
         }
