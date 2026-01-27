@@ -24,17 +24,29 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
-        /* HERO - FOTO DE FUNDO PRINCIPAL */
-        /* Para mudar a foto de fundo, troque o link dentro de url('') */
+        /* HERO - FUNDO + LOGO */
         .hero { 
             height: 90vh; 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
+            /* AQUI É A IMAGEM DE FUNDO (ATRÁS DA LOGO) */
+            /* Você pode trocar esse link do unsplash pela sua própria foto de fundo se quiser (ex: url('fundo-arena.jpg')) */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), 
                         url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); 
             background-size: cover; background-position: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
         }
-        .hero h1 { font-size: 3.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .hero h1 span { color: var(--primary); }
+        
+        /* ESTILO DA LOGO NOVA */
+        .hero-logo {
+            max-width: 800px; /* Tamanho máximo no computador */
+            width: 90%;       /* Ocupa 90% da tela no celular */
+            height: auto;
+            margin-bottom: 20px;
+            /* Filtro opcional: Se a logo for preta e não aparecer no fundo escuro, 
+               podemos inverter as cores ou adicionar brilho. 
+               Como sua logo parece ter amarelo e preto, vou deixar sem filtro por enquanto. */
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); /* Sombra para destacar do fundo */
+        }
+
         .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
@@ -74,28 +86,10 @@
         .btn-agendar-final { margin-top: 20px; background: var(--primary); color: black; padding: 15px; width: 100%; font-weight: 900; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
         .btn-agendar-final:hover { transform: scale(1.02); background: var(--hover); }
 
-        /* GALERIA DE FOTOS (NOVO) */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            max-width: 1000px;
-            margin: auto;
-        }
-        .gallery-item {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            transition: 0.3s;
-            filter: grayscale(30%);
-        }
-        .gallery-item:hover {
-            filter: grayscale(0%);
-            border-color: var(--primary);
-            transform: scale(1.02);
-        }
+        /* GALERIA DE FOTOS */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
+        .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
+        .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
 
         /* PARCEIROS */
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
@@ -156,7 +150,8 @@
 <body>
 
     <div class="hero">
-        <h1>Arena <span>Vitale</span></h1>
+        <img src="logo-arena.png" alt="Arena Vitale" class="hero-logo">
+        
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
     </div>
