@@ -200,16 +200,15 @@
                     <span style="color:#777;">h</span>
                 </div>
                 <div id="priceDisplay" class="price-display">
-                    Valor: R$ 40,00
+                    Valor: R$ 45,00
                 </div>
             </div>
 
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
-                    <option value="40" selected>Espécie - R$ 40,00/h</option>
-                    <option value="45">Pix - R$ 45,00/h</option>
-                    <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
+                    <option value="45" selected>Espécie / Pix - R$ 45,00/h</option>
+                    <option value="48">Cartão (Crédito/Débito) - R$ 48,00/h</option>
                 </select>
             </div>
 
@@ -249,10 +248,10 @@
             </div>
 
             <div class="terms-box">
-                ⚠️ <strong>Política de Cancelamento:</strong><br>
-                • Cancelamentos com até <strong>4h de antecedência</strong> são gratuitos.<br>
-                • Cancelamentos dentro dessas 4h terão multa de <strong>R$ 10,00</strong> por hora marcada.<br>
-                • O tempo conta a partir da hora agendada. Atrasos não estendem o horário final.
+                ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
+                • Cancelamentos realizados com até <strong>3 (três) horas</strong> de antecedência do horário agendado não sofrerão cobrança adicional.<br><br>
+                • Cancelamentos efetuados com <strong>menos de 3 (três) horas</strong> de antecedência implicarão na cobrança de <strong>50%</strong> (cinquenta por cento) do valor referente ao tempo reservado.<br><br>
+                • Esta política tem como objetivo garantir a organização da agenda e a disponibilidade das quadras para todos os atletas.
             </div>
 
             <div class="checkbox-container">
@@ -356,23 +355,23 @@
         <div style="max-width: 600px; margin: auto; text-align: left;">
             <details class="faq-item">
                 <summary>Preciso levar minha própria raquete?</summary>
-                <p>Não necessariamente! A Arena Vitale disponibiliza raquetes gratuitamente para os jogadores. Mas se você já tiver a sua, pode trazer!</p>
+                <p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong> para os jogadores. Mas se você já tiver a sua, pode trazer!</p>
             </details>
             <details class="faq-item">
                 <summary>Qual a antecedência para cancelar?</summary>
-                <p>Cancelamentos gratuitos devem ser feitos com até <strong>4 horas</strong> de antecedência. Após esse prazo, cobramos taxa de R$ 10,00.</p>
+                <p>Cancelamentos gratuitos devem ser feitos com até <strong>3 horas</strong> de antecedência. Após esse prazo, cobramos taxa de 50%.</p>
             </details>
             <details class="faq-item">
                 <summary>Quais as formas de pagamentos aceitamos?</summary>
-                <p>Aceitamos pagamentos em Espécie, Pix e Cartão de Crédito/Débito.</p>
+                <p>Aceitamos: Espécie, Pix e Cartão de Crédito/Débito.</p>
             </details>
             <details class="faq-item">
                 <summary>Funciona em dias de chuva?</summary>
-                <p>Sim! Como a Arena Vitale é totalmente coberta, as atividades acontecem normalmente mesmo em dias de chuva.</p>
+                <p>Sim! Como a Arena Vitale é <strong>totalmente coberta</strong>, as atividades acontecem normalmente mesmo em dias de chuva.</p>
             </details>
             <details class="faq-item">
                 <summary>Por que há diferença nos valores conforme a forma de pagamento?</summary>
-                <p>A diferença está de acordo com a Lei nº 13.455/2017, que permite a variação de preços conforme a forma de pagamento escolhida. Assim, os valores podem mudar dependendo se o pagamento é feito em espécie, via Pix ou no cartão.</p>
+                <p>A diferença está de acordo com a <strong>Lei nº 13.455/2017</strong>, que permite a variação de preços conforme a forma de pagamento escolhida. Assim, os valores podem mudar dependendo se o pagamento é feito em espécie, via Pix ou no cartão.</p>
             </details>
         </div>
     </div>
@@ -384,8 +383,8 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const SCRIPT_URL = "COLE_AQUI_A_URL_DO_APP_DA_WEB_QUE_VOCE_CRIOU"; 
         const whatsappNumber = "5588993127830";
-        let PRECO_HORA = 40; // Inicial com Espécie
-        let nomePagamento = "Espécie";
+        let PRECO_HORA = 45; // Inicial com Espécie/Pix
+        let nomePagamento = "Espécie / Pix";
         
         let duracaoSelecionada = 1; 
         let quadraSelecionada = 1; 
