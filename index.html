@@ -32,18 +32,21 @@
             background-size: cover; background-position: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
         }
-        
-        /* ESTILO DO NOME (VOLTOU!) */
-        .hero h1 { 
-            font-size: 4rem; 
-            text-transform: uppercase; 
-            font-weight: 900; 
-            margin-bottom: 10px; 
-            letter-spacing: 2px; 
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5); 
-            line-height: 1;
+
+        /* --- LOGO --- */
+        .brand-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
         }
-        .hero h1 span { color: var(--primary); }
+        
+        .brand-icon svg {
+            width: 400px;
+            height: auto;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+        }
+        /* --- FIM DA LOGO --- */
 
         .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
@@ -125,6 +128,14 @@
         .reset-btn { margin-top: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
         .reset-btn:hover { background: var(--primary); color: black; }
 
+        /* PERGUNTAS FREQUENTES (FAQ) */
+        .faq-item { background: #222; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #444; }
+        .faq-item summary { padding: 15px; cursor: pointer; font-weight: bold; color: white; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        .faq-item summary:hover { background: #333; }
+        .faq-item summary::after { content: '+'; color: var(--primary); font-size: 1.5rem; font-weight: bold; }
+        .faq-item[open] summary::after { content: '-'; }
+        .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
+
         /* RESTANTE */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
@@ -144,16 +155,46 @@
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
         
-        /* Celular */
         @media (max-width: 600px) {
-            .hero h1 { font-size: 3rem; }
+            .brand-main { font-size: 3rem; }
+            .brand-icon svg { width: 300px; }
         }
     </style>
 </head>
 <body>
 
     <div class="hero">
-        <h1>Arena <span>Vitale</span></h1>
+        <div class="brand-container">
+            <div class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" width="400" height="166">
+                  <g transform="translate(10, 10)">
+                    <g transform="rotate(-45, 65, 65)">
+                      <path d="M35,65 Q35,15 95,15 Q155,15 155,65 Q155,115 95,115 Q35,115 35,65" fill="none" stroke="#FFD700" stroke-width="8"/>
+                      <path d="M42,65 Q42,22 95,22 Q148,22 148,65 Q148,108 95,108 Q42,108 42,65" fill="#000000"/>
+                      <rect x="88" y="115" width="14" height="35" rx="3" fill="#000000" stroke="#FFD700" stroke-width="2"/>
+                      <g fill="#000000">
+                        <circle cx="65" cy="45" r="2"/> <circle cx="85" cy="45" r="2"/> <circle cx="105" cy="45" r="2"/> <circle cx="125" cy="45" r="2"/>
+                        <circle cx="65" cy="65" r="2"/> <circle cx="85" cy="65" r="2"/> <circle cx="105" cy="65" r="2"/> <circle cx="125" cy="65" r="2"/>
+                        <circle cx="65" cy="85" r="2"/> <circle cx="85" cy="85" r="2"/> <circle cx="105" cy="85" r="2"/> <circle cx="125" cy="85" r="2"/>
+                      </g>
+                    </g>
+                    <g transform="translate(10, 85)">
+                      <path d="M-20,5 L15,-5" stroke="#000000" stroke-width="4"/>
+                      <path d="M-25,20 L15,5" stroke="#000000" stroke-width="4"/>
+                      <path d="M-20,35 L15,15" stroke="#000000" stroke-width="4"/>
+                      <path d="M-10,20 L5,10 L-5,30 L10,20" fill="#FFD700"/>
+                      <circle cx="20" cy="10" r="12" fill="#FFD700"/>
+                      <path d="M14,5 Q20,10 26,5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                    </g>
+                  </g>
+                  <g transform="translate(160, 50)">
+                    <text x="70" y="0" font-family="'Montserrat', sans-serif" font-weight="700" font-size="16" fill="#000000" letter-spacing="3">ARENA</text>
+                    <text x="0" y="50" font-family="'Montserrat', sans-serif" font-weight="900" font-size="55" fill="#000000">VITALE</text>
+                  </g>
+                </svg>
+            </div>
+        </div>
+        
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
     </div>
@@ -283,6 +324,28 @@
         <h2 class="section-title">Onde Estamos</h2>
         <p style="font-size: 1.1rem; margin-bottom: 10px;">Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p>
         <a href="https://maps.app.goo.gl/9z1hF99WNx5mbjXq8" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a>
+    </div>
+
+    <div class="section section-dark">
+        <h2 class="section-title">Dúvidas Frequentes</h2>
+        <div style="max-width: 600px; margin: auto; text-align: left;">
+            <details class="faq-item">
+                <summary>Preciso levar minha própria raquete?</summary>
+                <p>Não necessariamente! Temos raquetes para aluguel na recepção. Mas se você já tiver a sua, pode trazer!</p>
+            </details>
+            <details class="faq-item">
+                <summary>Qual a antecedência para cancelar?</summary>
+                <p>Cancelamentos gratuitos devem ser feitos com até <strong>4 horas</strong> de antecedência. Após esse prazo, cobramos taxa de R$ 10,00.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Aceitam Cartão ou PIX?</summary>
+                <p>Sim! Aceitamos PIX (preferencialmente) e cartões de crédito/débito na recepção.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Funciona em dias de chuva?</summary>
+                <p>Nossas quadras têm ótima drenagem, mas em caso de chuva forte/torrencial no horário do jogo, reagendamos sem custo.</p>
+            </details>
+        </div>
     </div>
 
     <div class="section section-dark">
