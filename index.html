@@ -246,8 +246,8 @@
             <h3>🎾 Dados do Jogador</h3>
             
             <div class="form-group">
-                <label>Nome Completo:</label>
-                <input type="text" id="cadNome" placeholder="Ex: João da Silva">
+                <label>Nome e Sobrenome:</label>
+                <input type="text" id="cadNomeCompleto" placeholder="Ex: João da Silva">
             </div>
             
             <div class="form-group">
@@ -602,7 +602,8 @@
         }
 
         function enviarAgendamento() {
-            const nomeCompleto = document.getElementById('cadNome').value;
+            // UNIFICADO: Pegando apenas um campo para Nome e Sobrenome
+            const nomeCompleto = document.getElementById('cadNomeCompleto').value;
             const telefone = document.getElementById('cadTelefone').value;
             const nascimento = document.getElementById('cadNascimento').value;
             const checkTermos = document.getElementById('checkTermos').checked;
@@ -643,7 +644,7 @@
                         `⏳ Duração: ${txtDuracao}\n` +
                         `💰 Valor: R$ ${tempValor},00`;
 
-            // Usando api.whatsapp.com para evitar bugs de caracteres
+            // CORREÇÃO EMOJIS: Usando api.whatsapp.com em vez de wa.me
             window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
             fecharModal();
         }
