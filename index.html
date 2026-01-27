@@ -24,28 +24,64 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
-        /* HERO - FUNDO + LOGO */
+        /* HERO */
         .hero { 
             height: 90vh; 
-            /* AQUI É A IMAGEM DE FUNDO (ATRÁS DA LOGO) */
-            /* Você pode trocar esse link do unsplash pela sua própria foto de fundo se quiser (ex: url('fundo-arena.jpg')) */
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
                         url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); 
             background-size: cover; background-position: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
         }
-        
-        /* ESTILO DA LOGO NOVA */
-        .hero-logo {
-            max-width: 800px; /* Tamanho máximo no computador */
-            width: 90%;       /* Ocupa 90% da tela no celular */
-            height: auto;
+
+        /* --- LOGO FEITA EM CÓDIGO (CSS + SVG) --- */
+        .brand-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 20px;
-            /* Filtro opcional: Se a logo for preta e não aparecer no fundo escuro, 
-               podemos inverter as cores ou adicionar brilho. 
-               Como sua logo parece ter amarelo e preto, vou deixar sem filtro por enquanto. */
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); /* Sombra para destacar do fundo */
         }
+        
+        .brand-icon svg {
+            width: 120px; /* Tamanho do ícone */
+            height: auto;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            margin-left: 15px;
+            line-height: 0.9;
+        }
+
+        .brand-sup {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .brand-main {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+        
+        /* Ajuste para celular */
+        @media (max-width: 600px) {
+            .brand-container { flex-direction: column; }
+            .brand-text { align-items: center; margin-left: 0; margin-top: 15px; }
+            .brand-sup { font-size: 1rem; letter-spacing: 0.5em; }
+            .brand-main { font-size: 3rem; }
+            .brand-icon svg { width: 100px; }
+        }
+
+        /* --- FIM DA LOGO --- */
 
         .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
@@ -150,7 +186,34 @@
 <body>
 
     <div class="hero">
-        <img src="logo1.png" alt="Arena Vitale" class="hero-logo">
+        
+        <div class="brand-container">
+            <div class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" width="150" height="150">
+                  <g transform="rotate(-45, 75, 75)">
+                    <ellipse cx="75" cy="55" rx="40" ry="50" fill="none" stroke="#FFD700" stroke-width="5"/>
+                    <path d="M 35,55 Q 35,5 75,5 Q 115,5 115,55 Q 115,105 75,105 Q 35,105 35,55" fill="#000000"/>
+                    <rect x="70" y="105" width="10" height="30" rx="2" fill="#000000"/>
+                    <g fill="#FFD700">
+                      <circle cx="55" cy="35" r="2"/> <circle cx="75" cy="35" r="2"/> <circle cx="95" cy="35" r="2"/>
+                      <circle cx="55" cy="55" r="2"/> <circle cx="75" cy="55" r="2"/> <circle cx="95" cy="55" r="2"/>
+                      <circle cx="55" cy="75" r="2"/> <circle cx="75" cy="75" r="2"/> <circle cx="95" cy="75" r="2"/>
+                    </g>
+                  </g>
+                  <g transform="translate(30, 80)">
+                    <path d="M -20,10 L 10,0 M -20,20 L 10,10 M -20,30 L 10,20" stroke="#000000" stroke-width="3"/>
+                    <path d="M -10,15 L 0,10 L -5,25 L 5,20" fill="none" stroke="#FFD700" stroke-width="2"/>
+                    <circle cx="15" cy="15" r="10" fill="#FFD700"/>
+                    <path d="M 10,10 Q 15,15 20,10" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                  </g>
+                </svg>
+            </div>
+            
+            <div class="brand-text">
+                <span class="brand-sup">ARENA</span>
+                <span class="brand-main">VITALE</span>
+            </div>
+        </div>
         
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
