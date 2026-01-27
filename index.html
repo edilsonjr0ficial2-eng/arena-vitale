@@ -27,17 +27,16 @@
         /* HERO - COM EFEITO DE DESFOQUE NO FUNDO */
         .hero { 
             height: 90vh; 
-            position: relative; /* Necessário para o posicionamento do fundo */
+            position: relative; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
             text-align: center; 
             padding: 20px; 
-            overflow: hidden; /* Garante que o desfoque não vaze da tela */
+            overflow: hidden; 
         }
 
-        /* Camada da Imagem de Fundo (AQUI ESTÁ O TRUQUE DO BLUR) */
         .hero::before {
             content: "";
             position: absolute;
@@ -45,26 +44,19 @@
             left: 0;
             width: 100%; 
             height: 100%;
-            /* SUA IMAGEM DA QUADRA AQUI */
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra2.jpeg');
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg');
             background-size: cover; 
             background-position: center;
-            
-            /* O DESFOQUE */
             filter: blur(6px) brightness(0.6); 
-            
-            /* Escala aumentada para evitar bordas brancas causadas pelo blur */
             transform: scale(1.1); 
             z-index: 1;
         }
 
-        /* Garante que o conteúdo fique NA FRENTE do fundo borrado */
         .hero > * {
             position: relative;
             z-index: 2;
         }
         
-        /* ESTILO DO NOME DA ARENA (TEXTO GRANDE) */
         .hero h1 { 
             font-size: 4.5rem; 
             text-transform: uppercase; 
@@ -76,7 +68,6 @@
             color: var(--text-color);
         }
         .hero h1 span { color: var(--primary); }
-
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
         
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
@@ -85,8 +76,34 @@
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* AGENDA */
-        .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; }
+        /* --- NOVO: SEÇÃO DE AGENDAMENTO COM FUNDO DESFOCADO --- */
+        #agenda-section {
+            position: relative; /* Cria o contexto para o fundo */
+            overflow: hidden; /* Impede vazamento do blur */
+        }
+
+        /* Camada de fundo específica para o agendamento */
+        #agenda-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Usa a imagem quadra1.jpeg */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px); /* Desfoque */
+            transform: scale(1.1); /* Evita bordas brancas */
+            z-index: 0;
+        }
+
+        /* Traz o conteúdo para frente do fundo desfocado */
+        #agenda-section > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* AGENDA BOX */
+        .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .btn-court { background: #222; color: white; border: 2px solid #444; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .btn-court:hover { border-color: var(--primary); }
