@@ -208,7 +208,7 @@
                 <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
                     <option value="45" selected>Espécie / Pix - R$ 45,00/h</option>
-                    <option value="48">Cartão (Crédito/Débito) - R$ 48,00/h</option>
+                    <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
                 </select>
             </div>
 
@@ -492,7 +492,21 @@
         }
 
         function mudarDia(delta) {
-            dataVisualizada.setDate(dataVisualizada.getDate() + delta);
+            // LÓGICA DE BLOQUEIO DE DATA PASSADA
+            const novaData = new Date(dataVisualizada);
+            novaData.setDate(novaData.getDate() + delta);
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            const novaDataZerada = new Date(novaData);
+            novaDataZerada.setHours(0, 0, 0, 0);
+
+            if (novaDataZerada < hoje) {
+                return; // Bloqueia a ação
+            }
+
+            dataVisualizada = novaData;
             carregarDadosDoDia();
         }
 
