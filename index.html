@@ -24,16 +24,47 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
-        /* HERO */
+        /* HERO - COM EFEITO DE DESFOQUE NO FUNDO */
         .hero { 
             height: 90vh; 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
-                        url('https://images.unsplash.com/photo-1626245946927-920f01222409?q=80&w=1974&auto=format&fit=crop'); 
-            background-size: cover; background-position: center; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
+            position: relative; /* Necessário para o posicionamento do fundo */
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px; 
+            overflow: hidden; /* Garante que o desfoque não vaze da tela */
+        }
+
+        /* Camada da Imagem de Fundo (AQUI ESTÁ O TRUQUE DO BLUR) */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            /* SUA IMAGEM DA QUADRA AQUI */
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra2.jpeg');
+            background-size: cover; 
+            background-position: center;
+            
+            /* O DESFOQUE */
+            filter: blur(6px) brightness(0.6); 
+            
+            /* Escala aumentada para evitar bordas brancas causadas pelo blur */
+            transform: scale(1.1); 
+            z-index: 1;
+        }
+
+        /* Garante que o conteúdo fique NA FRENTE do fundo borrado */
+        .hero > * {
+            position: relative;
+            z-index: 2;
         }
         
-        /* ESTILO DO NOME DA ARENA */
+        /* ESTILO DO NOME DA ARENA (TEXTO GRANDE) */
         .hero h1 { 
             font-size: 4.5rem; 
             text-transform: uppercase; 
@@ -46,7 +77,7 @@
         }
         .hero h1 span { color: var(--primary); }
 
-        .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
+        .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
         
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
         .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); background-color: var(--hover); }
@@ -90,10 +121,10 @@
         .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
         .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
 
-        /* PARCEIROS (MODIFICADO) */
+        /* PARCEIROS */
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
         .partner-link { text-decoration: none; display: inline-block; }
-        /* Removi o filtro amarelo no hover, agora fica apenas a cor original */
+        /* Logo normal sem filtro amarelo */
         .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
         .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
 
@@ -209,7 +240,7 @@
                 <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
                     <option value="45" selected>Espécie / Pix - R$ 45,00/h</option>
-                    <option value="48">Cartão (Crédito/Débito) - R$ 48,00/h</option>
+                    <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
                 </select>
             </div>
 
