@@ -308,7 +308,9 @@
                     <button class="btn-point" onclick="addPonto('A')">+</button>
                     <div class="games-display">Games: <span class="games-count" id="gameA">0</span></div>
                 </div>
+
                 <div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div>
+
                 <div class="team-score">
                     <input type="text" value="Dupla B">
                     <div class="points-display" id="scoreB" onclick="addPonto('B')">0</div>
@@ -316,7 +318,27 @@
                     <div class="games-display">Games: <span class="games-count" id="gameB">0</span></div>
                 </div>
             </div>
+            
             <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
+        </div>
+        <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Nossos Parceiros</h2>
+        <div class="partners-container">
+            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link">
+                <img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo">
+            </a>
+            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link">
+                <img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo">
+            </a>
+            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link">
+                <img src="vitale.jpg" alt="Arena Vitale" class="partner-logo">
+            </a>
+            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link">
+                <img src="foto4.jpg" alt="Parceiro 4" class="partner-logo">
+            </a>
         </div>
     </div>
 
@@ -339,24 +361,6 @@
                 <summary>Funciona em dias de chuva?</summary>
                 <p>Nossas quadras têm ótima drenagem, mas em caso de chuva forte/torrencial no horário do jogo, reagendamos sem custo.</p>
             </details>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">Nossos Parceiros</h2>
-        <div class="partners-container">
-            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link">
-                <img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo">
-            </a>
-            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link">
-                <img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo">
-            </a>
-            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link">
-                <img src="vitale.jpg" alt="Arena Vitale" class="partner-logo">
-            </a>
-            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link">
-                <img src="foto4.jpg" alt="Parceiro 4" class="partner-logo">
-            </a>
         </div>
     </div>
 
@@ -600,7 +604,6 @@
         }
 
         function enviarAgendamento() {
-            // UNIFICADO: Pegando apenas um campo para Nome e Sobrenome
             const nomeCompleto = document.getElementById('cadNomeCompleto').value;
             const telefone = document.getElementById('cadTelefone').value;
             const nascimento = document.getElementById('cadNascimento').value;
