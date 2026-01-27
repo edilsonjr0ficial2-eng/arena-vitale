@@ -32,21 +32,18 @@
             background-size: cover; background-position: center; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
         }
-
-        /* --- LOGO FEITA EM CÓDIGO (CSS + SVG) --- */
-        .brand-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
         
-        .brand-icon svg {
-            width: 400px; /* Tamanho do ícone */
-            height: auto;
-            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+        /* ESTILO DO NOME (VOLTOU!) */
+        .hero h1 { 
+            font-size: 4rem; 
+            text-transform: uppercase; 
+            font-weight: 900; 
+            margin-bottom: 10px; 
+            letter-spacing: 2px; 
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5); 
+            line-height: 1;
         }
-        /* --- FIM DA LOGO --- */
+        .hero h1 span { color: var(--primary); }
 
         .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 30px; max-width: 600px; }
         
@@ -146,42 +143,17 @@
         .wa-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
+        
+        /* Celular */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 3rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="hero">
-        <div class="brand-container">
-            <div class="brand-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" width="400" height="166">
-                  <g transform="translate(10, 10)">
-                    <g transform="rotate(-45, 65, 65)">
-                      <path d="M35,65 Q35,15 95,15 Q155,15 155,65 Q155,115 95,115 Q35,115 35,65" fill="none" stroke="#FFD700" stroke-width="8"/>
-                      <path d="M42,65 Q42,22 95,22 Q148,22 148,65 Q148,108 95,108 Q42,108 42,65" fill="#000000"/>
-                      <rect x="88" y="115" width="14" height="35" rx="3" fill="#000000" stroke="#FFD700" stroke-width="2"/>
-                      <g fill="#000000">
-                        <circle cx="65" cy="45" r="2"/> <circle cx="85" cy="45" r="2"/> <circle cx="105" cy="45" r="2"/> <circle cx="125" cy="45" r="2"/>
-                        <circle cx="65" cy="65" r="2"/> <circle cx="85" cy="65" r="2"/> <circle cx="105" cy="65" r="2"/> <circle cx="125" cy="65" r="2"/>
-                        <circle cx="65" cy="85" r="2"/> <circle cx="85" cy="85" r="2"/> <circle cx="105" cy="85" r="2"/> <circle cx="125" cy="85" r="2"/>
-                      </g>
-                    </g>
-                    <g transform="translate(10, 85)">
-                      <path d="M-20,5 L15,-5" stroke="#000000" stroke-width="4"/>
-                      <path d="M-25,20 L15,5" stroke="#000000" stroke-width="4"/>
-                      <path d="M-20,35 L15,15" stroke="#000000" stroke-width="4"/>
-                      <path d="M-10,20 L5,10 L-5,30 L10,20" fill="#FFD700"/>
-                      <circle cx="20" cy="10" r="12" fill="#FFD700"/>
-                      <path d="M14,5 Q20,10 26,5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-                    </g>
-                  </g>
-                  <g transform="translate(160, 50)">
-                    <text x="70" y="0" font-family="'Montserrat', sans-serif" font-weight="700" font-size="16" fill="#000000" letter-spacing="3">ARENA</text>
-                    <text x="0" y="50" font-family="'Montserrat', sans-serif" font-weight="900" font-size="55" fill="#000000">VITALE</text>
-                  </g>
-                </svg>
-            </div>
-        </div>
-        
+        <h1>Arena <span>Vitale</span></h1>
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
     </div>
