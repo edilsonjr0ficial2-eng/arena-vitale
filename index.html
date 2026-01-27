@@ -33,7 +33,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; 
         }
         
-        /* ESTILO DO NOME DA ARENA (TEXTO GRANDE) */
+        /* ESTILO DO NOME DA ARENA */
         .hero h1 { 
             font-size: 4.5rem; 
             text-transform: uppercase; 
@@ -200,15 +200,15 @@
                     <span style="color:#777;">h</span>
                 </div>
                 <div id="priceDisplay" class="price-display">
-                    Valor: R$ 45,00
+                    Valor: R$ 40,00
                 </div>
             </div>
 
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
-                    <option value="45" selected>Pix - R$ 45,00/h</option>
-                    <option value="40">Espécie - R$ 40,00/h</option>
+                    <option value="40" selected>Espécie - R$ 40,00/h</option>
+                    <option value="45">Pix - R$ 45,00/h</option>
                     <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
                 </select>
             </div>
@@ -317,7 +317,9 @@
                     <button class="btn-point" onclick="addPonto('A')">+</button>
                     <div class="games-display">Games: <span class="games-count" id="gameA">0</span></div>
                 </div>
+
                 <div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div>
+
                 <div class="team-score">
                     <input type="text" value="Dupla B">
                     <div class="points-display" id="scoreB" onclick="addPonto('B')">0</div>
@@ -325,6 +327,7 @@
                     <div class="games-display">Games: <span class="games-count" id="gameB">0</span></div>
                 </div>
             </div>
+            
             <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
         </div>
         <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
@@ -353,19 +356,23 @@
         <div style="max-width: 600px; margin: auto; text-align: left;">
             <details class="faq-item">
                 <summary>Preciso levar minha própria raquete?</summary>
-                <p>Não necessariamente! Temos raquetes para aluguel na recepção. Mas se você já tiver a sua, pode trazer!</p>
+                <p>Não necessariamente! A Arena Vitale disponibiliza raquetes gratuitamente para os jogadores. Mas se você já tiver a sua, pode trazer!</p>
             </details>
             <details class="faq-item">
                 <summary>Qual a antecedência para cancelar?</summary>
                 <p>Cancelamentos gratuitos devem ser feitos com até <strong>4 horas</strong> de antecedência. Após esse prazo, cobramos taxa de R$ 10,00.</p>
             </details>
             <details class="faq-item">
-                <summary>Aceitam Cartão ou PIX?</summary>
-                <p>Sim! Aceitamos PIX (preferencialmente) e cartões de crédito/débito na recepção.</p>
+                <summary>Quais as formas de pagamentos aceitamos?</summary>
+                <p>Aceitamos pagamentos em Espécie, Pix e Cartão de Crédito/Débito.</p>
             </details>
             <details class="faq-item">
                 <summary>Funciona em dias de chuva?</summary>
-                <p>Nossas quadras têm ótima drenagem, mas em caso de chuva forte/torrencial no horário do jogo, reagendamos sem custo.</p>
+                <p>Sim! Como a Arena Vitale é totalmente coberta, as atividades acontecem normalmente mesmo em dias de chuva.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Por que há diferença nos valores conforme a forma de pagamento?</summary>
+                <p>A diferença está de acordo com a Lei nº 13.455/2017, que permite a variação de preços conforme a forma de pagamento escolhida. Assim, os valores podem mudar dependendo se o pagamento é feito em espécie, via Pix ou no cartão.</p>
             </details>
         </div>
     </div>
@@ -377,8 +384,8 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const SCRIPT_URL = "COLE_AQUI_A_URL_DO_APP_DA_WEB_QUE_VOCE_CRIOU"; 
         const whatsappNumber = "5588993127830";
-        let PRECO_HORA = 45; // Inicial com Pix
-        let nomePagamento = "Pix";
+        let PRECO_HORA = 40; // Inicial com Espécie
+        let nomePagamento = "Espécie";
         
         let duracaoSelecionada = 1; 
         let quadraSelecionada = 1; 
@@ -447,17 +454,15 @@
             return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex };
         }
 
-        // ATUALIZADA PARA O NOVO SISTEMA DE PREÇO
         function atualizarPrecoDisplay() {
             const total = duracaoSelecionada * PRECO_HORA;
             document.getElementById('priceDisplay').innerText = `Valor: R$ ${total.toFixed(2).replace('.', ',')}`;
         }
 
-        // NOVA FUNÇÃO DE PAGAMENTO
         function mudarPagamento() {
             const select = document.getElementById('selectPagamento');
-            PRECO_HORA = parseInt(select.value); // Atualiza o preço global
-            nomePagamento = select.options[select.selectedIndex].text.split(' - ')[0]; // Pega só o nome (ex: Pix)
+            PRECO_HORA = parseInt(select.value); 
+            nomePagamento = select.options[select.selectedIndex].text.split(' - ')[0]; 
             atualizarPrecoDisplay();
         }
 
@@ -645,7 +650,6 @@
             let nascParts = nascimento.split('-');
             let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
 
-            // Inclui a forma de pagamento na mensagem
             const msg = `*NOVO PEDIDO DE AGENDAMENTO*\n` +
                         `👤 *Cliente:* ${nomeCompleto}\n` +
                         `🎂 *Nasc:* ${nascFormatada}\n` +
