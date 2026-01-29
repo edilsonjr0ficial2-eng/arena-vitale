@@ -44,6 +44,7 @@
             left: 0;
             width: 100%; 
             height: 100%;
+            /* Lembre-se de ter o arquivo quadra1.jpeg na pasta */
             background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg');
             background-size: cover; 
             background-position: center;
@@ -76,27 +77,22 @@
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* --- NOVO: SEÇÃO DE AGENDAMENTO COM FUNDO DESFOCADO --- */
+        /* AGENDAMENTO COM FUNDO DESFOCADO */
         #agenda-section {
-            position: relative; /* Cria o contexto para o fundo */
-            overflow: hidden; /* Impede vazamento do blur */
+            position: relative; 
+            overflow: hidden; 
         }
-
-        /* Camada de fundo específica para o agendamento */
         #agenda-section::before {
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Usa a imagem quadra2.jpeg */
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra2.jpeg');
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg');
             background-size: cover;
             background-position: center;
-            filter: blur(8px); /* Desfoque */
-            transform: scale(1.1); /* Evita bordas brancas */
+            filter: blur(8px); 
+            transform: scale(1.1);
             z-index: 0;
         }
-
-        /* Traz o conteúdo para frente do fundo desfocado */
         #agenda-section > * {
             position: relative;
             z-index: 1;
@@ -141,7 +137,6 @@
         /* PARCEIROS */
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
         .partner-link { text-decoration: none; display: inline-block; }
-        /* Logo normal sem filtro amarelo */
         .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
         .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
 
@@ -429,8 +424,10 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
+        // --- COLOQUE SUA NOVA URL AQUI EMBAIXO:
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
+        
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        const SCRIPT_URL = "COLE_AQUI_A_URL_DO_APP_DA_WEB_QUE_VOCE_CRIOU"; 
         const whatsappNumber = "5588993127830";
         let PRECO_HORA = 45; // Inicial com Espécie/Pix
         let nomePagamento = "Espécie / Pix";
@@ -699,34 +696,60 @@
                 return;
             }
 
-            if(SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
-                const dados = { nome: nomeCompleto, sobrenome: "", telefone: telefone };
-                fetch(SCRIPT_URL, {
-                    method: "POST", mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dados)
-                });
-            }
+            // --- AQUI ACONTECE A MÁGICA AUTOMÁTICA ---
+            const btnConfirm = document.querySelector('.btn-confirm');
+            btnConfirm.innerText = "Agendando...";
+            btnConfirm.disabled = true;
 
-            let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
-            let nascParts = nascimento.split('-');
-            let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
+            // Dados para enviar ao Google Sheets
+            const dadosParaPlanilha = {
+                nome: nomeCompleto,
+                telefone: telefone,
+                diaIndex: formatarDataHeader(dataVisualizada).index,
+                hora: tempHora,
+                quadra: quadraSelecionada,
+                duracao: duracaoSelecionada
+            };
 
-            const msg = `*NOVO PEDIDO DE AGENDAMENTO*\n` +
-                        `👤 *Cliente:* ${nomeCompleto}\n` +
-                        `🎂 *Nasc:* ${nascFormatada}\n` +
-                        `📞 *Tel:* ${telefone}\n` +
-                        `📝 *Aceitou Termos:* Sim\n` +
-                        `-----------------------\n` +
-                        `🏟️ *${nomeQuadra}*\n` +
-                        `🗓️ *${tempInfoDia}*\n` +
-                        `⏰ *${tempHora}:00 às ${tempFim}*\n` +
-                        `⏳ Duração: ${txtDuracao}\n` +
-                        `💰 Pagamento: ${nomePagamento}\n` +
-                        `💵 Valor Total: R$ ${tempValor},00`;
+            // Envia para o Google Script (bloqueio automático)
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(dadosParaPlanilha)
+            })
+            .then(() => {
+                // Monta e abre a mensagem do WhatsApp (confirmação financeira)
+                let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
+                let nascParts = nascimento.split('-');
+                let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
 
-            window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
-            fecharModal();
+                const msg = `*NOVO AGENDAMENTO REALIZADO (SITE)*\n` +
+                            `✅ *Horário Bloqueado Automaticamente*\n` +
+                            `-----------------------\n` +
+                            `👤 *Cliente:* ${nomeCompleto}\n` +
+                            `🎂 *Nasc:* ${nascFormatada}\n` +
+                            `📞 *Tel:* ${telefone}\n` +
+                            `🏟️ *${nomeQuadra}*\n` +
+                            `🗓️ *${tempInfoDia}*\n` +
+                            `⏰ *${tempHora}:00 às ${tempFim}*\n` +
+                            `⏳ Duração: ${txtDuracao}\n` +
+                            `💰 Pagamento: ${nomePagamento}\n` +
+                            `💵 Valor Total: R$ ${tempValor},00\n` +
+                            `-----------------------\n` +
+                            `⚠️ *Aguardando comprovante de pagamento para confirmação final.*`;
+
+                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
+                
+                alert("Horário pré-reservado! Envie o comprovante no WhatsApp para concluir.");
+                location.reload(); 
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                alert("Houve um erro ao reservar automaticamente. Por favor, chame no WhatsApp.");
+                btnConfirm.innerText = "Ir para WhatsApp";
+                btnConfirm.disabled = false;
+            });
         }
 
         carregarDadosDoDia();
