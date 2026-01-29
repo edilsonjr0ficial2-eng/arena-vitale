@@ -288,14 +288,14 @@
             </div>
             <div class="form-group">
                 <label>Data de Nascimento:</label>
-                <input type="date" id="cadNascimento">
+                <input type="text" id="cadNascimento" placeholder="DD/MM/AAAA" maxlength="10">
             </div>
 
             <div class="terms-box">
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
-                • Cancelamentos realizados com até <strong>3 (três) horas</strong> de antecedência do horário agendado não sofrerão cobrança adicional.<br><br>
-                • Cancelamentos efetuados com <strong>menos de 3 (três) horas</strong> de antecedência implicarão na cobrança de <strong>50%</strong> (cinquenta por cento) do valor referente ao tempo reservado.<br><br>
-                • Esta política tem como objetivo garantir a organização da agenda e a disponibilidade das quadras para todos os atletas.
+                ⚠️ Concordo com os termos e condições.<br><br>
+                • Cancelamentos realizados com antecedência mínima de 3 (três) horas em relação ao horário agendado não estarão sujeitos a cobrança adicional.<br><br>
+                • Cancelamentos efetuados com antecedência inferior a 3 (três) horas implicarão a cobrança de 50% (cinquenta por cento) do valor correspondente ao período reservado.
             </div>
 
             <div class="checkbox-container">
@@ -701,10 +701,10 @@
             btnConfirm.innerText = "Agendando...";
             btnConfirm.disabled = true;
 
-            // Dados para enviar ao Google Sheets
+            // REMOVIDO TELEFONE DO ENVIO PARA PLANILHA
             const dadosParaPlanilha = {
                 nome: nomeCompleto,
-                telefone: telefone,
+                // telefone: telefone,  <-- REMOVIDO PARA NÃO IR PRA PLANILHA
                 diaIndex: formatarDataHeader(dataVisualizada).index,
                 hora: tempHora,
                 quadra: quadraSelecionada,
@@ -721,14 +721,13 @@
             .then(() => {
                 // Monta e abre a mensagem do WhatsApp (confirmação financeira)
                 let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
-                let nascParts = nascimento.split('-');
-                let nascFormatada = `${nascParts[2]}/${nascParts[1]}/${nascParts[0]}`;
-
+                
+                // MANTIDO MENSAGEM DO WHATSAPP
                 const msg = `*NOVO AGENDAMENTO REALIZADO (SITE)*\n` +
                             `✅ *Horário Bloqueado Automaticamente*\n` +
                             `-----------------------\n` +
                             `👤 *Cliente:* ${nomeCompleto}\n` +
-                            `🎂 *Nasc:* ${nascFormatada}\n` +
+                            `🎂 *Nasc:* ${nascimento}\n` + // Data texto puro
                             `📞 *Tel:* ${telefone}\n` +
                             `🏟️ *${nomeQuadra}*\n` +
                             `🗓️ *${tempInfoDia}*\n` +
@@ -737,11 +736,11 @@
                             `💰 Pagamento: ${nomePagamento}\n` +
                             `💵 Valor Total: R$ ${tempValor},00\n` +
                             `-----------------------\n` +
-                            `⚠️ *Aguardando comprovante de pagamento para confirmação final.*`;
+                            `⚠️ *Confirmo que li e aceito a política de cancelamento.*`;
 
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
                 
-                alert("Horário pré-reservado! Envie o comprovante no WhatsApp para concluir.");
+                alert("Horário pré-reservado! Envie a mensagem no WhatsApp para concluir.");
                 location.reload(); 
             })
             .catch(error => {
