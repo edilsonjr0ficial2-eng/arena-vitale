@@ -7,178 +7,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* --- PALETA DE CORES PRETO E AMARELO --- */
-        :root {
-            --bg-color: #000000;
-            --card-color: #111111;
-            --primary: #FFD700;
-            --text-color: #ffffff;
-            --gray: #b0b0b0;
-            
-            --free: #FFD700;
-            --busy: #333333;
-            --partial: #555555;
-            --hover: #E6C300;
-        }
-
+        :root { --bg-color: #000000; --card-color: #111111; --primary: #FFD700; --text-color: #ffffff; --gray: #b0b0b0; --free: #FFD700; --busy: #333333; --partial: #555555; --hover: #E6C300; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
 
-        /* HERO - COM EFEITO DE DESFOQUE NO FUNDO */
-        .hero { 
-            height: 90vh; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 20px; 
-            overflow: hidden; 
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            top: 0; 
-            left: 0;
-            width: 100%; 
-            height: 100%;
-            /* Lembre-se de ter o arquivo quadra1.jpeg na pasta */
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg');
-            background-size: cover; 
-            background-position: center;
-            filter: blur(6px) brightness(0.6); 
-            transform: scale(1.1); 
-            z-index: 1;
-        }
-
-        .hero > * {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .hero h1 { 
-            font-size: 4.5rem; 
-            text-transform: uppercase; 
-            font-weight: 900; 
-            margin-bottom: 10px; 
-            letter-spacing: 3px; 
-            text-shadow: 0 0 20px rgba(0,0,0,0.8); 
-            line-height: 1;
-            color: var(--text-color);
-        }
+        /* HERO */
+        .hero { height: 90vh; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; overflow: hidden; }
+        .hero::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(6px) brightness(0.6); transform: scale(1.1); z-index: 1; }
+        .hero > * { position: relative; z-index: 2; }
+        .hero h1 { font-size: 4.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 10px; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0,0,0,0.8); line-height: 1; color: var(--text-color); }
         .hero h1 span { color: var(--primary); }
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
-        
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
         .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); background-color: var(--hover); }
 
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* AGENDAMENTO COM FUNDO DESFOCADO */
-        #agenda-section {
-            position: relative; 
-            overflow: hidden; 
-        }
-        #agenda-section::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px); 
-            transform: scale(1.1);
-            z-index: 0;
-        }
-        #agenda-section > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* AGENDA BOX */
+        /* AGENDAMENTO */
+        #agenda-section { position: relative; overflow: hidden; }
+        #agenda-section::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(8px); transform: scale(1.1); z-index: 0; }
+        #agenda-section > * { position: relative; z-index: 1; }
         .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .btn-court { background: #222; color: white; border: 2px solid #444; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .btn-court:hover { border-color: var(--primary); }
         .btn-court.active { background: var(--primary); border-color: var(--primary); color: black; }
         .btn-court.active::after { content: '✔'; font-weight: bold; }
-
         .day-navigation { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #222; padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: none; color: var(--primary); font-size: 1.5rem; cursor: pointer; padding: 0 15px; }
         .current-date-display { font-size: 1.1rem; font-weight: bold; color: white; text-transform: capitalize; }
-
         .duration-selector { margin-bottom: 20px; }
         .btn-duration { background: #222; color: white; border: 1px solid #444; padding: 8px 15px; margin: 2px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.9rem; }
         .btn-duration.active { background: var(--primary); border-color: var(--primary); color: black; }
-        
         .custom-time-box { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
         .custom-input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #555; background: #222; color: white; text-align: center; font-weight: bold; }
         .custom-input:focus { border-color: var(--primary); outline: none; }
-
         .price-display { margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: var(--primary); background: #222; padding: 10px; border-radius: 8px; border: 1px solid var(--primary); display: block; }
-
         .time-selector-container { margin-top: 20px; text-align: left; }
         .time-select { width: 100%; padding: 15px; font-size: 1rem; background: #222; color: white; border: 1px solid #555; border-radius: 10px; margin-top: 5px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23FFD700" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px top 50%; }
         .time-select:focus { border-color: var(--primary); outline: none; }
         .time-select option { background: #1a1a1a; color: white; padding: 10px; }
         .time-select option:disabled { color: var(--primary); background: var(--busy); font-style: italic; opacity: 0.7; }
-
         .btn-agendar-final { margin-top: 20px; background: var(--primary); color: black; padding: 15px; width: 100%; font-weight: 900; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
         .btn-agendar-final:hover { transform: scale(1.02); background: var(--hover); }
 
-        /* GALERIA DE FOTOS */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
-        .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
-
-        /* PARCEIROS */
-        .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
-        .partner-link { text-decoration: none; display: inline-block; }
-        .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
-        .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
-
-        /* MODAL CADASTRO */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; }
-        .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { font-size: 0.9rem; color: #ccc; display: block; margin-bottom: 5px; }
-        .modal-content input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
-        .modal-content input:focus { border-color: var(--primary); outline: none; }
-        .terms-box { background: #111; padding: 10px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #ccc; line-height: 1.4; }
-        .terms-box strong { color: var(--primary); }
-        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
-        .checkbox-container input { width: auto; accent-color: var(--primary); }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-cancel { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
-        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
-
-        /* PLACAR */
-        .scoreboard-container { background: var(--card-color); padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 2px solid var(--primary); position: relative; }
-        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .team-score { flex: 1; text-align: center; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; }
-        .team-score input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
-        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
-        .btn-point { background: #333; color: var(--primary); border: 2px solid var(--primary); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-        .btn-point:hover { background: var(--primary); color: black; }
-        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
-        .games-count { font-size: 1.5rem; color: white; font-weight: bold; }
-        .reset-btn { margin-top: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
-        .reset-btn:hover { background: var(--primary); color: black; }
-
-        /* PERGUNTAS FREQUENTES (FAQ) */
-        .faq-item { background: #222; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #444; }
-        .faq-item summary { padding: 15px; cursor: pointer; font-weight: bold; color: white; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-        .faq-item summary:hover { background: #333; }
-        .faq-item summary::after { content: '+'; color: var(--primary); font-size: 1.5rem; font-weight: bold; }
-        .faq-item[open] summary::after { content: '-'; }
-        .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
-
-        /* RESTANTE */
+        /* OUTROS */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
         .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
@@ -196,10 +71,42 @@
         .wa-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
-        
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 3rem; }
-        }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
+        .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
+        .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
+        .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
+        .partner-link { text-decoration: none; display: inline-block; }
+        .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
+        .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
+        .terms-box { background: #111; padding: 10px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #ccc; line-height: 1.4; }
+        .terms-box strong { color: var(--primary); }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
+        .checkbox-container input { width: auto; accent-color: var(--primary); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-cancel { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
+        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
+        .scoreboard-container { background: var(--card-color); padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 2px solid var(--primary); position: relative; }
+        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .team-score { flex: 1; text-align: center; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; }
+        .team-score input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
+        .btn-point { background: #333; color: var(--primary); border: 2px solid var(--primary); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .btn-point:hover { background: var(--primary); color: black; }
+        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+        .games-count { font-size: 1.5rem; color: white; font-weight: bold; }
+        .reset-btn { margin-top: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .reset-btn:hover { background: var(--primary); color: black; }
+        .faq-item { background: #222; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #444; }
+        .faq-item summary { padding: 15px; cursor: pointer; font-weight: bold; color: white; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        .faq-item summary:hover { background: #333; }
+        .faq-item summary::after { content: '+'; color: var(--primary); font-size: 1.5rem; font-weight: bold; }
+        .faq-item[open] summary::after { content: '-'; }
+        .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
+        @media (max-width: 600px) { .hero h1 { font-size: 3rem; } }
     </style>
 </head>
 <body>
@@ -412,10 +319,8 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
-        // --- COLOQUE SUA NOVA URL AQUI EMBAIXO:
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
         
-        // --- LINK CSV (Confira se está certo!) ---
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         
         const whatsappNumber = "5588993127830";
@@ -519,17 +424,33 @@
             }
         }
 
+        // --- AQUI ESTÁ A LÓGICA DE BLOQUEIO DO DOMINGO ---
         function mudarDia(delta) {
+            // Obter dias da semana (0 = Domingo, 1 = Segunda, etc)
+            let hoje = new Date();
+            let diaSemanaHoje = hoje.getDay(); // Dia real de hoje
+            let diaAtualVisualizado = dataVisualizada.getDay(); // Dia que está na tela
+
+            // BLOQUEIO: Se hoje é Domingo (0) e a pessoa tenta ir para o próximo dia (delta > 0)
+            // Ou seja, tenta ver Segunda-feira
+            if (diaSemanaHoje === 0 && delta > 0 && diaAtualVisualizado === 0) {
+                alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!");
+                return; // Para a função aqui, não deixa mudar
+            }
+
+            // Lógica normal de navegação
             const novaData = new Date(dataVisualizada);
             novaData.setDate(novaData.getDate() + delta);
-            const hoje = new Date();
+
+            // Bloqueio de passado
             hoje.setHours(0, 0, 0, 0);
             const novaDataZerada = new Date(novaData);
             novaDataZerada.setHours(0, 0, 0, 0);
+
             if (novaDataZerada < hoje) { return; }
+            
             dataVisualizada = novaData;
             
-            // ATUALIZA A DATA VISUALMENTE IMEDIATAMENTE (CORREÇÃO DO BUG DO SUMIÇO)
             const infoDia = formatarDataHeader(dataVisualizada);
             document.getElementById('dateDisplay').innerText = infoDia.texto;
             
@@ -540,22 +461,16 @@
             const loading = document.getElementById('loading');
             const select = document.getElementById('selectHora');
             const btnAgendar = document.getElementById('btnAgendar');
-            
             loading.style.display = 'block';
             select.innerHTML = '<option value="">Carregando...</option>';
             btnAgendar.style.display = 'none';
-
-            // GARANTIA: A data já é atualizada antes de tentar baixar a planilha
             const infoDia = formatarDataHeader(dataVisualizada);
             document.getElementById('dateDisplay').innerText = infoDia.texto;
-
             try {
-                // Tenta forçar atualização do cache com timestamp
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(','));
                 
-                // CORREÇÃO: OFFSET 8 PARA A QUADRA 2 (COLUNA J)
                 let colOffset = 0;
                 if (quadraSelecionada === 2) colOffset = 8; 
                 
@@ -575,8 +490,6 @@
                 atualizarMenuHorarios();
             } catch (error) {
                 console.error("Erro planilha:", error);
-                // Se der erro, mostra os horários como livres mas avisa no console
-                // Isso evita que o menu suma
                 horariosOcupadosDoDia = [];
                 atualizarMenuHorarios(); 
             } finally {
