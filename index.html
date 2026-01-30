@@ -424,32 +424,38 @@
             }
         }
 
-        // --- AQUI ESTÁ A LÓGICA DE BLOQUEIO DO DOMINGO ---
+        // --- TRAVA DE SEGURANÇA REFORÇADA ---
         function mudarDia(delta) {
-            // Obter dias da semana (0 = Domingo, 1 = Segunda, etc)
             let hoje = new Date();
-            let diaSemanaHoje = hoje.getDay(); // Dia real de hoje
-            let diaAtualVisualizado = dataVisualizada.getDay(); // Dia que está na tela
+            let diaHoje = hoje.getDay(); // 0=Domingo...6=Sábado
+            
+            // Calcula qual é a data do próximo Domingo
+            let diasAteDomingo = (7 - diaHoje) % 7;
+            if (diaHoje === 0) diasAteDomingo = 0; // Se hoje é domingo, o limite é hoje
+            
+            let dataLimiteDomingo = new Date(hoje);
+            dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo);
+            dataLimiteDomingo.setHours(23, 59, 59, 999); // Final do dia de domingo
 
-            // BLOQUEIO: Se hoje é Domingo (0) e a pessoa tenta ir para o próximo dia (delta > 0)
-            // Ou seja, tenta ver Segunda-feira
-            if (diaSemanaHoje === 0 && delta > 0 && diaAtualVisualizado === 0) {
+            // Calcula a data que o usuário QUER ver
+            const novaDataTentativa = new Date(dataVisualizada);
+            novaDataTentativa.setDate(novaDataTentativa.getDate() + delta);
+            novaDataTentativa.setHours(12, 0, 0, 0); // Define meio dia para evitar erro de fuso
+
+            // Se a data que ele quer ver for MAIOR que o próximo Domingo, BLOQUEIA.
+            if (novaDataTentativa > dataLimiteDomingo) {
                 alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!");
-                return; // Para a função aqui, não deixa mudar
+                return; 
             }
 
-            // Lógica normal de navegação
-            const novaData = new Date(dataVisualizada);
-            novaData.setDate(novaData.getDate() + delta);
-
-            // Bloqueio de passado
+            // Bloqueio de passado normal
             hoje.setHours(0, 0, 0, 0);
-            const novaDataZerada = new Date(novaData);
+            const novaDataZerada = new Date(novaDataTentativa);
             novaDataZerada.setHours(0, 0, 0, 0);
 
             if (novaDataZerada < hoje) { return; }
             
-            dataVisualizada = novaData;
+            dataVisualizada = novaDataTentativa;
             
             const infoDia = formatarDataHeader(dataVisualizada);
             document.getElementById('dateDisplay').innerText = infoDia.texto;
@@ -461,16 +467,22 @@
             const loading = document.getElementById('loading');
             const select = document.getElementById('selectHora');
             const btnAgendar = document.getElementById('btnAgendar');
+            
             loading.style.display = 'block';
             select.innerHTML = '<option value="">Carregando...</option>';
             btnAgendar.style.display = 'none';
+
+            // GARANTIA: A data já é atualizada antes de tentar baixar a planilha
             const infoDia = formatarDataHeader(dataVisualizada);
             document.getElementById('dateDisplay').innerText = infoDia.texto;
+
             try {
+                // Tenta forçar atualização do cache com timestamp
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(','));
                 
+                // CORREÇÃO: OFFSET 8 PARA A QUADRA 2 (COLUNA J)
                 let colOffset = 0;
                 if (quadraSelecionada === 2) colOffset = 8; 
                 
@@ -490,6 +502,8 @@
                 atualizarMenuHorarios();
             } catch (error) {
                 console.error("Erro planilha:", error);
+                // Se der erro, mostra os horários como livres mas avisa no console
+                // Isso evita que o menu suma
                 horariosOcupadosDoDia = [];
                 atualizarMenuHorarios(); 
             } finally {
