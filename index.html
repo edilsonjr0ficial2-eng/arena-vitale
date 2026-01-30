@@ -412,10 +412,10 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
-        // --- SCRIPT URL (SEU NOVO LINK) ---
+        // --- SCRIPT URL (SEU LINK CORRETO) ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
         
-        // --- LINK CSV DA PLANILHA ---
+        // --- LINK CSV ---
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         
         const whatsappNumber = "5588993127830";
@@ -545,7 +545,7 @@
                 const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(','));
                 
-                // --- CORREÇÃO DA LEITURA CSV PARA QUADRA 2 (COLUNA J = INDEX 8 NO OFFSET) ---
+                // --- CORREÇÃO DE COLUNA (QUADRA 2 = OFFSET 8) ---
                 let colOffset = 0;
                 if (quadraSelecionada === 2) colOffset = 8; 
                 
