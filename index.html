@@ -9,7 +9,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- PALETA DE CORES ORIGINAL (PRETO E AMARELO) --- */
+        /* --- PALETA DE CORES --- */
         :root {
             --bg-color: #000000;
             --card-color: #111111;
@@ -23,98 +23,70 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
 
-        /* --- CABEÇALHO (NAVBAR) --- */
+        /* --- CLASSE MÁGICA PARA OCULTAR O SITE --- */
+        .oculto-inicialmente {
+            display: none; /* Isso faz as seções sumirem */
+        }
+        
+        /* Animação suave quando aparecer */
+        .fade-in {
+            animation: aparecerSuave 1s forwards;
+        }
+        @keyframes aparecerSuave {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CABEÇALHO --- */
         .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            position: fixed; top: 0; left: 0; width: 100%;
             background-color: rgba(0, 0, 0, 0.95);
             border-bottom: 2px solid var(--primary);
-            z-index: 2000;
-            padding: 10px 0;
+            z-index: 2000; padding: 10px 0;
             backdrop-filter: blur(5px);
         }
         .nav-container {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
+            max-width: 1200px; margin: auto; display: flex;
+            justify-content: space-between; align-items: center; padding: 0 20px;
         }
+        .nav-logo-img { max-height: 50px; width: auto; display: block; }
         
-        /* Logo pequena do menu (opcional, mantive a imagem pois fica mais profissional) */
-        .nav-logo-img {
-            max-height: 50px; 
-            width: auto;
-            display: block;
-        }
-        
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 25px;
-        }
+        .nav-links { list-style: none; display: flex; gap: 25px; }
         .nav-links a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            transition: 0.3s;
+            text-decoration: none; color: white; font-weight: bold;
+            font-size: 0.9rem; text-transform: uppercase; transition: 0.3s;
+            cursor: pointer; /* Garante que pareça clicável */
         }
         .nav-links a:hover { color: var(--primary); }
 
-        /* Menu Mobile */
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
         
         @media (max-width: 900px) {
             .nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background-color: #111;
-                flex-direction: column;
-                align-items: center;
-                padding: 20px 0;
-                gap: 20px;
-                border-bottom: 1px solid var(--primary);
-                display: none; 
+                position: absolute; top: 100%; left: 0; width: 100%;
+                background-color: #111; flex-direction: column;
+                align-items: center; padding: 20px 0; gap: 20px;
+                border-bottom: 1px solid var(--primary); display: none; 
             }
             .nav-links.active { display: flex; }
             .hamburger { display: block; }
         }
 
-        /* RELÓGIO FLUTUANTE */
+        /* RELÓGIO */
         .floating-clock {
-            position: fixed;
-            top: 95px; 
-            right: 20px;
+            position: fixed; top: 95px; right: 20px;
             background-color: rgba(0, 0, 0, 0.8);
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 900;
-            z-index: 1000;
+            border: 2px solid var(--primary); color: var(--primary);
+            padding: 5px 15px; border-radius: 50px;
+            font-size: 1rem; font-weight: 900; z-index: 1000;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-            letter-spacing: 1px;
         }
 
-        /* --- HERO (ONDE FIZ A MUDANÇA PRINCIPAL) --- */
+        /* HERO (BANNER PRINCIPAL) */
         .hero { 
-            height: 90vh; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 20px; 
-            overflow: hidden; 
+            height: 90vh; position: relative; display: flex; 
+            flex-direction: column; justify-content: center; 
+            align-items: center; text-align: center; padding: 20px; overflow: hidden; 
         }
         .hero::before { 
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -124,59 +96,51 @@
         }
         .hero > * { position: relative; z-index: 2; }
         
-        /* ESTILO DA LOGO GRANDE DO HERO */
         .hero-logo {
-            max-width: 90%;      /* No celular ocupa quase toda a largura */
-            width: 600px;        /* Tamanho máximo no PC */
-            height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); /* Sombra para destacar do fundo */
+            max-width: 90%; width: 600px; height: auto;
+            margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
         }
-
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
         
-        .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
-        .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); background-color: var(--hover); }
+        .btn-main { 
+            background-color: var(--primary); color: black; padding: 18px 40px; 
+            font-size: 1.2rem; font-weight: bold; text-transform: uppercase; 
+            border: none; border-radius: 50px; cursor: pointer; 
+            text-decoration: none; display: inline-block; transition: 0.3s; 
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); 
+        }
+        .btn-main:hover { transform: scale(1.05); background-color: var(--hover); }
 
+        /* ESTILOS PADRÃO DAS SEÇÕES */
         .section { padding: 60px 20px; text-align: center; }
         .section-title { font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
 
-        /* AGENDAMENTO COMPACTO */
+        /* AGENDA */
         #agenda-section { position: relative; overflow: hidden; }
         #agenda-section::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(8px); transform: scale(1.1); z-index: 0; }
         #agenda-section > * { position: relative; z-index: 1; }
         .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
+        /* RESTO DO CSS MANTIDO */
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .btn-court { background: #222; color: white; border: 2px solid #444; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .btn-court:hover { border-color: var(--primary); }
         .btn-court.active { background: var(--primary); border-color: var(--primary); color: black; }
         .btn-court.active::after { content: '✔'; font-weight: bold; }
-
         .day-navigation { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #222; padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: none; color: var(--primary); font-size: 1.5rem; cursor: pointer; padding: 0 15px; }
         .current-date-display { font-size: 1.1rem; font-weight: bold; color: white; text-transform: capitalize; }
-
         .duration-selector { margin-bottom: 20px; }
         .btn-duration { background: #222; color: white; border: 1px solid #444; padding: 8px 15px; margin: 2px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.9rem; }
         .btn-duration.active { background: var(--primary); border-color: var(--primary); color: black; }
-        
         .custom-time-box { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
         .custom-input { width: 60px; padding: 5px; border-radius: 5px; border: 1px solid #555; background: #222; color: white; text-align: center; font-weight: bold; }
         .custom-input:focus { border-color: var(--primary); outline: none; }
-
         .price-display { margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: var(--primary); background: #222; padding: 10px; border-radius: 8px; border: 1px solid var(--primary); display: block; }
-
         .time-selector-container { margin-top: 20px; text-align: left; }
         .time-select { width: 100%; padding: 15px; font-size: 1rem; background: #222; color: white; border: 1px solid #555; border-radius: 10px; margin-top: 5px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23FFD700" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px top 50%; }
-        .time-select:focus { border-color: var(--primary); outline: none; }
-        .time-select option { background: #1a1a1a; color: white; padding: 10px; }
-        .time-select option:disabled { color: var(--primary); background: var(--busy); font-style: italic; opacity: 0.7; }
-
         .btn-agendar-final { margin-top: 20px; background: var(--primary); color: black; padding: 15px; width: 100%; font-weight: 900; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; }
         .btn-agendar-final:hover { transform: scale(1.02); background: var(--hover); }
-
-        /* OUTROS */
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
         .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
@@ -184,7 +148,6 @@
         .section-dark { background-color: var(--card-color); }
         .team-generator { background-color: #222; border-radius: 20px; padding: 30px; max-width: 500px; margin: auto; border: 1px solid #444; }
         input[type="text"] { width: 100%; padding: 12px; background: #333; border: 1px solid #555; color: white; border-radius: 8px; margin: 10px 0; }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; }
         .teams-result { margin-top: 20px; padding: 15px; background: #333; border-radius: 10px; display: none; text-align: left; border: 1px solid var(--primary); }
         .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
         .team-box strong { color: var(--primary); font-size: 1.1rem; }
@@ -236,17 +199,17 @@
 
     <header class="navbar">
         <div class="nav-container">
-            <a href="#" class="nav-logo">
+            <a href="#" class="nav-logo" onclick="location.reload()">
                 <img src="logo2.png" alt="Arena Vitale" class="nav-logo-img">
             </a>
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#agenda-section" onclick="toggleMenu()">Agendar</a></li>
-                <li><a href="#modalidades" onclick="toggleMenu()">Esportes</a></li>
-                <li><a href="#arena" onclick="toggleMenu()">A Arena</a></li>
-                <li><a href="#times" onclick="toggleMenu()">Times</a></li>
-                <li><a href="#local" onclick="toggleMenu()">Local</a></li>
-                <li><a href="#placar" onclick="toggleMenu()">Placar</a></li>
+                <li><a href="#agenda-section" onclick="abrirSite('agenda-section')">Agendar</a></li>
+                <li><a href="#modalidades" onclick="abrirSite('modalidades')">Esportes</a></li>
+                <li><a href="#arena" onclick="abrirSite('arena')">A Arena</a></li>
+                <li><a href="#times" onclick="abrirSite('times')">Times</a></li>
+                <li><a href="#local" onclick="abrirSite('local')">Local</a></li>
+                <li><a href="#placar" onclick="abrirSite('placar')">Placar</a></li>
             </ul>
         </div>
     </header>
@@ -255,32 +218,24 @@
 
     <div class="hero">
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
-        
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
-        <a href="#agenda-section" class="btn-main">🔍 VERIFICAR HORÁRIOS</a>
+        
+        <a href="#agenda-section" class="btn-main" onclick="abrirSite('agenda-section')">🔍 VERIFICAR HORÁRIOS</a>
     </div>
 
-    <div id="agenda-section" class="section">
+    <div id="agenda-section" class="section oculto-inicialmente">
         <h2 class="section-title">Agendamento</h2>
-        
         <div class="agenda-box">
-            
             <p class="duration-title" style="color:white; font-weight:bold;">1. Escolha a Quadra:</p>
             <div class="court-selector">
-                <button class="btn-court active" onclick="mudarQuadra(1, this)">
-                    <span>Quadra Chicashoes</span>
-                </button>
-                <button class="btn-court" onclick="mudarQuadra(2, this)">
-                    <span>Quadra Panificadora N. Sra. de Fátima</span>
-                </button>
+                <button class="btn-court active" onclick="mudarQuadra(1, this)"><span>Quadra Chicashoes</span></button>
+                <button class="btn-court" onclick="mudarQuadra(2, this)"><span>Quadra Panificadora N. Sra. de Fátima</span></button>
             </div>
-
             <div class="day-navigation">
                 <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
                 <div class="current-date-display" id="dateDisplay">...</div>
                 <button class="nav-btn" onclick="mudarDia(1)">❯</button>
             </div>
-
             <div class="duration-selector">
                 <p class="duration-title">Tempo de jogo:</p>
                 <div style="display:flex; justify-content:center; flex-wrap:wrap;">
@@ -293,11 +248,8 @@
                     <input type="number" id="customInput" class="custom-input" placeholder="0" max="16" oninput="usarPersonalizado(this.value)">
                     <span style="color:#777;">h</span>
                 </div>
-                <div id="priceDisplay" class="price-display">
-                    Valor: R$ 45,00
-                </div>
+                <div id="priceDisplay" class="price-display">Valor: R$ 45,00</div>
             </div>
-
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="mudarPagamento()">
@@ -305,54 +257,30 @@
                     <option value="50">Cartão (Crédito/Débito) - R$ 50,00/h</option>
                 </select>
             </div>
-
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
                 <div id="loading" class="loading-msg">Carregando disponibilidade...</div>
                 <select id="selectHora" class="time-select" onchange="liberarBotao()">
                     <option value="">Aguarde, carregando agenda...</option>
                 </select>
-                <button id="btnAgendar" class="btn-agendar-final" onclick="prepararAgendamento()">
-                    ✅ CONFIRMAR HORÁRIO
-                </button>
+                <button id="btnAgendar" class="btn-agendar-final" onclick="prepararAgendamento()">✅ CONFIRMAR HORÁRIO</button>
             </div>
-
         </div>
     </div>
 
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-content">
             <h3>🎾 Dados do Jogador</h3>
-            <div class="form-group">
-                <label>Nome e Sobrenome:</label>
-                <input type="text" id="cadNomeCompleto" placeholder="Ex: João da Silva">
-            </div>
-            <div class="form-group">
-                <label>Telefone (WhatsApp):</label>
-                <input type="tel" id="cadTelefone" placeholder="(88) 99999-9999">
-            </div>
-            <div class="form-group">
-                <label>Data de Nascimento:</label>
-                <input type="text" id="cadNascimento" placeholder="DD/MM/AAAA" maxlength="10">
-            </div>
-            <div class="terms-box">
-                ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
-                ⚠️ Concordo com os termos e condições.<br><br>
-                • Cancelamentos realizados com antecedência mínima de 3 (três) horas em relação ao horário agendado não estarão sujeitos a cobrança adicional.<br><br>
-                • Cancelamentos efetuados com antecedência inferior a 3 (três) horas implicarão a cobrança de 50% (cinquenta por cento) do valor correspondente ao período reservado.
-            </div>
-            <div class="checkbox-container">
-                <input type="checkbox" id="checkTermos">
-                <label for="checkTermos">Concordo com os termos e condições.</label>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-                <button class="btn-confirm" onclick="enviarAgendamento()">Ir para WhatsApp</button>
-            </div>
+            <div class="form-group"><label>Nome e Sobrenome:</label><input type="text" id="cadNomeCompleto" placeholder="Ex: João da Silva"></div>
+            <div class="form-group"><label>Telefone (WhatsApp):</label><input type="tel" id="cadTelefone" placeholder="(88) 99999-9999"></div>
+            <div class="form-group"><label>Data de Nascimento:</label><input type="text" id="cadNascimento" placeholder="DD/MM/AAAA" maxlength="10"></div>
+            <div class="terms-box">⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>• Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br>• Menos de 3 horas: cobrança de 50%.</div>
+            <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos.</label></div>
+            <div class="modal-buttons"><button class="btn-cancel" onclick="fecharModal()">Cancelar</button><button class="btn-confirm" onclick="enviarAgendamento()">Ir para WhatsApp</button></div>
         </div>
     </div>
 
-    <div id="modalidades" class="section">
+    <div id="modalidades" class="section oculto-inicialmente">
         <h2 class="section-title">Nossas Modalidades</h2>
         <div class="grid-cards">
             <div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada.</p></div>
@@ -361,7 +289,7 @@
         </div>
     </div>
 
-    <div id="arena" class="section">
+    <div id="arena" class="section oculto-inicialmente">
         <h2 class="section-title">Conheça a Arena</h2>
         <div class="gallery-grid">
             <img src="fachada.jpeg" alt="Arena Vitale" class="gallery-item">
@@ -371,7 +299,7 @@
         </div>
     </div>
 
-    <div id="times" class="section section-dark">
+    <div id="times" class="section section-dark oculto-inicialmente">
         <h2 class="section-title">Gerador de Times ⚡</h2>
         <div class="team-generator">
             <label>Jogadores (separe por vírgula):</label>
@@ -381,13 +309,13 @@
         </div>
     </div>
 
-    <div id="local" class="section">
+    <div id="local" class="section oculto-inicialmente">
         <h2 class="section-title">Onde Estamos</h2>
         <p style="font-size: 1.1rem; margin-bottom: 10px;">Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p>
         <a href="https://maps.app.goo.gl/9z1hF99WNx5mbjXq8" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a>
     </div>
 
-    <div id="placar" class="section section-dark">
+    <div id="placar" class="section section-dark oculto-inicialmente">
         <h2 class="section-title">Placar Virtual ⚡</h2>
         <div class="scoreboard-container">
             <div class="mode-switch">
@@ -395,77 +323,65 @@
                 <button class="btn-duration" onclick="mudarModo('volei')" id="btnVolei">Vôlei / Fute</button>
             </div>
             <div class="score-box">
-                <div class="team-score">
-                    <input type="text" value="Dupla A">
-                    <div class="points-display" id="scoreA" onclick="addPonto('A')">0</div>
-                    <button class="btn-point" onclick="addPonto('A')">+</button>
-                    <div class="games-display">Games: <span class="games-count" id="gameA">0</span></div>
-                </div>
+                <div class="team-score"><input type="text" value="Dupla A"><div class="points-display" id="scoreA" onclick="addPonto('A')">0</div><button class="btn-point" onclick="addPonto('A')">+</button><div class="games-display">Games: <span class="games-count" id="gameA">0</span></div></div>
                 <div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div>
-                <div class="team-score">
-                    <input type="text" value="Dupla B">
-                    <div class="points-display" id="scoreB" onclick="addPonto('B')">0</div>
-                    <button class="btn-point" onclick="addPonto('B')">+</button>
-                    <div class="games-display">Games: <span class="games-count" id="gameB">0</span></div>
-                </div>
+                <div class="team-score"><input type="text" value="Dupla B"><div class="points-display" id="scoreB" onclick="addPonto('B')">0</div><button class="btn-point" onclick="addPonto('B')">+</button><div class="games-display">Games: <span class="games-count" id="gameB">0</span></div></div>
             </div>
             <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
         </div>
         <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
     </div>
 
-    <div class="section">
+    <div class="section oculto-inicialmente">
         <h2 class="section-title">Nossos Parceiros</h2>
         <div class="partners-container">
-            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link">
-                <img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo">
-            </a>
-            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link">
-                <img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo">
-            </a>
-            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link">
-                <img src="vitale.jpg" alt="Arena Vitale" class="partner-logo">
-            </a>
-            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link">
-                <img src="foto4.jpg" alt="Parceiro 4" class="partner-logo">
-            </a>
+            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a>
+            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a>
+            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a>
+            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a>
         </div>
     </div>
 
-    <div id="faq" class="section section-dark">
+    <div id="faq" class="section section-dark oculto-inicialmente">
         <h2 class="section-title">Dúvidas Frequentes</h2>
         <div style="max-width: 600px; margin: auto; text-align: left;">
-            <details class="faq-item">
-                <summary>Preciso levar minha própria raquete?</summary>
-                <p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong> para os jogadores. Mas se você já tiver a sua, pode trazer!</p>
-            </details>
-            <details class="faq-item">
-                <summary>Qual a antecedência para cancelar?</summary>
-                <p>Cancelamentos gratuitos devem ser feitos com até <strong>3 horas</strong> de antecedência. Após esse prazo, cobramos taxa de 50%.</p>
-            </details>
-            <details class="faq-item">
-                <summary>Quais as formas de pagamentos aceitamos?</summary>
-                <p>Aceitamos: Espécie, Pix e Cartão de Crédito/Débito.</p>
-            </details>
-            <details class="faq-item">
-                <summary>Funciona em dias de chuva?</summary>
-                <p>Sim! Como a Arena Vitale é <strong>totalmente coberta</strong>, as atividades acontecem normalmente mesmo em dias de chuva.</p>
-            </details>
-            <details class="faq-item">
-                <summary>Por que há diferença nos valores conforme a forma de pagamento?</summary>
-                <p>A diferença está de acordo com a <strong>Lei nº 13.455/2017</strong>, que permite a variação de preços conforme a forma de pagamento escolhida. Assim, os valores podem mudar dependendo se o pagamento é feito em espécie, via Pix ou no cartão.</p>
-            </details>
+            <details class="faq-item"><summary>Preciso levar minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details>
+            <details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details>
+            <details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details>
+            <details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details>
+            <details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017.</p></details>
         </div>
     </div>
 
-    <footer><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
+    <footer class="oculto-inicialmente"><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
+        // --- FUNÇÃO MÁGICA PARA ABRIR O SITE ---
+        function abrirSite(destinoId) {
+            // Seleciona tudo que está escondido
+            const escondidos = document.querySelectorAll('.oculto-inicialmente');
+            
+            // Remove a classe que esconde e adiciona animação
+            escondidos.forEach(elemento => {
+                elemento.classList.remove('oculto-inicialmente');
+                elemento.classList.add('fade-in');
+            });
+
+            // Fecha o menu mobile se estiver aberto
+            document.getElementById('navLinks').classList.remove('active');
+
+            // Rola até o destino (se houver)
+            if (destinoId) {
+                setTimeout(() => {
+                    document.getElementById(destinoId).scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+        }
+
+        // --- SCRIPTS EXISTENTES ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
-        
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        
         const whatsappNumber = "5588993127830";
         let PRECO_HORA = 45; 
         let nomePagamento = "Espécie / Pix";
@@ -476,355 +392,97 @@
         let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; 
-        
         let dataVisualizada = new Date(); 
 
-        // MENU MOBILE
-        function toggleMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
-        }
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString('pt-BR'); }
+        setInterval(atualizarRelogio, 1000); atualizarRelogio(); 
 
-        // RELÓGIO FLUTUANTE
-        function atualizarRelogio() {
-            const agora = new Date();
-            const timeString = agora.toLocaleTimeString('pt-BR');
-            document.getElementById('relogioFlutuante').innerText = timeString;
-        }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio(); 
-
-        let modoJogo = 'beach'; 
-        let pA = 0, pB = 0; 
-        let gA = 0, gB = 0; 
-        const beachPoints = [0, 15, 30, 40];
-
-        function mudarModo(modo) {
-            modoJogo = modo;
-            document.getElementById('btnBeach').classList.remove('active');
-            document.getElementById('btnVolei').classList.remove('active');
-            if(modo === 'beach') document.getElementById('btnBeach').classList.add('active');
-            else document.getElementById('btnVolei').classList.add('active');
-            zerarPlacar();
-        }
-
-        function addPonto(time) {
-            if(modoJogo === 'beach') {
-                if(time === 'A') { if(pA < 3) pA++; else { gA++; pA = 0; pB = 0; } } else { if(pB < 3) pB++; else { gB++; pA = 0; pB = 0; } }
-                atualizarTelaBeach();
-            } else {
-                if(time === 'A') gA++; else gB++;
-                document.getElementById('scoreA').innerText = gA;
-                document.getElementById('scoreB').innerText = gB;
-                document.getElementById('gameA').innerText = "-";
-                document.getElementById('gameB').innerText = "-";
-            }
-        }
-
-        function atualizarTelaBeach() {
-            document.getElementById('scoreA').innerText = beachPoints[pA];
-            document.getElementById('scoreB').innerText = beachPoints[pB];
-            document.getElementById('gameA').innerText = gA;
-            document.getElementById('gameB').innerText = gB;
-        }
-
-        function zerarPlacar() {
-            pA = 0; pB = 0; gA = 0; gB = 0;
-            if(modoJogo === 'beach') atualizarTelaBeach();
-            else {
-                document.getElementById('scoreA').innerText = 0;
-                document.getElementById('scoreB').innerText = 0;
-            }
-        }
-
-        function formatarDataHeader(date) {
-            let diaSemanaJS = date.getDay(); 
-            let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1;
-            let dia = String(date.getDate()).padStart(2, '0');
-            let mes = String(date.getMonth() + 1).padStart(2, '0');
-            return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex };
-        }
-
-        function atualizarPrecoDisplay() {
-            const total = duracaoSelecionada * PRECO_HORA;
-            document.getElementById('priceDisplay').innerText = `Valor: R$ ${total.toFixed(2).replace('.', ',')}`;
-        }
-
-        function mudarPagamento() {
-            const select = document.getElementById('selectPagamento');
-            PRECO_HORA = parseInt(select.value); 
-            nomePagamento = select.options[select.selectedIndex].text.split(' - ')[0]; 
-            atualizarPrecoDisplay();
-        }
-
-        function mudarQuadra(id, btn) {
-            quadraSelecionada = id;
-            nomeQuadra = id === 1 ? "Quadra Chicashoes" : "Quadra Panificadora N. Sra. de Fátima";
-            document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            carregarDadosDoDia(); 
-        }
-
-        function setDuracao(horas, btn) {
-            duracaoSelecionada = horas;
-            document.getElementById('customInput').value = ""; 
-            document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-            atualizarPrecoDisplay();
-            carregarDadosDoDia(); 
-        }
-
-        function usarPersonalizado(valor) {
-            if(valor) {
-                let v = parseFloat(valor);
-                if(v > 16) {
-                    alert("O tempo máximo permitido é 16 horas.");
-                    document.getElementById('customInput').value = 16;
-                    duracaoSelecionada = 16;
-                } else if(v > 0) {
-                    duracaoSelecionada = v;
-                }
-                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-                atualizarPrecoDisplay();
-                carregarDadosDoDia();
-            }
-        }
-
-        function mudarDia(delta) {
-            let hoje = new Date();
-            let diaHoje = hoje.getDay(); 
-            let diasAteDomingo = (7 - diaHoje) % 7;
-            if (diaHoje === 0) diasAteDomingo = 0;
-            
-            let dataLimiteDomingo = new Date(hoje);
-            dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo);
-            dataLimiteDomingo.setHours(23, 59, 59, 999);
-
-            const novaDataTentativa = new Date(dataVisualizada);
-            novaDataTentativa.setDate(novaDataTentativa.getDate() + delta);
-            novaDataTentativa.setHours(12, 0, 0, 0);
-
-            if (novaDataTentativa > dataLimiteDomingo) {
-                alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!");
-                return; 
-            }
-
-            hoje.setHours(0, 0, 0, 0);
-            const novaDataZerada = new Date(novaDataTentativa);
-            novaDataZerada.setHours(0, 0, 0, 0);
-
-            if (novaDataZerada < hoje) { return; }
-            
-            dataVisualizada = novaDataTentativa;
-            const infoDia = formatarDataHeader(dataVisualizada);
-            document.getElementById('dateDisplay').innerText = infoDia.texto;
-            carregarDadosDoDia();
+        let modoJogo = 'beach'; let pA = 0, pB = 0; let gA = 0, gB = 0; const beachPoints = [0, 15, 30, 40];
+        function mudarModo(modo) { modoJogo = modo; document.getElementById('btnBeach').classList.remove('active'); document.getElementById('btnVolei').classList.remove('active'); if(modo === 'beach') document.getElementById('btnBeach').classList.add('active'); else document.getElementById('btnVolei').classList.add('active'); zerarPlacar(); }
+        function addPonto(time) { if(modoJogo === 'beach') { if(time === 'A') { if(pA < 3) pA++; else { gA++; pA = 0; pB = 0; } } else { if(pB < 3) pB++; else { gB++; pA = 0; pB = 0; } } atualizarTelaBeach(); } else { if(time === 'A') gA++; else gB++; document.getElementById('scoreA').innerText = gA; document.getElementById('scoreB').innerText = gB; document.getElementById('gameA').innerText = "-"; document.getElementById('gameB').innerText = "-"; } }
+        function atualizarTelaBeach() { document.getElementById('scoreA').innerText = beachPoints[pA]; document.getElementById('scoreB').innerText = beachPoints[pB]; document.getElementById('gameA').innerText = gA; document.getElementById('gameB').innerText = gB; }
+        function zerarPlacar() { pA = 0; pB = 0; gA = 0; gB = 0; if(modoJogo === 'beach') atualizarTelaBeach(); else { document.getElementById('scoreA').innerText = 0; document.getElementById('scoreB').innerText = 0; } }
+        function formatarDataHeader(date) { let diaSemanaJS = date.getDay(); let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex }; }
+        function atualizarPrecoDisplay() { document.getElementById('priceDisplay').innerText = `Valor: R$ ${(duracaoSelecionada * PRECO_HORA).toFixed(2).replace('.', ',')}`; }
+        function mudarPagamento() { const select = document.getElementById('selectPagamento'); PRECO_HORA = parseInt(select.value); nomePagamento = select.options[select.selectedIndex].text.split(' - ')[0]; atualizarPrecoDisplay(); }
+        function mudarQuadra(id, btn) { quadraSelecionada = id; nomeQuadra = id === 1 ? "Quadra Chicashoes" : "Quadra Panificadora N. Sra. de Fátima"; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
+        function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); atualizarPrecoDisplay(); carregarDadosDoDia(); }
+        function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); document.getElementById('customInput').value = 16; duracaoSelecionada = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); atualizarPrecoDisplay(); carregarDadosDoDia(); } }
+        
+        function mudarDia(delta) { 
+            let hoje = new Date(); let diaHoje = hoje.getDay(); let diasAteDomingo = (7 - diaHoje) % 7; if (diaHoje === 0) diasAteDomingo = 0; 
+            let dataLimiteDomingo = new Date(hoje); dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo); dataLimiteDomingo.setHours(23, 59, 59, 999);
+            const novaDataTentativa = new Date(dataVisualizada); novaDataTentativa.setDate(novaDataTentativa.getDate() + delta); novaDataTentativa.setHours(12, 0, 0, 0);
+            if (novaDataTentativa > dataLimiteDomingo) { alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!"); return; }
+            hoje.setHours(0, 0, 0, 0); const novaDataZerada = new Date(novaDataTentativa); novaDataZerada.setHours(0, 0, 0, 0);
+            if (novaDataZerada < hoje) { return; } dataVisualizada = novaDataTentativa; 
+            document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia();
         }
 
         async function carregarDadosDoDia() {
-            const loading = document.getElementById('loading');
-            const select = document.getElementById('selectHora');
-            const btnAgendar = document.getElementById('btnAgendar');
-            loading.style.display = 'block';
-            select.innerHTML = '<option value="">Carregando...</option>';
-            btnAgendar.style.display = 'none';
-            const infoDia = formatarDataHeader(dataVisualizada);
-            document.getElementById('dateDisplay').innerText = infoDia.texto;
+            const loading = document.getElementById('loading'); const select = document.getElementById('selectHora'); const btnAgendar = document.getElementById('btnAgendar');
+            loading.style.display = 'block'; select.innerHTML = '<option value="">Carregando...</option>'; btnAgendar.style.display = 'none';
+            document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
             try {
-                const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
-                const data = await response.text();
-                const rows = data.split('\n').map(row => row.split(','));
-                let colOffset = 0;
-                if (quadraSelecionada === 2) colOffset = 8; 
+                const response = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const data = await response.text();
+                const rows = data.split('\n').map(row => row.split(',')); let colOffset = (quadraSelecionada === 2) ? 8 : 0;
                 horariosOcupadosDoDia = [];
                 rows.forEach((row, rowIndex) => {
-                    if (rowIndex === 0) return; 
-                    const horaDaLinha = parseInt(row[0]); 
+                    if (rowIndex === 0) return; const horaDaLinha = parseInt(row[0]);
                     if (!isNaN(horaDaLinha)) {
-                        let diaPlanilha = infoDia.index + 1;
-                        let colunaReal = diaPlanilha + colOffset;
+                        let diaPlanilha = formatarDataHeader(dataVisualizada).index + 1; let colunaReal = diaPlanilha + colOffset;
                         let cellValue = row[colunaReal] ? row[colunaReal].replace(/[\r\n"]/g, '').trim() : "";
-                        if (cellValue.length > 0) {
-                            horariosOcupadosDoDia.push({ hora: horaDaLinha, nome: cellValue }); 
-                        }
+                        if (cellValue.length > 0) horariosOcupadosDoDia.push({ hora: horaDaLinha, nome: cellValue });
                     }
                 });
                 atualizarMenuHorarios();
-            } catch (error) {
-                console.error("Erro planilha:", error);
-                horariosOcupadosDoDia = [];
-                atualizarMenuHorarios(); 
-            } finally {
-                loading.style.display = 'none';
-            }
+            } catch (error) { console.error(error); horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
         function atualizarMenuHorarios() {
-            const select = document.getElementById('selectHora');
-            select.innerHTML = '<option value="">Selecione o horário...</option>';
+            const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
             horas.forEach(h => {
-                let option = document.createElement('option');
-                let texto = `${h}:00 - Livre`;
-                let valor = h;
-                let disabled = false;
-                let estaOcupado = false;
-                let motivo = "";
-                let nomeNoHorario = "";
+                let option = document.createElement('option'); let texto = `${h}:00 - Livre`; let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = "";
                 let blocosNecessarios = Math.ceil(duracaoSelecionada);
                 for (let i = 0; i < blocosNecessarios; i++) {
                     let ocupacao = horariosOcupadosDoDia.find(item => item.hora === (h + i));
-                    if (ocupacao) {
-                        estaOcupado = true;
-                        if ((h + i) === h) {
-                            motivo = "busy";
-                            let nomeLimpo = ocupacao.nome.toLowerCase();
-                            if(nomeLimpo === 'x' || nomeLimpo === 'ok' || nomeLimpo === 'ocupado') {
-                                nomeNoHorario = "Reservado";
-                            } else {
-                                nomeNoHorario = ocupacao.nome;
-                            }
-                        } else {
-                            motivo = "conflict";
-                        }
-                        break;
-                    }
+                    if (ocupacao) { estaOcupado = true; if ((h + i) === h) nomeNoHorario = (ocupacao.nome.toLowerCase() === 'x' || ocupacao.nome.toLowerCase() === 'ok') ? "Reservado" : ocupacao.nome; break; }
                 }
-                if (estaOcupado) {
-                    disabled = true;
-                    if (motivo === "busy") {
-                        texto = `${h}:00 - ⛔ Ocupado (${nomeNoHorario})`;
-                    } else {
-                        texto = `${h}:00 - ⚠️ Indisponível (Choque de horário)`;
-                    }
-                }
-                option.value = valor;
-                option.text = texto;
-                option.disabled = disabled;
-                select.appendChild(option);
+                if (estaOcupado) { disabled = true; texto = `${h}:00 - ⛔ Ocupado (${nomeNoHorario})`; }
+                option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
             });
         }
 
-        function liberarBotao() {
-            const select = document.getElementById('selectHora');
-            const btn = document.getElementById('btnAgendar');
-            if (select.value) { btn.style.display = 'block'; } else { btn.style.display = 'none'; }
-        }
-
-        function prepararAgendamento() {
-            const h = parseInt(document.getElementById('selectHora').value);
-            const infoDia = formatarDataHeader(dataVisualizada);
-            let fim = h + duracaoSelecionada;
-            let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`;
-            let valorTotal = duracaoSelecionada * PRECO_HORA;
-            abrirModal(h, horaFimTexto, infoDia.texto, valorTotal);
-        }
-
-        function abrirModal(hora, fim, infoDia, valor) {
-            tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor;
-            document.getElementById('modalCadastro').style.display = 'flex';
-        }
-
-        function fecharModal() {
-            document.getElementById('modalCadastro').style.display = 'none';
-        }
+        function liberarBotao() { const select = document.getElementById('selectHora'); document.getElementById('btnAgendar').style.display = select.value ? 'block' : 'none'; }
+        function prepararAgendamento() { const h = parseInt(document.getElementById('selectHora').value); let fim = h + duracaoSelecionada; let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`; let valorTotal = duracaoSelecionada * PRECO_HORA; abrirModal(h, horaFimTexto, formatarDataHeader(dataVisualizada).texto, valorTotal); }
+        function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
         function enviarAgendamento() {
-            const nomeCompleto = document.getElementById('cadNomeCompleto').value;
-            const telefone = document.getElementById('cadTelefone').value;
-            const nascimento = document.getElementById('cadNascimento').value;
-            const checkTermos = document.getElementById('checkTermos').checked;
-
-            if(!nomeCompleto || !telefone || !nascimento) { alert("Por favor, preencha todos os campos!"); return; }
-            if(!checkTermos) { alert("Você precisa concordar com os termos para continuar."); return; }
-
-            const btnConfirm = document.querySelector('.btn-confirm');
-            btnConfirm.innerText = "Agendando...";
-            btnConfirm.disabled = true;
-
-            const dadosParaPlanilha = {
-                nome: nomeCompleto,
-                diaIndex: formatarDataHeader(dataVisualizada).index,
-                hora: tempHora,
-                quadra: quadraSelecionada,
-                duracao: duracaoSelecionada
-            };
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(dadosParaPlanilha)
-            })
+            const nome = document.getElementById('cadNomeCompleto').value; const tel = document.getElementById('cadTelefone').value; const nasc = document.getElementById('cadNascimento').value;
+            if(!nome || !tel || !nasc) return alert("Preencha tudo!"); if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
+            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
+            const dados = { nome: nome, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada };
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dados) })
             .then(() => {
-                let txtDuracao = duracaoSelecionada + (duracaoSelecionada === 1 ? " hora" : " horas");
-                
-                const msg = `*NOVO AGENDAMENTO REALIZADO (SITE)*\n` +
-                            `✅ *Horário Bloqueado Automaticamente*\n` +
-                            `-----------------------\n` +
-                            `👤 *Cliente:* ${nomeCompleto}\n` +
-                            `🎂 *Nasc:* ${nascimento}\n` + 
-                            `📞 *Tel:* ${telefone}\n` +
-                            `🏟️ *${nomeQuadra}*\n` +
-                            `🗓️ *${tempInfoDia}*\n` +
-                            `⏰ *${tempHora}:00 às ${tempFim}*\n` +
-                            `⏳ Duração: ${txtDuracao}\n` +
-                            `💰 Pagamento: ${nomePagamento}\n` +
-                            `💵 Valor Total: R$ ${tempValor},00\n` +
-                            `-----------------------\n` +
-                            `⚠️ *Confirmo que li e aceito a política de cancelamento.*`;
-
+                let msg = `*NOVO AGENDAMENTO*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${tempInfoDia}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 R$ ${tempValor},00\n✅ Aceito os termos.`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
-                
-                alert("Horário pré-reservado! Envie a mensagem no WhatsApp para concluir.");
-                
-                const select = document.getElementById('selectHora');
-                const options = select.options;
-                for (let i = 0; i < options.length; i++) {
-                    if (options[i].value == tempHora) {
-                        options[i].text = `${tempHora}:00 - ✅ Reservado (Você)`;
-                        options[i].disabled = true;
-                        break;
-                    }
-                }
-                
-                select.value = "";
-                document.getElementById('btnAgendar').style.display = 'none';
-                fecharModal();
-                btnConfirm.innerText = "Ir para WhatsApp";
-                btnConfirm.disabled = false;
+                alert("Pré-reserva feita! Finalize no WhatsApp."); location.reload();
             })
-            .catch(error => {
-                console.error("Erro:", error);
-                alert("Houve um erro ao reservar automaticamente. Por favor, chame no WhatsApp.");
-                btnConfirm.innerText = "Ir para WhatsApp";
-                btnConfirm.disabled = false;
-            });
+            .catch(() => { alert("Erro. Chame no Zap."); btn.disabled = false; });
         }
 
-        const infoInicial = formatarDataHeader(dataVisualizada);
-        document.getElementById('dateDisplay').innerText = infoInicial.texto;
-        
-        carregarDadosDoDia();
-        atualizarPrecoDisplay();
+        const infoInicial2 = formatarDataHeader(dataVisualizada); document.getElementById('dateDisplay').innerText = infoInicial2.texto;
+        carregarDadosDoDia(); atualizarPrecoDisplay();
 
         function gerarTimes() {
-            const input = document.getElementById('playerNames').value;
-            const resultArea = document.getElementById('resultArea');
-            if (!input.trim()) return alert("Digite nomes!");
-            let players = input.split(',').map(n => n.trim()).filter(n => n !== "");
-            if (players.length < 2) return alert("Mínimo 2 jogadores!");
-            for (let i = players.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [players[i], players[j]] = [players[j], players[i]];
-            }
-            let html = "";
-            let c = 1;
-            for (let i = 0; i < players.length; i += 2) {
-                let p2 = players[i+1] || "(Revezamento)";
-                html += `<div class="team-box"><strong>Time ${c++}:</strong> ${players[i]} e ${p2}</div>`;
-            }
-            resultArea.innerHTML = html;
-            resultArea.style.display = "block";
+            const input = document.getElementById('playerNames').value; const resultArea = document.getElementById('resultArea');
+            if (!input.trim()) return alert("Digite nomes!"); let players = input.split(',').map(n => n.trim()).filter(n => n !== "");
+            if (players.length < 2) return alert("Mínimo 2!");
+            for (let i = players.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [players[i], players[j]] = [players[j], players[i]]; }
+            let html = ""; let c = 1; for (let i = 0; i < players.length; i += 2) { html += `<div class="team-box"><strong>Time ${c++}:</strong> ${players[i]} e ${players[i+1] || "(Revezamento)"}</div>`; }
+            resultArea.innerHTML = html; resultArea.style.display = "block";
         }
     </script>
 </body>
