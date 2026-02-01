@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin | Arena Vitale</title>
+    
+    <link rel="icon" href="logo2.png" type="image/png">
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -25,7 +28,7 @@
         
         /* ESTILO DA LOGO (IMAGEM) */
         .logo-img {
-            max-height: 70px; /* Aumentei um pouco para valorizar o PNG */
+            max-height: 70px;
             width: auto;
             display: block;
         }
@@ -102,11 +105,11 @@
     <div class="header">
         <div class="top-row">
             <img src="logo2.png" alt="Arena Vitale" class="logo-img">
-            
             <button class="tool-btn btn-logout" onclick="fazerLogout()">Sair 🚪</button>
         </div>
         
         <div class="toolbar">
+            <button class="tool-btn" onclick="window.open('index.html', '_blank')" title="Ir para o Site Público">🌐 Ver Site</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="bloqueioEmergencia()">⛔ Interditar Dia</button>
             <button class="tool-btn" onclick="alternarModo()">🌗 Sol/Sombra</button>
@@ -234,7 +237,7 @@
                 if(idx === 0) return;
                 let h = parseInt(row[0]);
                 if(!isNaN(h)) {
-                    let colQ1 = 1 + diaIndex; // Ajuste conforme suas colunas
+                    let colQ1 = 1 + diaIndex; 
                     let colQ2 = 9 + diaIndex;
                     let nomeQ1 = row[colQ1] ? row[colQ1].replace(/[\r\n"]/g, '').trim() : "";
                     let nomeQ2 = row[colQ2] ? row[colQ2].replace(/[\r\n"]/g, '').trim() : "";
@@ -250,9 +253,9 @@
         }
 
         function atualizarEstatisticas(ocupados) {
-            let totalSlots = horas.length * 2; // 2 Quadras
+            let totalSlots = horas.length * 2; 
             let porcentagem = Math.round((ocupados / totalSlots) * 100);
-            let faturamento = ocupados * 45; // Valor base R$ 45
+            let faturamento = ocupados * 45; 
             
             document.getElementById('statOcupacao').innerText = porcentagem + "%";
             document.getElementById('statFaturamento').innerText = "R$ " + faturamento.toFixed(2).replace('.', ',');
