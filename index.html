@@ -23,10 +23,9 @@
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
 
         /* --- UTILITÁRIOS DE EXIBIÇÃO --- */
-        /* Esta classe esconde as seções que não estão em uso */
         .secao-conteudo {
             display: none; /* Começa escondido */
-            min-height: 80vh; /* Garante que ocupe a tela */
+            min-height: 80vh;
             padding: 40px 20px;
             animation: fadeIn 0.5s ease;
         }
@@ -45,27 +44,30 @@
             backdrop-filter: blur(5px);
         }
         .nav-container {
-            max-width: 1200px; margin: auto; display: flex;
+            max-width: 1300px; margin: auto; display: flex; /* Aumentei max-width para caber mais itens */
             justify-content: space-between; align-items: center; padding: 0 20px;
         }
         .nav-logo-img { max-height: 50px; width: auto; display: block; cursor: pointer; }
         
-        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links { list-style: none; display: flex; gap: 15px; } /* Gap menor para caber tudo */
         .nav-links a {
             text-decoration: none; color: white; font-weight: bold;
-            font-size: 0.85rem; text-transform: uppercase; transition: 0.3s; cursor: pointer;
+            font-size: 0.75rem; /* Fonte um pouco menor para caber os nomes longos */
+            text-transform: uppercase; transition: 0.3s; cursor: pointer;
+            white-space: nowrap;
         }
         .nav-links a:hover { color: var(--primary); }
 
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
         
-        @media (max-width: 900px) {
+        @media (max-width: 1100px) { /* Breakpoint ajustado para menus longos */
             .nav-links {
                 position: absolute; top: 100%; left: 0; width: 100%;
                 background-color: #111; flex-direction: column;
                 align-items: center; padding: 20px 0; gap: 20px;
                 border-bottom: 1px solid var(--primary); display: none; 
             }
+            .nav-links a { font-size: 1rem; } /* No mobile volta a ser grande */
             .nav-links.active { display: flex; }
             .hamburger { display: block; }
         }
@@ -80,10 +82,9 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
         }
 
-        /* --- HERO (TELA INICIAL) --- */
+        /* --- HERO --- */
         #tela-inicial {
-            display: flex; /* Flex para centralizar */
-            height: 90vh; flex-direction: column; 
+            display: flex; height: 90vh; flex-direction: column; 
             justify-content: center; align-items: center; 
             text-align: center; padding: 20px; overflow: hidden; position: relative;
         }
@@ -114,7 +115,7 @@
         .section-title { font-size: 2rem; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; text-align: center; width: 100%; }
         .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* RESTO DO CSS (Mantido igual) */
+        /* ELEMENTOS CSS */
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .btn-court { background: #222; color: white; border: 2px solid #444; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .btn-court:hover { border-color: var(--primary); }
@@ -197,11 +198,13 @@
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
-                <li><a onclick="navegarPara('tela-modalidades')">Esportes</a></li>
-                <li><a onclick="navegarPara('tela-arena')">A Arena</a></li>
-                <li><a onclick="navegarPara('tela-times')">Times</a></li>
-                <li><a onclick="navegarPara('tela-local')">Local</a></li>
-                <li><a onclick="navegarPara('tela-placar')">Placar</a></li>
+                <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
+                <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
+                <li><a onclick="navegarPara('tela-times')">Gerador de Times</a></li>
+                <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
+                <li><a onclick="navegarPara('tela-placar')">Marcar Placar</a></li>
+                <li><a onclick="navegarPara('tela-parceiros')">Nossos Parceiros</a></li>
+                <li><a onclick="navegarPara('tela-faq')">Dúvidas Frequentes</a></li>
             </ul>
         </div>
     </header>
@@ -281,31 +284,12 @@
     </div>
 
     <div id="tela-arena" class="secao-conteudo">
-        <h2 class="section-title">Conheça a Arena</h2>
+        <h2 class="section-title">Conheça Nossa Arena</h2>
         <div class="gallery-grid">
             <img src="fachada.jpeg" alt="Arena Vitale" class="gallery-item">
             <img src="quadra2.jpeg" alt="Quadra de Beach Tennis" class="gallery-item">
             <img src="geral2.jpeg" alt="Lounge" class="gallery-item">
             <img src="foto4.jpg" alt="Iluminação Noturna" class="gallery-item">
-        </div>
-        
-        <h2 class="section-title" style="margin-top:50px;">Nossos Parceiros</h2>
-        <div class="partners-container">
-            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a>
-            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a>
-            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a>
-            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a>
-        </div>
-        
-        <div id="faq" class="section section-dark" style="margin-top:50px;">
-            <h2 class="section-title">Dúvidas Frequentes</h2>
-            <div style="max-width: 600px; margin: auto; text-align: left;">
-                <details class="faq-item"><summary>Preciso levar minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details>
-                <details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details>
-                <details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details>
-                <details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details>
-                <details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017.</p></details>
-            </div>
         </div>
     </div>
 
@@ -340,6 +324,27 @@
             <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button>
         </div>
         <p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p>
+    </div>
+
+    <div id="tela-parceiros" class="secao-conteudo">
+        <h2 class="section-title">Nossos Parceiros</h2>
+        <div class="partners-container">
+            <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a>
+            <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a>
+            <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a>
+            <a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a>
+        </div>
+    </div>
+
+    <div id="tela-faq" class="secao-conteudo section-dark">
+        <h2 class="section-title">Dúvidas Frequentes</h2>
+        <div style="max-width: 600px; margin: auto; text-align: left;">
+            <details class="faq-item"><summary>Preciso levar minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details>
+            <details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details>
+            <details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details>
+            <details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details>
+            <details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017.</p></details>
+        </div>
     </div>
 
     <footer><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
