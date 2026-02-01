@@ -101,7 +101,7 @@
         
         <div class="toolbar">
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
-            <button class="tool-btn" onclick="bloqueioEmergencia()">🌧️ Chuva/Manut.</button>
+            <button class="tool-btn" onclick="bloqueioEmergencia()">⛔ Interditar Dia</button>
             <button class="tool-btn" onclick="alternarModo()">🌗 Sol/Sombra</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
@@ -312,15 +312,15 @@
             navigator.clipboard.writeText(texto).then(() => alert("Agenda copiada! Cole no WhatsApp."));
         }
 
-        // 2. BLOQUEIO DE EMERGÊNCIA
+        // 2. BLOQUEIO DE EMERGÊNCIA (MODIFICADO: SEM CHUVA)
         function bloqueioEmergencia() {
-            if(!confirm("⚠️ Tem certeza? Isso vai bloquear TODOS os horários livres de hoje com 'MANUTENÇÃO'.")) return;
+            if(!confirm("⚠️ Tem certeza? Isso vai bloquear TODOS os horários livres de hoje como 'INTERDITADO'.")) return;
             
             // Loop para bloquear Q1 e Q2
             horas.forEach(h => {
                 let slot = dadosAgenda.find(d => d.hora === h);
-                if (!slot.q1) enviarComando("agendar", h, 1, "⛔ INTERDITADO (Chuva/Mnt)");
-                if (!slot.q2) enviarComando("agendar", h, 2, "⛔ INTERDITADO (Chuva/Mnt)");
+                if (!slot.q1) enviarComando("agendar", h, 1, "⛔ INTERDITADO");
+                if (!slot.q2) enviarComando("agendar", h, 2, "⛔ INTERDITADO");
             });
             alert("Bloqueio de emergência enviado!");
         }
