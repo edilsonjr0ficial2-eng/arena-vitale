@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arena Vitale | Beach Tennis</title>
     
-    <link rel="icon" href="logo2.png" type="image/png">
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- PALETA DE CORES --- */
+        /* --- PALETA --- */
         :root {
             --bg-color: #000000;
             --card-color: #111111;
@@ -22,9 +22,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
 
-        /* --- SISTEMA DE ABAS (PÁGINA ÚNICA) --- */
+        /* --- UTILITÁRIOS DE EXIBIÇÃO --- */
         .secao-conteudo {
-            display: none; /* Começa tudo oculto */
+            display: none; /* Começa escondido */
             min-height: 80vh;
             padding: 40px 20px;
             animation: fadeIn 0.5s ease;
@@ -35,7 +35,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- NAVBAR FIXA --- */
+        /* --- NAVBAR --- */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%;
             background-color: rgba(0, 0, 0, 0.95);
@@ -72,7 +72,7 @@
             .hamburger { display: block; }
         }
 
-        /* RELÓGIO FLUTUANTE */
+        /* RELÓGIO */
         .floating-clock {
             position: fixed; top: 95px; right: 20px;
             background-color: rgba(0, 0, 0, 0.8);
@@ -82,7 +82,7 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
         }
 
-        /* --- TELA INICIAL (HERO) --- */
+        /* --- HERO --- */
         #tela-inicial {
             display: flex; height: 90vh; flex-direction: column; 
             justify-content: center; align-items: center; 
@@ -111,11 +111,11 @@
         }
         .btn-main:hover { transform: scale(1.05); background-color: var(--hover); }
 
-        /* ESTILOS GERAIS */
+        /* Estilos Gerais */
         .section-title { font-size: 2rem; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; text-align: center; width: 100%; }
         .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* BOTÕES E INPUTS */
+        /* ELEMENTOS CSS */
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .btn-court { background: #222; color: white; border: 2px solid #444; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 1rem; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .btn-court:hover { border-color: var(--primary); }
@@ -144,11 +144,8 @@
         .teams-result { margin-top: 20px; padding: 15px; background: #333; border-radius: 10px; display: none; text-align: left; border: 1px solid var(--primary); }
         .team-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #444; }
         .team-box strong { color: var(--primary); font-size: 1.1rem; }
-        
-        /* BOTÃO DO MAPA */
         .map-btn { margin-top: 25px; padding: 15px 30px; border: 2px solid var(--primary); color: var(--primary); text-decoration: none; border-radius: 50px; display: inline-block; transition: 0.3s; font-weight: bold; font-size: 1.1rem; }
         .map-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
-        
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: var(--primary); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; }
         .wa-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center;}
@@ -196,7 +193,7 @@
     <header class="navbar">
         <div class="nav-container">
             <a onclick="navegarPara('tela-inicial')" class="nav-logo">
-                <img src="logo2.png" alt="Arena Vitale" class="nav-logo-img">
+                <img src="logo.jpg" alt="Arena Vitale" class="nav-logo-img">
             </a>
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-links" id="navLinks">
@@ -312,7 +309,7 @@
         
         <div class="map-responsive">
             <iframe 
-                src="https://maps.google.com/maps?q=Arena%20Vitale%20Russas%20Ceara&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.222379379893!2d-37.9748!3d-4.9392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNTYnMjEuMSJTIDM3wrA1OCcyOS4zIlc!5e0!3m2!1spt-BR!2sbr!4v1234567890" 
                 width="100%" 
                 height="450" 
                 style="border:0; border-radius: 15px;" 
@@ -322,7 +319,7 @@
         </div>
 
         <br><br>
-        <a href="https://www.google.com/maps/search/?api=1&query=Arena+Vitale+Russas" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=Av.+Cel+Antônio+Cordeiro,+2261,+Russas+-+CE" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a>
     </div>
 
     <div id="tela-placar" class="secao-conteudo">
