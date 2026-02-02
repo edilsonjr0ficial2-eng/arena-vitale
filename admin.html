@@ -50,16 +50,6 @@
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         
-        /* ESTILOS DA TABELA DE CLIENTES */
-        .modal-wide { max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; }
-        table.clientes-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 15px; color: #ccc; }
-        table.clientes-table th, table.clientes-table td { border: 1px solid #444; padding: 8px; text-align: left; }
-        table.clientes-table th { background: #333; color: var(--primary); }
-        table.clientes-table tr:nth-child(even) { background: rgba(255,255,255,0.05); }
-
-        .blacklist-container { max-height: 200px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
-        .black-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 8px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
-        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
@@ -89,10 +79,11 @@
         
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="abrirClientes()">👥 Clientes</button>
+            <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes (Nova Aba)</button>
+            <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra (Nova Aba)</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="bloqueioEmergencia()">⛔ Interditar Dia</button>
-            <button class="tool-btn" onclick="abrirBlacklist()">📜 Lista Negra</button>
+            <button class="tool-btn" onclick="abrirModalAddBloqueio()">➕ Add Bloqueio</button>
             <button class="tool-btn" onclick="alternarModo()">🌗 Sol/Sombra</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
@@ -129,22 +120,13 @@
         </div>
     </div>
 
-    <div id="modalBlacklist" class="modal-bg">
+    <div id="modalAddBlacklist" class="modal-bg">
         <div class="modal-box">
-            <h3 style="color:var(--danger)">Gerenciar Lista Negra</h3>
+            <h3 style="color:var(--danger)">Adicionar à Lista Negra</h3>
             <input type="text" id="blNome" placeholder="Nome do Bloqueado">
             <input type="tel" id="blTel" placeholder="Telefone (apenas números)">
-            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">ADICIONAR</button>
-            <div class="blacklist-container" id="listaNegraContainer"></div>
-            <button class="close-btn" onclick="fecharModalBlacklist()">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalClientes" class="modal-bg">
-        <div class="modal-box modal-wide">
-            <h3 style="color:var(--primary)">Base de Clientes</h3>
-            <div id="tabelaClientesContainer">Carregando...</div>
-            <button class="close-btn" onclick="document.getElementById('modalClientes').style.display='none'">Fechar</button>
+            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">CONFIRMAR BLOQUEIO</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -157,7 +139,6 @@
         const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let dadosAgenda = [];
-        let listaNegraCache = [];
         let tempAgendamento = {};
 
         // --- INICIALIZAÇÃO ---
@@ -182,12 +163,69 @@
         function alternarModo() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
         function aplicarTemaSalvo() { if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode'); }
         function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); carregarAgenda(); }
-        
         function formatarData(date) {
             let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
             let dia = String(date.getDate()).padStart(2, '0');
             let mes = String(date.getMonth() + 1).padStart(2, '0');
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
+        }
+
+        // --- FUNÇÃO PARA GERAR RELATÓRIOS EM NOVA ABA ---
+        function gerarRelatorio(tipo) {
+            let win = window.open("", "_blank");
+            win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando dados...</h2></body></html>");
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" })
+            })
+            .then(r => r.json())
+            .then(data => {
+                let titulo = tipo === 'clientes' ? "Relatório de Clientes" : "Relatório da Lista Negra";
+                let html = `
+                    <html>
+                    <head>
+                        <title>${titulo}</title>
+                        <style>
+                            body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
+                            h1 { color: #FFD700; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #222; }
+                            th, td { padding: 12px; border: 1px solid #444; text-align: left; }
+                            th { background: #FFD700; color: #000; font-weight: bold; }
+                            tr:nth-child(even) { background: #2a2a2a; }
+                            tr:hover { background: #333; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${titulo}</h1>
+                        <table>
+                `;
+
+                if (tipo === 'clientes') {
+                    html += `<thead><tr><th>Data Cadastro</th><th>Nome</th><th>Telefone</th><th>Senha</th><th>Último Acesso</th></tr></thead><tbody>`;
+                    // Pula cabeçalho (índice 0)
+                    for(let i = 1; i < data.lista.length; i++) {
+                        let row = data.lista[i];
+                        let dataF = row[0] ? new Date(row[0]).toLocaleDateString() : "-";
+                        html += `<tr><td>${dataF}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
+                    }
+                } else {
+                    html += `<thead><tr><th>Nome Bloqueado</th><th>Telefone Bloqueado</th></tr></thead><tbody>`;
+                    for(let i = 0; i < data.lista.length; i++) {
+                        let row = data.lista[i];
+                        html += `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`;
+                    }
+                }
+
+                html += `</tbody></table><br><button onclick="window.close()" style="padding:10px 20px;cursor:pointer;">Fechar Aba</button></body></html>`;
+                
+                win.document.open();
+                win.document.write(html);
+                win.document.close();
+            })
+            .catch(e => {
+                win.document.body.innerHTML = "<h2 style='color:red'>Erro ao carregar dados. Verifique a conexão.</h2>";
+            });
         }
 
         // --- AGENDA E CSV ---
@@ -197,7 +235,6 @@
             document.getElementById('printDate').innerText = info.texto;
             document.getElementById('listaQ1').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
             document.getElementById('listaQ2').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
-
             try {
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
                 const csv = await response.text();
@@ -207,8 +244,7 @@
 
         function processarCSV(csv, diaIndex) {
             const rows = csv.split('\n').map(r => r.split(','));
-            dadosAgenda = []; listaNegraCache = []; let ocupados = 0;
-
+            dadosAgenda = []; let ocupados = 0;
             rows.forEach((row, idx) => {
                 if(idx === 0) return;
                 let h = parseInt(row[0]);
@@ -219,9 +255,6 @@
                     if(nomeQ1) ocupados++; if(nomeQ2) ocupados++;
                     dadosAgenda.push({ hora: h, q1: nomeQ1, q2: nomeQ2 });
                 }
-                let nomeBL = row[25] ? row[25].replace(/[\r\n"]/g, '').trim() : "";
-                let telBL = row[26] ? row[26].replace(/[\r\n"]/g, '').trim() : "";
-                if (nomeBL || telBL) listaNegraCache.push({ nome: nomeBL, tel: telBL });
             });
             atualizarEstatisticas(ocupados);
             renderizarGrid();
@@ -255,75 +288,16 @@
             return `<div class="slot"><span class="time-label">${hora}:00</span><div class="slot-content ${ocupado ? 'booked' : ''}">${conteudo}</div><div class="actions">${botoes}</div></div>`;
         }
 
-        // --- CLIENTES (NOVO) ---
-        function abrirClientes() {
-            document.getElementById('modalClientes').style.display = 'flex';
-            document.getElementById('tabelaClientesContainer').innerHTML = "Carregando dados da nuvem...";
-            
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "listar_clientes" })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if(data.erro) {
-                    document.getElementById('tabelaClientesContainer').innerHTML = "Erro: " + data.erro;
-                } else {
-                    renderizarTabelaClientes(data.lista);
-                }
-            })
-            .catch(e => document.getElementById('tabelaClientesContainer').innerHTML = "Erro de conexão.");
-        }
-
-        function renderizarTabelaClientes(lista) {
-            if(!lista || lista.length < 2) {
-                document.getElementById('tabelaClientesContainer').innerHTML = "Nenhum cliente cadastrado.";
-                return;
-            }
-            // Cabeçalho da planilha: Data, Nome, Telefone, Senha, Acesso
-            let html = '<table class="clientes-table"><thead><tr><th>Nome</th><th>Telefone</th><th>Último Acesso</th><th>Data Cadastro</th></tr></thead><tbody>';
-            
-            // Começa do índice 1 para pular cabeçalho
-            for(let i = 1; i < lista.length; i++) {
-                let col = lista[i];
-                let dataCad = col[0] ? new Date(col[0]).toLocaleDateString() : "-";
-                let nome = col[1] || "-";
-                let tel = col[2] || "-";
-                let acesso = col[4] || "-"; // Coluna E
-                
-                html += `<tr><td>${nome}</td><td>${tel}</td><td>${acesso}</td><td>${dataCad}</td></tr>`;
-            }
-            html += '</tbody></table>';
-            document.getElementById('tabelaClientesContainer').innerHTML = html;
-        }
-
-        // --- LISTA NEGRA ---
-        function abrirBlacklist() { document.getElementById('modalBlacklist').style.display = 'flex'; renderizarListaNegraUI(); }
-        function fecharModalBlacklist() { document.getElementById('modalBlacklist').style.display = 'none'; }
+        // --- GESTÃO RÁPIDA LISTA NEGRA ---
+        function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
         
-        function renderizarListaNegraUI() {
-            const container = document.getElementById('listaNegraContainer');
-            if (listaNegraCache.length === 0) { container.innerHTML = '<p style="color:#777;text-align:center;">Lista vazia.</p>'; return; }
-            let html = '';
-            listaNegraCache.forEach(item => {
-                html += `<div class="black-item"><div class="black-info"><b>${item.nome}</b><br><span>${item.tel}</span></div><button class="btn-icon btn-del" onclick="removerBloqueio('${item.nome}')">🗑️</button></div>`;
-            });
-            container.innerHTML = html;
-        }
-
         function adicionarBloqueio() {
             const nome = document.getElementById('blNome').value; const tel = document.getElementById('blTel').value;
             if(!nome) return alert("Digite o nome.");
             if(confirm(`Bloquear ${nome}?`)) {
                 enviarFetch({ acao: "bloquear", nome: nome, telefone: tel });
-                listaNegraCache.push({ nome: nome, tel: tel }); renderizarListaNegraUI();
                 document.getElementById('blNome').value = ""; document.getElementById('blTel').value = "";
-            }
-        }
-        function removerBloqueio(nome) {
-            if(confirm(`Desbloquear ${nome}?`)) {
-                enviarFetch({ acao: "desbloquear", nome: nome });
-                listaNegraCache = listaNegraCache.filter(item => item.nome !== nome); renderizarListaNegraUI();
+                document.getElementById('modalAddBlacklist').style.display='none';
             }
         }
 
