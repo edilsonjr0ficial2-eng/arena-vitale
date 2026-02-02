@@ -381,10 +381,9 @@
     <a href="https://wa.me/5588993127830" class="wa-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
 
     <script>
-        // --- 1. LÓGICA DE AUTENTICAÇÃO (MOCK) ---
-        let usuarioLogado = null; // Guarda os dados do user: {nome, phone}
+        // --- 1. LÓGICA DE AUTENTICAÇÃO E CADASTRO ---
+        let usuarioLogado = null; 
 
-        // Tenta recuperar login salvo ao abrir
         window.onload = function() {
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
@@ -404,8 +403,6 @@
         function fazerLogin() {
             const phone = document.getElementById('loginPhone').value;
             const pass = document.getElementById('loginPass').value;
-            
-            // Simulação de Banco de Dados Local
             const db = JSON.parse(localStorage.getItem('dbUsuariosArena')) || [];
             const user = db.find(u => u.phone === phone && u.pass === pass);
 
@@ -425,38 +422,36 @@
 
             if(!nome || !phone || !pass) { alert("Preencha todos os campos!"); return; }
 
-            // Salva no 'banco' local simulado
+            // Salva Localmente
             let db = JSON.parse(localStorage.getItem('dbUsuariosArena')) || [];
-            
-            // Verifica se já existe
             if(db.find(u => u.phone === phone)) { alert("Este número já possui cadastro!"); return; }
-
             const novoUsuario = { nome, phone, pass };
             db.push(novoUsuario);
             localStorage.setItem('dbUsuariosArena', JSON.stringify(db));
+
+            // ENVIA PARA A PLANILHA (BACKEND) - NOVO!
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ 
+                    acao: "salvar_cliente", 
+                    nome: nome, 
+                    telefone: phone 
+                }) 
+            }).then(() => console.log("Cliente salvo na planilha"));
 
             alert("✅ Cadastro realizado com sucesso! Faça login.");
             mostrarLogin();
         }
 
-        // Simulação de Recuperação de Senha
         let codigoRecuperacao = null;
         function enviarCodigoRecuperacao() {
             const phone = document.getElementById('recPhone').value;
             if(!phone) return alert("Digite seu telefone.");
-            
-            // Verifica se existe no banco
             let db = JSON.parse(localStorage.getItem('dbUsuariosArena')) || [];
             const user = db.find(u => u.phone === phone);
-            
             if(!user) return alert("Número não encontrado.");
-
-            // Gera código aleatório
             codigoRecuperacao = Math.floor(1000 + Math.random() * 9000);
-            
-            // SIMULAÇÃO DE SMS (Na vida real, usaria uma API paga)
             alert(`📩 SIMULAÇÃO SMS:\nSeu código de recuperação é: ${codigoRecuperacao}`);
-            
             document.getElementById('etapa1-rec').style.display = 'none';
             document.getElementById('etapa2-rec').style.display = 'block';
         }
@@ -464,20 +459,14 @@
         function confirmarNovaSenha() {
             const codigoDigitado = document.getElementById('recCodigo').value;
             const novaSenha = document.getElementById('recNovaSenha').value;
-
             if(parseInt(codigoDigitado) !== codigoRecuperacao) { alert("Código incorreto!"); return; }
-            
-            // Atualiza senha no banco
             let db = JSON.parse(localStorage.getItem('dbUsuariosArena'));
             const phone = document.getElementById('recPhone').value;
             const userIndex = db.findIndex(u => u.phone === phone);
-            
             db[userIndex].pass = novaSenha;
             localStorage.setItem('dbUsuariosArena', JSON.stringify(db));
-
             alert("✅ Senha alterada com sucesso!");
             mostrarLogin();
-            // Reseta form
             document.getElementById('etapa1-rec').style.display = 'block';
             document.getElementById('etapa2-rec').style.display = 'none';
         }
@@ -488,17 +477,16 @@
             document.getElementById('relogioFlutuante').style.display = 'block';
             document.querySelector('.wa-float').style.display = 'flex';
             document.querySelector('footer').style.display = 'block';
-            
             navegarPara('tela-inicial');
             atualizarRelogio();
         }
 
         function fazerLogout() {
             localStorage.removeItem('usuarioArenaVitale');
-            location.reload(); // Recarrega a página voltando pro login
+            location.reload(); 
         }
 
-        // --- 2. SISTEMA ANTIGO COM AJUSTES DE USUÁRIO ---
+        // --- 2. SISTEMA PRINCIPAL ---
         function navegarPara(idTela) {
             const todasAsTelas = document.querySelectorAll('#tela-inicial, .secao-conteudo');
             todasAsTelas.forEach(tela => { tela.style.display = 'none'; });
@@ -573,7 +561,6 @@
                     if (ocupacao) { estaOcupado = true; if ((h + i) === h) nomeNoHorario = (ocupacao.nome.toLowerCase() === 'x' || ocupacao.nome.toLowerCase() === 'ok') ? "Reservado" : ocupacao.nome; break; }
                 }
                 
-                // LÓGICA DE BLOQUEIO SIMULADA
                 if (estaOcupado) { disabled = true; texto = `${h}:00 - ⛔ Ocupado (${nomeNoHorario})`; }
                 
                 option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
@@ -583,12 +570,10 @@
         function liberarBotao() { const select = document.getElementById('selectHora'); document.getElementById('btnAgendar').style.display = select.value ? 'block' : 'none'; }
         
         function prepararAgendamento() { 
-            // PREENCHIMENTO AUTOMÁTICO COM DADOS DO LOGIN
             if(usuarioLogado) {
                 document.getElementById('cadNomeCompleto').value = usuarioLogado.nome;
                 document.getElementById('cadTelefone').value = usuarioLogado.phone;
             }
-
             const h = parseInt(document.getElementById('selectHora').value); 
             let fim = h + duracaoSelecionada; 
             let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`; 
@@ -598,7 +583,6 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // --- FUNÇÃO CORRIGIDA ---
         function enviarAgendamento() {
             const nome = document.getElementById('cadNomeCompleto').value; 
             const tel = document.getElementById('cadTelefone').value;
@@ -622,17 +606,17 @@
                 method: "POST", 
                 body: JSON.stringify(dados) 
             })
-            .then(response => response.text()) // Converte a resposta para texto
+            .then(response => response.text()) 
             .then(textoResposta => {
-                // Se o texto começar com "Erro", mostramos o alerta e paramos
-                if (textoResposta.startsWith("Erro")) {
-                    alert("❌ " + textoResposta); 
+                // SE DER ERRO DE BLOQUEIO (ATENÇÃO)
+                if (textoResposta.startsWith("Atenção")) {
+                    alert("⚠️ " + textoResposta.replace("Atenção: ", "")); 
                     btn.disabled = false;
                     btn.innerText = "Ir para WhatsApp";
-                    return; // PARE AQUI! Não abra o WhatsApp
+                    return; // PARE AQUI! Não abre o Zap.
                 }
 
-                // Se não deu erro, segue o fluxo normal
+                // SUCESSO
                 let msg = `*NOVO AGENDAMENTO*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00\n💰 R$ ${duracaoSelecionada * PRECO_HORA},00\n✅ Aceito os termos.`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
                 alert("Pré-reserva feita! Finalize no WhatsApp."); 
