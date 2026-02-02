@@ -601,15 +601,24 @@
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
         function enviarAgendamento() {
-            // Usa os dados do formulário (que foram preenchidos auto)
+            // Usa os dados do formulário
             const nome = document.getElementById('cadNomeCompleto').value; 
-            const tel = document.getElementById('cadTelefone').value; 
+            const tel = document.getElementById('cadTelefone').value; // Pega o telefone
             const nasc = document.getElementById('cadNascimento').value;
             
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
-            const dados = { nome: nome, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada };
+            
+            // AGORA ENVIAMOS O TELEFONE NO PACOTE 'DADOS'
+            const dados = { 
+                nome: nome, 
+                telefone: tel, // <--- ADICIONADO AQUI
+                diaIndex: formatarDataHeader(dataVisualizada).index, 
+                hora: tempHora, 
+                quadra: quadraSelecionada, 
+                duracao: duracaoSelecionada 
+            };
             
             fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dados) })
             .then(() => {
