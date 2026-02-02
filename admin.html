@@ -50,6 +50,21 @@
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         
+        /* TABELA DE INTERDIÇÃO */
+        .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
+        .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        .interdicao-item input { width: auto; margin: 0; }
+
+        /* ESTILOS DA TABELA DE CLIENTES */
+        .modal-wide { max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; }
+        table.clientes-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 15px; color: #ccc; }
+        table.clientes-table th, table.clientes-table td { border: 1px solid #444; padding: 8px; text-align: left; }
+        table.clientes-table th { background: #333; color: var(--primary); }
+        table.clientes-table tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+
+        .blacklist-container { max-height: 200px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
+        .black-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 8px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
+        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
@@ -79,10 +94,10 @@
         
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes (Nova Aba)</button>
-            <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra (Nova Aba)</button>
+            <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
+            <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
-            <button class="tool-btn" onclick="bloqueioEmergencia()">⛔ Interditar Dia</button>
+            <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
             <button class="tool-btn" onclick="abrirModalAddBloqueio()">➕ Add Bloqueio</button>
             <button class="tool-btn" onclick="alternarModo()">🌗 Sol/Sombra</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
@@ -130,6 +145,24 @@
         </div>
     </div>
 
+    <div id="modalInterdicao" class="modal-bg">
+        <div class="modal-box modal-wide" style="max-width:500px;">
+            <h3 style="color:var(--danger)">Interditar Horários</h3>
+            <p style="color:#aaa; font-size:0.8rem; margin-bottom:10px;">Selecione os horários para fechar.</p>
+            
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+                <button onclick="marcarTodos(true)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Marcar Todos</button>
+                <button onclick="marcarTodos(false)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Desmarcar Todos</button>
+            </div>
+
+            <div class="interdicao-grid" id="listaInterdicao">
+                </div>
+
+            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR SELECIONADOS</button>
+            <button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
@@ -141,7 +174,6 @@
         let dadosAgenda = [];
         let tempAgendamento = {};
 
-        // --- INICIALIZAÇÃO ---
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
@@ -170,7 +202,7 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- FUNÇÃO PARA GERAR RELATÓRIOS EM NOVA ABA ---
+        // --- RELATÓRIOS ---
         function gerarRelatorio(tipo) {
             let win = window.open("", "_blank");
             win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando dados...</h2></body></html>");
@@ -182,28 +214,10 @@
             .then(r => r.json())
             .then(data => {
                 let titulo = tipo === 'clientes' ? "Relatório de Clientes" : "Relatório da Lista Negra";
-                let html = `
-                    <html>
-                    <head>
-                        <title>${titulo}</title>
-                        <style>
-                            body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
-                            h1 { color: #FFD700; border-bottom: 2px solid #333; padding-bottom: 10px; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #222; }
-                            th, td { padding: 12px; border: 1px solid #444; text-align: left; }
-                            th { background: #FFD700; color: #000; font-weight: bold; }
-                            tr:nth-child(even) { background: #2a2a2a; }
-                            tr:hover { background: #333; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${titulo}</h1>
-                        <table>
-                `;
+                let html = `<html><head><title>${titulo}</title><style>body{font-family:'Segoe UI',sans-serif;background:#1a1a1a;color:#fff;padding:20px;}h1{color:#FFD700;border-bottom:2px solid #333;padding-bottom:10px;}table{width:100%;border-collapse:collapse;margin-top:20px;background:#222;}th,td{padding:12px;border:1px solid #444;text-align:left;}th{background:#FFD700;color:#000;font-weight:bold;}tr:nth-child(even){background:#2a2a2a;}tr:hover{background:#333;}</style></head><body><h1>${titulo}</h1><table>`;
 
                 if (tipo === 'clientes') {
                     html += `<thead><tr><th>Data Cadastro</th><th>Nome</th><th>Telefone</th><th>Senha</th><th>Último Acesso</th></tr></thead><tbody>`;
-                    // Pula cabeçalho (índice 0)
                     for(let i = 1; i < data.lista.length; i++) {
                         let row = data.lista[i];
                         let dataF = row[0] ? new Date(row[0]).toLocaleDateString() : "-";
@@ -216,16 +230,56 @@
                         html += `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`;
                     }
                 }
-
                 html += `</tbody></table><br><button onclick="window.close()" style="padding:10px 20px;cursor:pointer;">Fechar Aba</button></body></html>`;
-                
-                win.document.open();
-                win.document.write(html);
-                win.document.close();
+                win.document.open(); win.document.write(html); win.document.close();
             })
-            .catch(e => {
-                win.document.body.innerHTML = "<h2 style='color:red'>Erro ao carregar dados. Verifique a conexão.</h2>";
+            .catch(e => { win.document.body.innerHTML = "<h2 style='color:red'>Erro ao carregar dados.</h2>"; });
+        }
+
+        // --- INTERDIÇÃO SELETIVA ---
+        function abrirModalInterdicao() {
+            document.getElementById('modalInterdicao').style.display = 'flex';
+            let html = "";
+            horas.forEach(h => {
+                html += `
+                    <div class="interdicao-item">
+                        <input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> 
+                        <label>${h}:00 - Chicashoes</label>
+                    </div>
+                    <div class="interdicao-item">
+                        <input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> 
+                        <label>${h}:00 - Panificadora</label>
+                    </div>
+                `;
             });
+            document.getElementById('listaInterdicao').innerHTML = html;
+        }
+
+        function marcarTodos(status) {
+            document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status);
+        }
+
+        function confirmarInterdicao() {
+            let selecionados = [];
+            document.querySelectorAll('.chk-interdicao:checked').forEach(chk => {
+                selecionados.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') });
+            });
+
+            if(selecionados.length === 0) return alert("Selecione pelo menos um horário.");
+
+            if(confirm(`Interditar ${selecionados.length} horários selecionados?`)) {
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ acao: "bloqueio_lote", itens: selecionados, diaIndex: formatarData(dataAtual).index })
+                })
+                .then(() => {
+                    alert("Interdição enviada com sucesso!");
+                    document.getElementById('modalInterdicao').style.display='none';
+                    setTimeout(carregarAgenda, 2000);
+                });
+            }
         }
 
         // --- AGENDA E CSV ---
@@ -288,7 +342,6 @@
             return `<div class="slot"><span class="time-label">${hora}:00</span><div class="slot-content ${ocupado ? 'booked' : ''}">${conteudo}</div><div class="actions">${botoes}</div></div>`;
         }
 
-        // --- GESTÃO RÁPIDA LISTA NEGRA ---
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
         
         function adicionarBloqueio() {
@@ -301,7 +354,6 @@
             }
         }
 
-        // --- UTILS ---
         function enviarFetch(dadosJSON) {
             fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dadosJSON) })
             .then(() => setTimeout(carregarAgenda, 2000))
