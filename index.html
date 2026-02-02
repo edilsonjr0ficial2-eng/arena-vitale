@@ -574,8 +574,6 @@
                 }
                 
                 // LÓGICA DE BLOQUEIO SIMULADA
-                // Se o nome do ocupante contiver "BLOQUEADO" e for o mesmo telefone do usuário (Simulado pelo script backend)
-                // Aqui no front só conseguimos ver o nome. Se o admin escrever "BLOQUEADO" na planilha, aparece ocupado.
                 if (estaOcupado) { disabled = true; texto = `${h}:00 - ⛔ Ocupado (${nomeNoHorario})`; }
                 
                 option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
@@ -600,33 +598,51 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
+        // --- FUNÇÃO CORRIGIDA ---
         function enviarAgendamento() {
-            // Usa os dados do formulário
             const nome = document.getElementById('cadNomeCompleto').value; 
-            const tel = document.getElementById('cadTelefone').value; // Pega o telefone
+            const tel = document.getElementById('cadTelefone').value;
             const nasc = document.getElementById('cadNascimento').value;
             
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
             
-            // AGORA ENVIAMOS O TELEFONE NO PACOTE 'DADOS'
             const dados = { 
                 nome: nome, 
-                telefone: tel, // <--- ADICIONADO AQUI
+                telefone: tel, 
                 diaIndex: formatarDataHeader(dataVisualizada).index, 
                 hora: tempHora, 
                 quadra: quadraSelecionada, 
                 duracao: duracaoSelecionada 
             };
             
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dados) })
-            .then(() => {
-                let msg = `*NOVO AGENDAMENTO*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${tempInfoDia}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 R$ ${tempValor},00\n✅ Aceito os termos.`;
-                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
-                alert("Pré-reserva feita! Finalize no WhatsApp."); location.reload();
+            // REMOVIDO mode: 'no-cors' para podermos ler a resposta
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify(dados) 
             })
-            .catch(() => { alert("Erro. Chame no Zap."); btn.disabled = false; });
+            .then(response => response.text()) // Converte a resposta para texto
+            .then(textoResposta => {
+                // Se o texto começar com "Erro", mostramos o alerta e paramos
+                if (textoResposta.startsWith("Erro")) {
+                    alert("❌ " + textoResposta); 
+                    btn.disabled = false;
+                    btn.innerText = "Ir para WhatsApp";
+                    return; // PARE AQUI! Não abra o WhatsApp
+                }
+
+                // Se não deu erro, segue o fluxo normal
+                let msg = `*NOVO AGENDAMENTO*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00\n💰 R$ ${duracaoSelecionada * PRECO_HORA},00\n✅ Aceito os termos.`;
+                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
+                alert("Pré-reserva feita! Finalize no WhatsApp."); 
+                location.reload();
+            })
+            .catch(error => { 
+                console.error(error);
+                alert("Erro de conexão. Tente novamente."); 
+                btn.disabled = false; 
+            });
         }
 
         const infoInicial2 = formatarDataHeader(dataVisualizada); document.getElementById('dateDisplay').innerText = infoInicial2.texto;
