@@ -50,17 +50,18 @@
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         
-        /* TABELA DE INTERDIÇÃO */
+        /* TABELAS E LISTAS */
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .interdicao-item input { width: auto; margin: 0; }
 
-        /* ESTILOS SORTEIO */
         .sorteio-display { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 30px 0; min-height: 60px; text-transform: uppercase; }
         .confetti { color: var(--success); font-size: 1.5rem; margin-top: 10px; display: none; }
 
-        .blacklist-container { max-height: 200px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
-        .black-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 8px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
+        .blacklist-container, .ausentes-container { max-height: 300px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
+        .black-item, .ausente-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 10px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
+        .ausente-info b { color: var(--primary); font-size: 1rem; }
+        .ausente-info span { color: #aaa; font-size: 0.8rem; }
         
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
@@ -92,6 +93,7 @@
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
+            <button class="tool-btn" onclick="abrirModalAusentes()">📢 Alerta Sumidos</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
@@ -124,10 +126,7 @@
             <h3 style="color:var(--primary)">Novo Agendamento</h3>
             <p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
             <input type="text" id="manualNome" placeholder="Nome do Jogador / Bloqueio">
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="checkMensalista" style="width:auto;">
-                <label>Marcar como Mensalista (M)</label>
-            </div>
+            <div class="checkbox-wrapper"><input type="checkbox" id="checkMensalista" style="width:auto;"><label>Marcar como Mensalista (M)</label></div>
             <button class="primary-btn" onclick="salvarManual()">SALVAR</button>
             <button class="close-btn" onclick="fecharModal()">Cancelar</button>
         </div>
@@ -146,13 +145,12 @@
     <div id="modalInterdicao" class="modal-bg">
         <div class="modal-box" style="max-width:500px;">
             <h3 style="color:var(--danger)">Interditar Horários</h3>
-            <p style="color:#aaa; font-size:0.8rem; margin-bottom:10px;">Selecione os horários para fechar.</p>
             <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
-                <button onclick="marcarTodos(true)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Marcar Todos</button>
-                <button onclick="marcarTodos(false)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Desmarcar Todos</button>
+                <button onclick="marcarTodos(true)" style="font-size:0.8rem; padding:5px;">Marcar Todos</button>
+                <button onclick="marcarTodos(false)" style="font-size:0.8rem; padding:5px;">Desmarcar Todos</button>
             </div>
             <div class="interdicao-grid" id="listaInterdicao"></div>
-            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR SELECIONADOS</button>
+            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button>
             <button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
         </div>
     </div>
@@ -160,13 +158,29 @@
     <div id="modalSorteio" class="modal-bg">
         <div class="modal-box">
             <h3 style="color:var(--primary)">Sorteio de Clientes 🎲</h3>
-            <p style="color:#aaa;">Sorteie um cliente da base cadastrada.</p>
-            
             <div id="displaySorteio" class="sorteio-display">...</div>
             <div id="confetti" class="confetti">🎉 PARABÉNS! 🎉</div>
-            
             <button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR AGORA</button>
             <button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalAusentes" class="modal-bg">
+        <div class="modal-box modal-wide" style="max-width:600px;">
+            <h3 style="color:var(--primary)">📢 Reengajamento</h3>
+            <p style="color:#aaa; font-size:0.9rem;">Clientes que não aparecem há mais de:</p>
+            
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input type="number" id="inputDiasAusentes" value="5" style="width:70px; text-align:center;">
+                <span style="font-weight:bold;">DIAS</span>
+                <button class="primary-btn" style="width:auto; margin:0;" onclick="buscarAusentes()">BUSCAR</button>
+            </div>
+
+            <div class="ausentes-container" id="listaAusentes">
+                <p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR para ver a lista.</p>
+            </div>
+
+            <button class="close-btn" onclick="document.getElementById('modalAusentes').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -209,120 +223,100 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
+        // --- CLIENTES AUSENTES (NOVO) ---
+        function abrirModalAusentes() {
+            document.getElementById('modalAusentes').style.display = 'flex';
+            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR para ver a lista.</p>';
+        }
+
+        function buscarAusentes() {
+            let dias = document.getElementById('inputDiasAusentes').value;
+            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:var(--primary);">Carregando...</p>';
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ acao: "listar_ausentes", dias: dias })
+            })
+            .then(r => r.json())
+            .then(data => {
+                let lista = data.lista;
+                let html = "";
+                if (!lista || lista.length === 0) {
+                    html = '<p style="text-align:center; color:#aaa;">Nenhum cliente ausente nesse período.</p>';
+                } else {
+                    lista.forEach(c => {
+                        let msgZap = `Olá ${c.nome}! 🎾\n\nFaz ${c.dias} dias que não te vemos na Arena Vitale. Aconteceu algo? Estamos com saudades!\n\nBora marcar um jogo para essa semana?`;
+                        let linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msgZap)}`;
+                        
+                        html += `
+                            <div class="ausente-item">
+                                <div class="ausente-info">
+                                    <b>${c.nome}</b><br>
+                                    <span>Ausente há <b style="color:var(--danger)">${c.dias} dias</b></span>
+                                </div>
+                                <button class="btn-icon btn-wa" onclick="window.open('${linkZap}', '_blank')" title="Enviar Mensagem">📩 Chamar no Zap</button>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById('listaAusentes').innerHTML = html;
+            })
+            .catch(e => {
+                document.getElementById('listaAusentes').innerHTML = '<p style="color:red; text-align:center;">Erro ao buscar.</p>';
+            });
+        }
+
         // --- RELATÓRIOS ---
         function gerarRelatorio(tipo) {
             let win = window.open("", "_blank");
             win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando dados...</h2></body></html>");
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" })
-            })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" }) })
             .then(r => r.json())
             .then(data => {
                 let titulo = tipo === 'clientes' ? "Relatório de Clientes" : "Relatório da Lista Negra";
                 let html = `<html><head><title>${titulo}</title><style>body{font-family:'Segoe UI',sans-serif;background:#1a1a1a;color:#fff;padding:20px;}h1{color:#FFD700;border-bottom:2px solid #333;padding-bottom:10px;}table{width:100%;border-collapse:collapse;margin-top:20px;background:#222;}th,td{padding:12px;border:1px solid #444;text-align:left;}th{background:#FFD700;color:#000;font-weight:bold;}tr:nth-child(even){background:#2a2a2a;}tr:hover{background:#333;}</style></head><body><h1>${titulo}</h1><table>`;
-
                 if (tipo === 'clientes') {
                     html += `<thead><tr><th>Data Cadastro</th><th>Nome</th><th>Telefone</th><th>Senha</th><th>Último Acesso</th></tr></thead><tbody>`;
-                    for(let i = 1; i < data.lista.length; i++) {
-                        let row = data.lista[i];
-                        let dataF = row[0] ? new Date(row[0]).toLocaleDateString() : "-";
-                        html += `<tr><td>${dataF}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[4]}</td></tr>`;
-                    }
+                    for(let i = 1; i < data.lista.length; i++) { let r = data.lista[i]; let d = r[0] ? new Date(r[0]).toLocaleDateString() : "-"; html += `<tr><td>${d}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`; }
                 } else {
-                    html += `<thead><tr><th>Nome Bloqueado</th><th>Telefone Bloqueado</th></tr></thead><tbody>`;
-                    for(let i = 0; i < data.lista.length; i++) {
-                        let row = data.lista[i];
-                        html += `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`;
-                    }
+                    html += `<thead><tr><th>Nome</th><th>Telefone</th></tr></thead><tbody>`;
+                    for(let i = 0; i < data.lista.length; i++) { let r = data.lista[i]; html += `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`; }
                 }
-                html += `</tbody></table><br><button onclick="window.close()" style="padding:10px 20px;cursor:pointer;">Fechar Aba</button></body></html>`;
+                html += `</tbody></table><br><button onclick="window.close()" style="padding:10px 20px;cursor:pointer;">Fechar</button></body></html>`;
                 win.document.open(); win.document.write(html); win.document.close();
             })
-            .catch(e => { win.document.body.innerHTML = "<h2 style='color:red'>Erro ao carregar dados.</h2>"; });
+            .catch(e => { win.document.body.innerHTML = "<h2 style='color:red'>Erro.</h2>"; });
         }
 
         // --- SORTEIO ---
-        function abrirModalSorteio() {
-            document.getElementById('modalSorteio').style.display = 'flex';
-            document.getElementById('displaySorteio').innerText = "???";
-            document.getElementById('confetti').style.display = 'none';
-            document.getElementById('btnSortear').disabled = false;
-            document.getElementById('btnSortear').innerText = "SORTEAR AGORA";
-        }
-
+        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; document.getElementById('displaySorteio').innerText = "???"; document.getElementById('confetti').style.display = 'none'; document.getElementById('btnSortear').disabled = false; document.getElementById('btnSortear').innerText = "SORTEAR AGORA"; }
         function realizarSorteio() {
-            const btn = document.getElementById('btnSortear');
-            const display = document.getElementById('displaySorteio');
-            btn.disabled = true;
-            btn.innerText = "Sorteando...";
-            
-            // Efeito visual de embaralhar
-            let timer = setInterval(() => {
-                display.innerText = "Sorteando..."; 
-                display.style.opacity = Math.random() > 0.5 ? 1 : 0.5;
-            }, 100);
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "sortear_cliente" })
-            })
+            const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio');
+            btn.disabled = true; btn.innerText = "Sorteando...";
+            let timer = setInterval(() => { display.innerText = "Sorteando..."; display.style.opacity = Math.random() > 0.5 ? 1 : 0.5; }, 100);
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) })
             .then(r => r.json())
             .then(data => {
-                clearInterval(timer);
-                display.style.opacity = 1;
-                
-                if (data.erro) {
-                    display.innerText = "Erro";
-                    alert(data.erro);
-                    btn.disabled = false;
-                    btn.innerText = "Tentar Novamente";
-                } else {
-                    let v = data.vencedor;
-                    display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`;
-                    document.getElementById('confetti').style.display = 'block';
-                    btn.innerText = "Sorteio Concluído";
-                }
-            })
-            .catch(e => {
-                clearInterval(timer);
-                display.innerText = "Erro de conexão";
-                btn.disabled = false;
-            });
+                clearInterval(timer); display.style.opacity = 1;
+                if (data.erro) { display.innerText = "Erro"; alert(data.erro); btn.disabled = false; btn.innerText = "Tentar Novamente"; }
+                else { let v = data.vencedor; display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; document.getElementById('confetti').style.display = 'block'; btn.innerText = "Sorteio Concluído"; }
+            }).catch(e => { clearInterval(timer); display.innerText = "Erro"; btn.disabled = false; });
         }
 
-        // --- INTERDIÇÃO SELETIVA ---
+        // --- INTERDIÇÃO ---
         function abrirModalInterdicao() {
             document.getElementById('modalInterdicao').style.display = 'flex';
             let html = "";
             horas.forEach(h => {
-                html += `
-                    <div class="interdicao-item">
-                        <input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> 
-                        <label>${h}:00 - Chicashoes</label>
-                    </div>
-                    <div class="interdicao-item">
-                        <input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> 
-                        <label>${h}:00 - Panificadora</label>
-                    </div>
-                `;
+                html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Panificadora</label></div>`;
             });
             document.getElementById('listaInterdicao').innerHTML = html;
         }
-
         function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
-
         function confirmarInterdicao() {
-            let selecionados = [];
-            document.querySelectorAll('.chk-interdicao:checked').forEach(chk => {
-                selecionados.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') });
-            });
-            if(selecionados.length === 0) return alert("Selecione pelo menos um horário.");
-            if(confirm(`Interditar ${selecionados.length} horários selecionados?`)) {
-                enviarFetch({ acao: "bloqueio_lote", itens: selecionados, diaIndex: formatarData(dataAtual).index });
-                document.getElementById('modalInterdicao').style.display='none';
-            }
+            let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); });
+            if(sel.length === 0) return alert("Selecione um horário.");
+            if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; }
         }
 
         // --- AGENDA E CSV ---
@@ -332,19 +326,12 @@
             document.getElementById('printDate').innerText = info.texto;
             document.getElementById('listaQ1').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
             document.getElementById('listaQ2').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
-            try {
-                const response = await fetch(SHEET_URL + '&t=' + new Date().getTime());
-                const csv = await response.text();
-                processarCSV(csv, info.index);
-            } catch (e) { console.error(e); }
+            try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); }
         }
-
         function processarCSV(csv, diaIndex) {
-            const rows = csv.split('\n').map(r => r.split(','));
-            dadosAgenda = []; let ocupados = 0;
+            const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0;
             rows.forEach((row, idx) => {
-                if(idx === 0) return;
-                let h = parseInt(row[0]);
+                if(idx === 0) return; let h = parseInt(row[0]);
                 if(!isNaN(h)) {
                     let colQ1 = 1 + diaIndex; let colQ2 = 9 + diaIndex;
                     let nomeQ1 = row[colQ1] ? row[colQ1].replace(/[\r\n"]/g, '').trim() : "";
@@ -353,84 +340,49 @@
                     dadosAgenda.push({ hora: h, q1: nomeQ1, q2: nomeQ2 });
                 }
             });
-            atualizarEstatisticas(ocupados);
+            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100);
+            document.getElementById('statOcupacao').innerText = porc + "%";
+            document.getElementById('statFaturamento').innerText = "R$ " + (ocupados * 45).toFixed(2).replace('.', ',');
             renderizarGrid();
         }
-
-        function atualizarEstatisticas(ocupados) {
-            let totalSlots = horas.length * 2; let porcentagem = Math.round((ocupados / totalSlots) * 100);
-            document.getElementById('statOcupacao').innerText = porcentagem + "%";
-            document.getElementById('statFaturamento').innerText = "R$ " + (ocupados * 45).toFixed(2).replace('.', ',');
-        }
-
         function renderizarGrid() {
-            let htmlQ1 = ""; let htmlQ2 = "";
+            let hQ1 = ""; let hQ2 = "";
             horas.forEach(h => {
                 let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" };
-                htmlQ1 += criarSlotHTML(h, 1, slot.q1);
-                htmlQ2 += criarSlotHTML(h, 2, slot.q2);
+                hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2);
             });
-            document.getElementById('listaQ1').innerHTML = htmlQ1;
-            document.getElementById('listaQ2').innerHTML = htmlQ2;
+            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
+        }
+        function criarSlotHTML(h, q, n) {
+            let ocup = n.length > 0; let cont = ocup ? `<span class="booked">${n}</span>` : "Livre";
+            let btns = ocup 
+                ? `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button><button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>`
+                : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
+            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${ocup ? 'booked' : ''}">${cont}</div><div class="actions">${btns}</div></div>`;
         }
 
-        function criarSlotHTML(hora, quadra, nome) {
-            let ocupado = nome.length > 0;
-            let conteudo = ocupado ? `<span class="booked">${nome}</span>` : "Livre";
-            let botoes = ocupado 
-                ? `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${nome}', ${hora})">📞</button>
-                   <button class="btn-icon btn-pay ${nome.includes('✅') ? 'paid' : ''}" onclick="togglePago(${hora}, ${quadra}, '${nome}')">💲</button>
-                   <button class="btn-icon btn-del" onclick="cancelar(${hora}, ${quadra}, '${nome}')">🗑️</button>`
-                : `<button class="btn-icon btn-add" onclick="abrirManual(${hora}, ${quadra})">➕</button>`;
-            return `<div class="slot"><span class="time-label">${hora}:00</span><div class="slot-content ${ocupado ? 'booked' : ''}">${conteudo}</div><div class="actions">${botoes}</div></div>`;
-        }
-
+        // --- FUNÇÕES UTILS ---
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
-        
         function adicionarBloqueio() {
-            const nome = document.getElementById('blNome').value; const tel = document.getElementById('blTel').value;
-            if(!nome) return alert("Digite o nome.");
-            if(confirm(`Bloquear ${nome}?`)) {
-                enviarFetch({ acao: "bloquear", nome: nome, telefone: tel });
-                document.getElementById('blNome').value = ""; document.getElementById('blTel').value = "";
-                document.getElementById('modalAddBlacklist').style.display='none';
-            }
+            const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value;
+            if(!n) return alert("Nome?");
+            if(confirm(`Bloquear ${n}?`)) { enviarFetch({ acao: "bloquear", nome: n, telefone: t }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; }
         }
-
-        function enviarFetch(dadosJSON) {
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(dadosJSON) })
-            .then(() => setTimeout(carregarAgenda, 2000))
-            .catch(e => alert("Erro ao comunicar."));
-        }
-        
-        function abrirWhatsApp(nome, hora) {
-            let num = prompt(`Número de ${nome}:`, "");
-            if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${nome}, confirmando ${hora}h 🎾`)}`, '_blank');
-        }
-        function togglePago(hora, quadra, nome) {
-            let novo = nome.includes("✅") ? nome.replace(/ ?✅/g, "") : nome + " ✅";
-            enviarComando("agendar", hora, quadra, novo);
-        }
-        function abrirManual(hora, quadra) {
-            tempAgendamento = { hora, quadra };
-            document.getElementById('modalInfo').innerText = `${hora}:00 - Quadra ${quadra}`;
-            document.getElementById('manualNome').value = ""; document.getElementById('checkMensalista').checked = false;
-            document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus();
-        }
+        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
+        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
+        function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
+        function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Q${q}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
         function salvarManual() {
-            let nome = document.getElementById('manualNome').value;
-            if(!nome) return alert("Nome?");
-            if(document.getElementById('checkMensalista').checked) nome += " (M)";
-            enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, nome); fecharModal();
+            let n = document.getElementById('manualNome').value; if(!n) return alert("Nome?");
+            if(document.getElementById('checkMensalista').checked) n += " (M)";
+            enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n); fecharModal();
         }
-        function cancelar(hora, quadra, nome) { if(confirm(`Apagar ${nome}?`)) enviarComando("cancelar", hora, quadra, ""); }
-        function enviarComando(acao, hora, quadra, nome) {
-            let index = dadosAgenda.findIndex(d => d.hora === hora);
-            if(index === -1) { dadosAgenda.push({hora, q1:"", q2:""}); index = dadosAgenda.length -1; }
-            if(quadra === 1) dadosAgenda[index].q1 = (acao === "agendar" ? nome : ""); else dadosAgenda[index].q2 = (acao === "agendar" ? nome : "");
-            renderizarGrid();
-            enviarFetch({ acao: acao, nome: nome, diaIndex: formatarData(dataAtual).index, hora: hora, quadra: quadra, duracao: 1 });
+        function cancelar(h, q, n) { if(confirm(`Apagar ${n}?`)) enviarComando("cancelar", h, q, ""); }
+        function enviarComando(a, h, q, n) {
+            let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
+            if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : "");
+            renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1 });
         }
     </script>
 </body>
