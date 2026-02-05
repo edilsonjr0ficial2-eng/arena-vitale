@@ -55,12 +55,9 @@
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .interdicao-item input { width: auto; margin: 0; }
 
-        /* ESTILOS DA TABELA DE CLIENTES */
-        .modal-wide { max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; }
-        table.clientes-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 15px; color: #ccc; }
-        table.clientes-table th, table.clientes-table td { border: 1px solid #444; padding: 8px; text-align: left; }
-        table.clientes-table th { background: #333; color: var(--primary); }
-        table.clientes-table tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+        /* ESTILOS SORTEIO */
+        .sorteio-display { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 30px 0; min-height: 60px; text-transform: uppercase; }
+        .confetti { color: var(--success); font-size: 1.5rem; margin-top: 10px; display: none; }
 
         .blacklist-container { max-height: 200px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
         .black-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 8px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
@@ -95,6 +92,7 @@
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
+            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
@@ -146,20 +144,29 @@
     </div>
 
     <div id="modalInterdicao" class="modal-bg">
-        <div class="modal-box modal-wide" style="max-width:500px;">
+        <div class="modal-box" style="max-width:500px;">
             <h3 style="color:var(--danger)">Interditar Horários</h3>
             <p style="color:#aaa; font-size:0.8rem; margin-bottom:10px;">Selecione os horários para fechar.</p>
-            
             <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
                 <button onclick="marcarTodos(true)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Marcar Todos</button>
                 <button onclick="marcarTodos(false)" style="font-size:0.8rem; padding:5px 10px; cursor:pointer;">Desmarcar Todos</button>
             </div>
-
-            <div class="interdicao-grid" id="listaInterdicao">
-                </div>
-
+            <div class="interdicao-grid" id="listaInterdicao"></div>
             <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR SELECIONADOS</button>
             <button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modalSorteio" class="modal-bg">
+        <div class="modal-box">
+            <h3 style="color:var(--primary)">Sorteio de Clientes 🎲</h3>
+            <p style="color:#aaa;">Sorteie um cliente da base cadastrada.</p>
+            
+            <div id="displaySorteio" class="sorteio-display">...</div>
+            <div id="confetti" class="confetti">🎉 PARABÉNS! 🎉</div>
+            
+            <button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR AGORA</button>
+            <button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -236,6 +243,55 @@
             .catch(e => { win.document.body.innerHTML = "<h2 style='color:red'>Erro ao carregar dados.</h2>"; });
         }
 
+        // --- SORTEIO ---
+        function abrirModalSorteio() {
+            document.getElementById('modalSorteio').style.display = 'flex';
+            document.getElementById('displaySorteio').innerText = "???";
+            document.getElementById('confetti').style.display = 'none';
+            document.getElementById('btnSortear').disabled = false;
+            document.getElementById('btnSortear').innerText = "SORTEAR AGORA";
+        }
+
+        function realizarSorteio() {
+            const btn = document.getElementById('btnSortear');
+            const display = document.getElementById('displaySorteio');
+            btn.disabled = true;
+            btn.innerText = "Sorteando...";
+            
+            // Efeito visual de embaralhar
+            let timer = setInterval(() => {
+                display.innerText = "Sorteando..."; 
+                display.style.opacity = Math.random() > 0.5 ? 1 : 0.5;
+            }, 100);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ acao: "sortear_cliente" })
+            })
+            .then(r => r.json())
+            .then(data => {
+                clearInterval(timer);
+                display.style.opacity = 1;
+                
+                if (data.erro) {
+                    display.innerText = "Erro";
+                    alert(data.erro);
+                    btn.disabled = false;
+                    btn.innerText = "Tentar Novamente";
+                } else {
+                    let v = data.vencedor;
+                    display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`;
+                    document.getElementById('confetti').style.display = 'block';
+                    btn.innerText = "Sorteio Concluído";
+                }
+            })
+            .catch(e => {
+                clearInterval(timer);
+                display.innerText = "Erro de conexão";
+                btn.disabled = false;
+            });
+        }
+
         // --- INTERDIÇÃO SELETIVA ---
         function abrirModalInterdicao() {
             document.getElementById('modalInterdicao').style.display = 'flex';
@@ -255,30 +311,17 @@
             document.getElementById('listaInterdicao').innerHTML = html;
         }
 
-        function marcarTodos(status) {
-            document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status);
-        }
+        function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
 
         function confirmarInterdicao() {
             let selecionados = [];
             document.querySelectorAll('.chk-interdicao:checked').forEach(chk => {
                 selecionados.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') });
             });
-
             if(selecionados.length === 0) return alert("Selecione pelo menos um horário.");
-
             if(confirm(`Interditar ${selecionados.length} horários selecionados?`)) {
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ acao: "bloqueio_lote", itens: selecionados, diaIndex: formatarData(dataAtual).index })
-                })
-                .then(() => {
-                    alert("Interdição enviada com sucesso!");
-                    document.getElementById('modalInterdicao').style.display='none';
-                    setTimeout(carregarAgenda, 2000);
-                });
+                enviarFetch({ acao: "bloqueio_lote", itens: selecionados, diaIndex: formatarData(dataAtual).index });
+                document.getElementById('modalInterdicao').style.display='none';
             }
         }
 
