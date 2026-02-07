@@ -533,7 +533,9 @@
             
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
-            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
+            const btn = document.querySelector('.btn-confirm'); 
+            btn.innerText = "Agendando..."; 
+            btn.disabled = true;
             
             const dados = { 
                 nome: nome, 
@@ -541,7 +543,8 @@
                 diaIndex: formatarDataHeader(dataVisualizada).index, 
                 hora: tempHora, 
                 quadra: quadraSelecionada, 
-                duracao: duracaoSelecionada 
+                duracao: duracaoSelecionada,
+                status: 'pendente' 
             };
             
             fetch(SCRIPT_URL, { 
@@ -550,16 +553,16 @@
             })
             .then(response => response.text()) 
             .then(textoResposta => {
-                if (textoResposta.startsWith("Atenção")) {
+                if (textoResposta.startsWith("Atenção") || textoResposta.startsWith("Erro")) {
                     alert("⚠️ " + textoResposta.replace("Atenção: ", "")); 
                     btn.disabled = false;
                     btn.innerText = "Ir para WhatsApp";
                     return; 
                 }
 
-                let msg = `*NOVO AGENDAMENTO*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00\n💰 R$ ${duracaoSelecionada * PRECO_HORA},00\n✅ Aceito os termos.`;
+                let msg = `*SOLICITAÇÃO DE RESERVA (AGUARDANDO CONFIRMAÇÃO)*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00\n💰 R$ ${duracaoSelecionada * PRECO_HORA},00\n✅ Aguardando sua confirmação.`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
-                alert("Pré-reserva feita! Finalize no WhatsApp."); 
+                alert("Pré-reserva feita! Aguarde a confirmação no WhatsApp."); 
                 location.reload();
             })
             .catch(error => { 
