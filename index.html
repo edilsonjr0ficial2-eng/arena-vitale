@@ -49,8 +49,20 @@
         .auth-link { color: #ccc; font-size: 0.9rem; cursor: pointer; text-decoration: underline; margin-top: 10px; display: block; }
         .auth-link:hover { color: var(--primary); }
 
-        /* RELÓGIO */
+        /* RELÓGIO E BOTÃO ATUALIZAR */
         .floating-clock { position: fixed; top: 95px; right: 20px; background-color: rgba(0, 0, 0, 0.8); border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 1rem; font-weight: 900; z-index: 1000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); display: none; }
+        
+        .btn-refresh-float { 
+            position: fixed; top: 140px; right: 20px; 
+            background: rgba(0,0,0,0.8); border: 2px solid var(--primary);
+            color: var(--primary); border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer; z-index: 1000; transition: 0.5s;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); display: none;
+        }
+        .btn-refresh-float:hover { 
+            transform: rotate(360deg); background: var(--primary); color: black; 
+        }
 
         /* --- HERO --- */
         #tela-inicial { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; overflow: hidden; position: relative; }
@@ -204,6 +216,8 @@
     </header>
 
     <div id="relogioFlutuante" class="floating-clock">--:--:--</div>
+    
+    <div class="btn-refresh-float" onclick="atualizarPagina()" title="Atualizar Dados">🔄</div>
 
     <div id="tela-inicial">
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
@@ -289,7 +303,23 @@
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
-                mostrarSitePrincipal();
+                
+                // Elementos visuais
+                document.getElementById('tela-auth').style.display = 'none';
+                document.querySelector('.navbar').style.display = 'block';
+                document.getElementById('relogioFlutuante').style.display = 'block';
+                document.querySelector('.btn-refresh-float').style.display = 'flex';
+                document.querySelector('.wa-float').style.display = 'flex';
+                document.querySelector('footer').style.display = 'block';
+                atualizarRelogio();
+            }
+
+            // RECUPERA A ÚLTIMA TELA VISITADA
+            const telaSalva = localStorage.getItem('ultimaTelaArena');
+            if (telaSalva && document.getElementById(telaSalva)) {
+                navegarPara(telaSalva);
+            } else {
+                navegarPara('tela-inicial');
             }
         }
 
@@ -330,7 +360,7 @@
                 } else if (data.sucesso) {
                     usuarioLogado = { nome: data.nome, phone: data.telefone };
                     localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
-                    mostrarSitePrincipal();
+                    location.reload(); // Recarrega para aplicar o window.onload corretamente
                 }
             })
             .catch(e => {
@@ -414,18 +444,9 @@
             document.getElementById('etapa2-rec').style.display = 'none';
         }
 
-        function mostrarSitePrincipal() {
-            document.getElementById('tela-auth').style.display = 'none';
-            document.querySelector('.navbar').style.display = 'block';
-            document.getElementById('relogioFlutuante').style.display = 'block';
-            document.querySelector('.wa-float').style.display = 'flex';
-            document.querySelector('footer').style.display = 'block';
-            navegarPara('tela-inicial');
-            atualizarRelogio();
-        }
-
         function fazerLogout() {
             localStorage.removeItem('usuarioArenaVitale');
+            localStorage.removeItem('ultimaTelaArena');
             location.reload(); 
         }
 
@@ -437,6 +458,16 @@
             if (idTela === 'tela-inicial') { telaAlvo.style.display = 'flex'; } else { telaAlvo.style.display = 'block'; }
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
+            
+            // SALVA A TELA ATUAL NA MEMÓRIA
+            localStorage.setItem('ultimaTelaArena', idTela);
+        }
+
+        // FUNÇÃO DE ATUALIZAR PÁGINA (REFRESH)
+        function atualizarPagina() {
+            const btn = document.querySelector('.btn-refresh-float');
+            btn.style.transform = "rotate(360deg)";
+            setTimeout(() => location.reload(), 300);
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
@@ -544,7 +575,7 @@
                 hora: tempHora, 
                 quadra: quadraSelecionada, 
                 duracao: duracaoSelecionada,
-                status: 'pendente' 
+                status: 'pendente'
             };
             
             fetch(SCRIPT_URL, { 
