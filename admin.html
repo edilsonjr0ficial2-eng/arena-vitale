@@ -7,9 +7,8 @@
     <link rel="icon" href="logo2.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; }
+        :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
-        body.light-mode .slot, body.light-mode table th, body.light-mode table td { border-color: #ccc; }
         
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
@@ -34,35 +33,32 @@
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.9rem; }
         
+        /* SLOTS E CORES */
         .slot { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.85rem; }
         .time-label { font-weight: bold; color: #777; width: 50px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slot-content.booked { color: var(--primary); font-weight: bold; }
+        .slot-content.pending { color: var(--pending); font-style: italic; } /* COR PENDENTE */
         
         .actions { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
         .btn-del { color: var(--danger); } .btn-del:hover { transform: scale(1.2); }
         .btn-wa { color: var(--success); } .btn-wa:hover { transform: scale(1.2); }
-        .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; } .btn-pay:hover { opacity: 1; }
+        .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
+        .btn-confirm { color: var(--pending); animation: pulse 2s infinite; } /* BOTÃO CONFIRMAR */
+        .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         #loginOverlay, .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         
-        /* TABELAS E LISTAS */
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .interdicao-item input { width: auto; margin: 0; }
 
-        .sorteio-display { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 30px 0; min-height: 60px; text-transform: uppercase; }
-        .confetti { color: var(--success); font-size: 1.5rem; margin-top: 10px; display: none; }
-
-        .blacklist-container, .ausentes-container { max-height: 300px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
-        .black-item, .ausente-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 10px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
-        .ausente-info b { color: var(--primary); font-size: 1rem; }
-        .ausente-info span { color: #aaa; font-size: 0.8rem; }
-        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
@@ -93,8 +89,6 @@
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
-            <button class="tool-btn" onclick="abrirModalAusentes()">📢 Alerta Sumidos</button>
-            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
@@ -126,7 +120,10 @@
             <h3 style="color:var(--primary)">Novo Agendamento</h3>
             <p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
             <input type="text" id="manualNome" placeholder="Nome do Jogador / Bloqueio">
-            <div class="checkbox-wrapper"><input type="checkbox" id="checkMensalista" style="width:auto;"><label>Marcar como Mensalista (M)</label></div>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="checkMensalista" style="width:auto;">
+                <label>Marcar como Mensalista (M)</label>
+            </div>
             <button class="primary-btn" onclick="salvarManual()">SALVAR</button>
             <button class="close-btn" onclick="fecharModal()">Cancelar</button>
         </div>
@@ -152,35 +149,6 @@
             <div class="interdicao-grid" id="listaInterdicao"></div>
             <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button>
             <button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
-        </div>
-    </div>
-
-    <div id="modalSorteio" class="modal-bg">
-        <div class="modal-box">
-            <h3 style="color:var(--primary)">Sorteio de Clientes 🎲</h3>
-            <div id="displaySorteio" class="sorteio-display">...</div>
-            <div id="confetti" class="confetti">🎉 PARABÉNS! 🎉</div>
-            <button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR AGORA</button>
-            <button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalAusentes" class="modal-bg">
-        <div class="modal-box modal-wide" style="max-width:600px;">
-            <h3 style="color:var(--primary)">📢 Reengajamento</h3>
-            <p style="color:#aaa; font-size:0.9rem;">Clientes que não aparecem há mais de:</p>
-            
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="number" id="inputDiasAusentes" value="5" style="width:70px; text-align:center;">
-                <span style="font-weight:bold;">DIAS</span>
-                <button class="primary-btn" style="width:auto; margin:0;" onclick="buscarAusentes()">BUSCAR</button>
-            </div>
-
-            <div class="ausentes-container" id="listaAusentes">
-                <p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR para ver a lista.</p>
-            </div>
-
-            <button class="close-btn" onclick="document.getElementById('modalAusentes').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -223,53 +191,10 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- CLIENTES AUSENTES (NOVO) ---
-        function abrirModalAusentes() {
-            document.getElementById('modalAusentes').style.display = 'flex';
-            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR para ver a lista.</p>';
-        }
-
-        function buscarAusentes() {
-            let dias = document.getElementById('inputDiasAusentes').value;
-            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:var(--primary);">Carregando...</p>';
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "listar_ausentes", dias: dias })
-            })
-            .then(r => r.json())
-            .then(data => {
-                let lista = data.lista;
-                let html = "";
-                if (!lista || lista.length === 0) {
-                    html = '<p style="text-align:center; color:#aaa;">Nenhum cliente ausente nesse período.</p>';
-                } else {
-                    lista.forEach(c => {
-                        let msgZap = `Olá ${c.nome}! 🎾\n\nFaz ${c.dias} dias que não te vemos na Arena Vitale. Aconteceu algo? Estamos com saudades!\n\nBora marcar um jogo para essa semana?`;
-                        let linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msgZap)}`;
-                        
-                        html += `
-                            <div class="ausente-item">
-                                <div class="ausente-info">
-                                    <b>${c.nome}</b><br>
-                                    <span>Ausente há <b style="color:var(--danger)">${c.dias} dias</b></span>
-                                </div>
-                                <button class="btn-icon btn-wa" onclick="window.open('${linkZap}', '_blank')" title="Enviar Mensagem">📩 Chamar no Zap</button>
-                            </div>
-                        `;
-                    });
-                }
-                document.getElementById('listaAusentes').innerHTML = html;
-            })
-            .catch(e => {
-                document.getElementById('listaAusentes').innerHTML = '<p style="color:red; text-align:center;">Erro ao buscar.</p>';
-            });
-        }
-
         // --- RELATÓRIOS ---
         function gerarRelatorio(tipo) {
             let win = window.open("", "_blank");
-            win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando dados...</h2></body></html>");
+            win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando...</h2></body></html>");
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" }) })
             .then(r => r.json())
             .then(data => {
@@ -282,25 +207,9 @@
                     html += `<thead><tr><th>Nome</th><th>Telefone</th></tr></thead><tbody>`;
                     for(let i = 0; i < data.lista.length; i++) { let r = data.lista[i]; html += `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`; }
                 }
-                html += `</tbody></table><br><button onclick="window.close()" style="padding:10px 20px;cursor:pointer;">Fechar</button></body></html>`;
+                html += `</tbody></table></body></html>`;
                 win.document.open(); win.document.write(html); win.document.close();
-            })
-            .catch(e => { win.document.body.innerHTML = "<h2 style='color:red'>Erro.</h2>"; });
-        }
-
-        // --- SORTEIO ---
-        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; document.getElementById('displaySorteio').innerText = "???"; document.getElementById('confetti').style.display = 'none'; document.getElementById('btnSortear').disabled = false; document.getElementById('btnSortear').innerText = "SORTEAR AGORA"; }
-        function realizarSorteio() {
-            const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio');
-            btn.disabled = true; btn.innerText = "Sorteando...";
-            let timer = setInterval(() => { display.innerText = "Sorteando..."; display.style.opacity = Math.random() > 0.5 ? 1 : 0.5; }, 100);
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) })
-            .then(r => r.json())
-            .then(data => {
-                clearInterval(timer); display.style.opacity = 1;
-                if (data.erro) { display.innerText = "Erro"; alert(data.erro); btn.disabled = false; btn.innerText = "Tentar Novamente"; }
-                else { let v = data.vencedor; display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; document.getElementById('confetti').style.display = 'block'; btn.innerText = "Sorteio Concluído"; }
-            }).catch(e => { clearInterval(timer); display.innerText = "Erro"; btn.disabled = false; });
+            });
         }
 
         // --- INTERDIÇÃO ---
@@ -345,6 +254,7 @@
             document.getElementById('statFaturamento').innerText = "R$ " + (ocupados * 45).toFixed(2).replace('.', ',');
             renderizarGrid();
         }
+        
         function renderizarGrid() {
             let hQ1 = ""; let hQ2 = "";
             horas.forEach(h => {
@@ -353,12 +263,38 @@
             });
             document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
         }
+
+        // --- GERAÇÃO DO SLOT (COM LÓGICA DE PENDENTE) ---
         function criarSlotHTML(h, q, n) {
-            let ocup = n.length > 0; let cont = ocup ? `<span class="booked">${n}</span>` : "Livre";
-            let btns = ocup 
-                ? `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button><button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>`
-                : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
-            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${ocup ? 'booked' : ''}">${cont}</div><div class="actions">${btns}</div></div>`;
+            let ocupado = n.length > 0;
+            let isPendente = n.includes("⏳");
+            let nomeExibicao = n;
+            let classeExtra = isPendente ? "pending" : "booked";
+            
+            let conteudo = ocupado ? `<span class="${classeExtra}">${nomeExibicao}</span>` : "Livre";
+            let botoes = "";
+
+            if (ocupado) {
+                // Se for Pendente, mostra o botão de Check
+                if (isPendente) {
+                    botoes = `
+                        <button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n.replace('⏳','').trim()}', ${h})">📞</button>
+                        <button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${n}')" title="Confirmar">🆗</button>
+                        <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>
+                    `;
+                } else {
+                    // Se for confirmado, mostra botão de pagamento e lixeira
+                    botoes = `
+                        <button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button>
+                        <button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button>
+                        <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>
+                    `;
+                }
+            } else {
+                botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
+            }
+
+            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content">${conteudo}</div><div class="actions">${botoes}</div></div>`;
         }
 
         // --- FUNÇÕES UTILS ---
@@ -371,6 +307,15 @@
         function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
+        
+        // CONFIRMAR AGENDAMENTO (REMOVE AMPULHETA)
+        function confirmarAgendamento(h, q, n) {
+            let nomeLimpo = n.replace("⏳", "").trim();
+            if(confirm(`Confirmar agendamento de ${nomeLimpo}?`)) {
+                enviarComando("agendar", h, q, nomeLimpo);
+            }
+        }
+
         function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Q${q}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
         function salvarManual() {
@@ -382,7 +327,14 @@
         function enviarComando(a, h, q, n) {
             let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
             if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : "");
-            renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1 });
+            renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true });
+        }
+        function copiarAgenda() {
+            let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra 1:*\n`;
+            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            t += `\n*Quadra 2:*\n`;
+            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            navigator.clipboard.writeText(t).then(() => alert("Copiado!"));
         }
     </script>
 </body>
