@@ -314,8 +314,10 @@
                 atualizarRelogio();
             }
 
-            // RECUPERA A ÚLTIMA TELA VISITADA
-            const telaSalva = localStorage.getItem('ultimaTelaArena');
+            // --- LÓGICA DE NAVEGAÇÃO "SESSÃO VS PERMANENTE" ---
+            // Se tiver na memória temporária (refresh), volta pra tela.
+            // Se fechou o navegador, sessionStorage apaga e volta pra Home.
+            const telaSalva = sessionStorage.getItem('ultimaTelaArena');
             if (telaSalva && document.getElementById(telaSalva)) {
                 navegarPara(telaSalva);
             } else {
@@ -446,7 +448,7 @@
 
         function fazerLogout() {
             localStorage.removeItem('usuarioArenaVitale');
-            localStorage.removeItem('ultimaTelaArena');
+            sessionStorage.removeItem('ultimaTelaArena'); // Limpa a sessão também
             location.reload(); 
         }
 
@@ -459,8 +461,8 @@
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
             
-            // SALVA A TELA ATUAL NA MEMÓRIA
-            localStorage.setItem('ultimaTelaArena', idTela);
+            // USANDO sessionStorage (Só dura enquanto a aba está aberta)
+            sessionStorage.setItem('ultimaTelaArena', idTela);
         }
 
         // FUNÇÃO DE ATUALIZAR PÁGINA (REFRESH)
@@ -575,7 +577,7 @@
                 hora: tempHora, 
                 quadra: quadraSelecionada, 
                 duracao: duracaoSelecionada,
-                status: 'pendente'
+                status: 'pendente' 
             };
             
             fetch(SCRIPT_URL, { 
