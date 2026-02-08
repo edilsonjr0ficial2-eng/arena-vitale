@@ -154,6 +154,25 @@
             .nav-links.active { display: flex; }
             .hamburger { display: block; }
         }
+
+        /* --- SEÇÃO BENEFÍCIOS --- */
+        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; max-width: 1100px; margin: 40px auto; text-align: center; }
+        .benefit-card { background: transparent; padding: 20px; transition: 0.3s; }
+        .benefit-card:hover { transform: translateY(-5px); }
+        
+        .icon-circle { 
+            width: 80px; height: 80px; margin: 0 auto 20px auto; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2.5rem; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+        }
+        
+        .ic-heart { background: rgba(77, 255, 136, 0.1); color: #4dff88; border: 1px solid #4dff88; }
+        .ic-run { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
+        .ic-brain { background: rgba(77, 255, 255, 0.1); color: #4dffff; border: 1px solid #4dffff; }
+        .ic-gym { background: rgba(255, 215, 0, 0.1); color: #FFD700; border: 1px solid #FFD700; }
+
+        .benefit-card h3 { font-size: 1.1rem; color: white; margin-bottom: 15px; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+        .benefit-card p { font-size: 0.9rem; color: #ccc; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -203,6 +222,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
+                <li><a onclick="navegarPara('tela-beneficios')">Benefícios</a></li>
                 <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
                 <li><a onclick="navegarPara('tela-areia')">Nossa Areia</a></li>
                 <li><a onclick="navegarPara('tela-times')">Gerador de Times</a></li>
@@ -283,6 +303,18 @@
     </div>
 
     <div id="tela-modalidades" class="secao-conteudo"><h2 class="section-title">Nossas Modalidades</h2><div class="grid-cards"><div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada.</p></div><div class="card"><h3>🏐 Vôlei de Praia</h3><p>Espaço perfeito para o set disputado.</p></div><div class="card"><h3>⚽ Futevôlei</h3><p>Treine com amigos.</p></div></div></div>
+    
+    <div id="tela-beneficios" class="secao-conteudo">
+        <h2 class="section-title">Benefícios do Beach Tennis</h2>
+        <p style="text-align:center; color:#777; margin-bottom:20px;">Por que praticar na Arena Vitale?</p>
+        <div class="benefits-grid">
+            <div class="benefit-card"><div class="icon-circle ic-heart">❤</div><h3>Melhora o condicionamento físico</h3><p>A movimentação constante faz com que o atleta saia de sua zona de conforto. São necessários muito fôlego, explosão e resistência para correr e saltar.</p></div>
+            <div class="benefit-card"><div class="icon-circle ic-run">🏃</div><h3>Queima mais calorias que muitos esportes</h3><p>A movimentação intensa e o solo irregular favorecem a queima de gordura e o alto gasto calórico, pois exigem bastante esforço da musculatura das pernas.</p></div>
+            <div class="benefit-card"><div class="icon-circle ic-brain">🧠</div><h3>Condiciona a mente a tomar decisões rápidas</h3><p>Como as trocas de bolas costumam ser rápidas e dinâmicas, mente e corpo precisam estar em sintonia para responder rápido e não perder o timing.</p></div>
+            <div class="benefit-card"><div class="icon-circle ic-gym">💪</div><h3>Estimula o fortalecimento muscular</h3><p>Todos os grupos musculares são exigidos durante uma partida de beach tennis, em especial, as pernas, já que é preciso correr muito para alcançar a bolinha.</p></div>
+        </div>
+    </div>
+
     <div id="tela-arena" class="secao-conteudo"><h2 class="section-title">Conheça Nossa Arena</h2><div class="gallery-grid"><img src="fachada.jpeg" alt="Arena Vitale" class="gallery-item"><img src="quadra2.jpeg" alt="Quadra de Beach Tennis" class="gallery-item"><img src="geral2.jpeg" alt="Lounge" class="gallery-item"><img src="foto4.jpg" alt="Iluminação Noturna" class="gallery-item"></div></div>
     <div id="tela-areia" class="secao-conteudo"><h2 class="section-title">Nossa Areia</h2><div style="max-width: 800px; margin: auto; background: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: left; line-height: 1.6;"><img src="quadra2.jpeg" alt="Areia de Alta Qualidade" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 25px; filter: brightness(0.8);"><p>A quadra de Beach Tennis utiliza areia de alta qualidade, cuidadosamente selecionada para garantir segurança, conforto e melhor desempenho esportivo.</p><br><p>Com granulometria ideal, essa areia proporciona o equilíbrio perfeito entre estabilidade do solo e absorção de impacto, favorecendo movimentos rápidos, precisos e seguros.</p><br><p style="text-align: center; font-weight: bold; color: var(--primary); font-size: 1.2rem; margin-top: 10px;">Aproveite o jogo com mais qualidade! 🎾</p></div></div>
     <div id="tela-times" class="secao-conteudo"><h2 class="section-title">Gerador de Times ⚡</h2><div class="team-generator"><label>Jogadores (separe por vírgula):</label><input type="text" id="playerNames" placeholder="Ex: João, Maria, Pedro, Ana..."><button class="btn-main" style="width: 100%; margin-top: 10px; font-size: 1rem;" onclick="gerarTimes()">🎲 SORTEAR DUPLAS</button><div id="resultArea" class="teams-result"></div></div></div>
