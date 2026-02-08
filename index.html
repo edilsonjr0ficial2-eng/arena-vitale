@@ -7,6 +7,11 @@
     
     <link rel="icon" href="logo.jpg" type="image/jpeg">
 
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* --- PALETA DE CORES --- */
@@ -332,6 +337,14 @@
         let usuarioLogado = null; 
 
         window.onload = function() {
+            // --- REGISTRO DO PWA (NOVO) ---
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                .then(function(reg) { console.log('App instalável pronta!', reg); })
+                .catch(function(err) { console.log('Erro PWA:', err); });
+            }
+            // -----------------------------
+
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
@@ -347,8 +360,6 @@
             }
 
             // --- LÓGICA DE NAVEGAÇÃO "SESSÃO VS PERMANENTE" ---
-            // Se tiver na memória temporária (refresh), volta pra tela.
-            // Se fechou o navegador, sessionStorage apaga e volta pra Home.
             const telaSalva = sessionStorage.getItem('ultimaTelaArena');
             if (telaSalva && document.getElementById(telaSalva)) {
                 navegarPara(telaSalva);
@@ -394,7 +405,7 @@
                 } else if (data.sucesso) {
                     usuarioLogado = { nome: data.nome, phone: data.telefone };
                     localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
-                    location.reload(); // Recarrega para aplicar o window.onload corretamente
+                    location.reload(); 
                 }
             })
             .catch(e => {
@@ -419,7 +430,7 @@
                 return; 
             }
 
-            // Verifica se já tem cadastro local para evitar requisição duplicada (opcional, mas bom pra UX)
+            // Verifica se já tem cadastro local para evitar requisição duplicada
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if (savedUser && JSON.parse(savedUser).phone === cleanPhone) {
                 alert("Você já está logado ou cadastrado.");
