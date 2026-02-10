@@ -7,38 +7,31 @@
     <link rel="icon" href="logo2.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* --- ESTILOS (Mantidos) --- */
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
-
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 70px; width: auto; display: block; }
-        
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
         .tool-btn { padding: 8px 12px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-logout { background: var(--danger); border: none; color: white; }
-
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
         .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
-
         .controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--card); padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; border-radius: 5px; }
         .date-display { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
-
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.9rem; }
-        
         .slot { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.85rem; }
         .time-label { font-weight: bold; color: #777; width: 50px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slot-content.booked { color: var(--primary); font-weight: bold; }
         .slot-content.pending { color: var(--pending); font-style: italic; }
-        
         .actions { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
@@ -47,38 +40,30 @@
         .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
         .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
-
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
         #loginOverlay, .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         .modal-wide { max-width: 600px; width: 95%; }
-
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        
-        /* ESTILO FINANCEIRO */
+        /* FINANCEIRO */
         .fin-summary { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
         .fin-card { background: #333; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #444; }
         .fin-card h4 { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
         .fin-card span { font-size: 1.2rem; font-weight: 900; }
         .fc-green { color: var(--success); } .fc-red { color: var(--danger); } .fc-gold { color: var(--primary); }
-        
-        .fin-list { max-height: 250px; overflow-y: auto; text-align: left; border-top: 1px solid #444; margin-top: 10px; }
-        .fin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; }
-        .fin-item-left { display: flex; gap: 10px; align-items: center; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .fin-list { max-height: 300px; overflow-y: auto; text-align: left; border-top: 1px solid #444; margin-top: 10px; }
+        .fin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; font-size: 0.9rem; }
+        .fin-item-left { display: flex; gap: 10px; align-items: center; flex: 1; }
+        .fin-info { display: flex; flex-direction: column; align-items: flex-start; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .dot-in { background: var(--success); } .dot-out { background: var(--danger); }
-
         .fin-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
-        .fin-inputs input, .fin-inputs select { margin: 0; }
-
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
         button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
-
         @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; } .col-header { background: #eee !important; color: black !important; -webkit-print-color-adjust: exact; } .slot-content { color: black; } #printHeader { display: block !important; } }
         #printHeader { display: none; }
     </style>
@@ -214,7 +199,6 @@
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let dadosAgenda = [];
         let tempAgendamento = {};
-        
         let faturamentoDia = 0; 
         let transacoesExtras = [];
 
@@ -246,7 +230,7 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- FINANCEIRO INTELIGENTE (ATUALIZADO) ---
+        // --- FINANCEIRO INTELIGENTE (CORRIGIDO PARA LER VALORES) ---
         function abrirModalFinanceiro() {
             document.getElementById('modalFinanceiro').style.display = 'flex';
             carregarFinanceiro();
@@ -292,18 +276,34 @@
             transacoesExtras.forEach((t, i) => {
                 let data = t[0] ? new Date(t[0]).toLocaleDateString('pt-BR') : "-";
                 
-                // LÓGICA NOVA: LÊ "Despesa" E "Receita" DO FORTUNO
+                // 1. Identifica o Tipo (Entrada/Saída)
                 let tipoRaw = t[1] ? t[1].toString().toLowerCase() : "";
                 let isSaida = tipoRaw.includes('saida') || tipoRaw.includes('despesa');
                 let isEntrada = tipoRaw.includes('entrada') || tipoRaw.includes('receita');
 
-                let desc = t[2];
-                // Remove R$ e converte para número
-                let valorRaw = t[3] ? t[3].toString().replace("R$", "").replace(/\./g,"").replace(",",".") : "0";
-                let valor = parseFloat(valorRaw);
-                
+                let desc = t[2] || "Sem descrição";
+
+                // 2. CORREÇÃO INTELIGENTE DE VALOR
+                let valorRaw = t[3];
+                let valor = 0;
+
+                // Se já for número, usa direto
+                if (typeof valorRaw === 'number') {
+                    valor = valorRaw;
+                } 
+                // Se for texto (Ex: "R$ 1.500,50" ou "50,00"), limpa a formatação
+                else if (typeof valorRaw === 'string') {
+                    let v = valorRaw.replace("R$", "").trim();
+                    // Se tiver vírgula, assume formato Brasil (remove ponto de milhar, troca vírgula por ponto)
+                    if (v.includes(',')) {
+                        v = v.replace(/\./g, "").replace(",", ".");
+                    }
+                    valor = parseFloat(v);
+                }
+
                 if(isNaN(valor)) valor = 0;
 
+                // Define cores
                 let corDot = isSaida ? 'dot-out' : 'dot-in';
                 let sinal = isSaida ? '- ' : '+ ';
                 let corTexto = isSaida ? 'fc-red' : 'fc-green';
@@ -314,7 +314,10 @@
                 html += `<div class="fin-item">
                     <div class="fin-item-left">
                         <div class="dot ${corDot}"></div>
-                        <div><b>${desc}</b><br><span style="font-size:0.7rem;color:#777;">${data}</span></div>
+                        <div class="fin-info">
+                            <b>${desc}</b>
+                            <span style="font-size:0.7rem;color:#777;">${data}</span>
+                        </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span class="${corTexto}">${sinal}R$ ${valor.toFixed(2)}</span>
@@ -325,6 +328,7 @@
 
             document.getElementById('listaTransacoes').innerHTML = html || '<p style="text-align:center;color:#555;">Nenhuma transação.</p>';
 
+            // Totais
             let receitasTotais = faturamentoDia + totalEntradasExtras; 
             let lucroLiquido = receitasTotais - totalDespesas;
 
@@ -333,7 +337,7 @@
             document.getElementById('finLucro').innerText = "R$ " + lucroLiquido.toFixed(2);
         }
 
-        // --- AGENDA ---
+        // --- AGENDA E OUTRAS FUNÇÕES (MANTIDAS) ---
         async function carregarAgenda() {
             const info = formatarData(dataAtual);
             document.getElementById('dateDisplay').innerText = info.texto;
