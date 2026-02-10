@@ -53,18 +53,26 @@
         #loginOverlay, .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
-        
+        .modal-wide { max-width: 600px; width: 95%; }
+
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        .interdicao-item input { width: auto; margin: 0; }
+        
+        /* ESTILO FINANCEIRO */
+        .fin-summary { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+        .fin-card { background: #333; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #444; }
+        .fin-card h4 { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+        .fin-card span { font-size: 1.2rem; font-weight: 900; }
+        .fc-green { color: var(--success); } .fc-red { color: var(--danger); } .fc-gold { color: var(--primary); }
+        
+        .fin-list { max-height: 250px; overflow-y: auto; text-align: left; border-top: 1px solid #444; margin-top: 10px; }
+        .fin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; }
+        .fin-item-left { display: flex; gap: 10px; align-items: center; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-in { background: var(--success); } .dot-out { background: var(--danger); }
 
-        .sorteio-display { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 30px 0; min-height: 60px; text-transform: uppercase; }
-        .confetti { color: var(--success); font-size: 1.5rem; margin-top: 10px; display: none; }
-
-        .blacklist-container, .ausentes-container { max-height: 300px; overflow-y: auto; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; text-align: left; }
-        .black-item, .ausente-item { display: flex; justify-content: space-between; align-items: center; background: #333; margin-bottom: 5px; padding: 10px; border-radius: 5px; font-size: 0.85rem; border: 1px solid #444; }
-        .ausente-info b { color: var(--primary); font-size: 1rem; }
-        .ausente-info span { color: #aaa; font-size: 0.8rem; }
+        .fin-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
+        .fin-inputs input, .fin-inputs select { margin: 0; }
 
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
@@ -95,10 +103,10 @@
         
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
+            <button class="tool-btn" onclick="abrirModalFinanceiro()">💰 Financeiro</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
-            <button class="tool-btn" onclick="abrirModalAusentes()">📢 Alerta Sumidos</button>
-            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
+            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
             <button class="tool-btn" onclick="abrirModalAddBloqueio()">➕ Add Bloqueio</button>
@@ -109,7 +117,7 @@
 
     <div class="stats-bar">
         <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
-        <div class="stat-item">Faturamento (Est.): <span id="statFaturamento">R$ 0,00</span></div>
+        <div class="stat-item">Faturamento do Dia: <span id="statFaturamento">R$ 0,00</span></div>
     </div>
 
     <div class="controls">
@@ -122,6 +130,32 @@
     <div class="grid-container">
         <div class="column"><div class="col-header">🎾 Chicashoes</div><div id="listaQ1"></div></div>
         <div class="column"><div class="col-header">🥐 Panificadora</div><div id="listaQ2"></div></div>
+    </div>
+
+    <div id="modalFinanceiro" class="modal-bg">
+        <div class="modal-box modal-wide">
+            <h3 style="color:var(--primary)">Gestão Financeira</h3>
+            
+            <div class="fin-summary">
+                <div class="fin-card"><h4>Receitas</h4><span id="finReceitas" class="fc-green">R$ 0,00</span></div>
+                <div class="fin-card"><h4>Despesas</h4><span id="finDespesas" class="fc-red">R$ 0,00</span></div>
+                <div class="fin-card"><h4>Lucro</h4><span id="finLucro" class="fc-gold">R$ 0,00</span></div>
+            </div>
+
+            <h4 style="text-align:left; color:#ccc; margin:10px 0;">Adicionar Lançamento</h4>
+            <div class="fin-inputs">
+                <select id="finTipo" style="width:30%"><option value="saida">🔴 Despesa</option><option value="entrada">🟢 Entrada Extra</option></select>
+                <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Água)" style="width:40%">
+                <input type="number" id="finValor" placeholder="Valor" style="width:30%">
+            </div>
+            <button class="primary-btn" style="margin-top:0;" onclick="salvarTransacao()">SALVAR</button>
+
+            <div class="fin-list" id="listaTransacoes">
+                <p style="color:#777; padding:10px;">Carregando...</p>
+            </div>
+
+            <button class="close-btn" onclick="document.getElementById('modalFinanceiro').style.display='none'">Fechar</button>
+        </div>
     </div>
 
     <div id="modalManual" class="modal-bg">
@@ -164,26 +198,9 @@
     <div id="modalSorteio" class="modal-bg">
         <div class="modal-box">
             <h3 style="color:var(--primary)">Sorteio de Clientes 🎲</h3>
-            <div id="displaySorteio" class="sorteio-display">❓</div>
-            <div id="confetti" class="confetti">🎉 PARABÉNS! 🎉</div>
+            <div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div>
             <button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR AGORA</button>
             <button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalAusentes" class="modal-bg">
-        <div class="modal-box modal-wide">
-            <h3 style="color:var(--primary)">📢 Reengajamento</h3>
-            <p style="color:#aaa; font-size:0.9rem;">Clientes sem jogar há mais de:</p>
-            <div style="display:flex; gap:10px; align-items:center; justify-content:center; margin:10px 0;">
-                <input type="number" id="inputDiasAusentes" value="5" style="width:70px; text-align:center;">
-                <span style="font-weight:bold;">DIAS</span>
-                <button class="primary-btn" style="width:auto; margin:0;" onclick="buscarAusentes()">BUSCAR</button>
-            </div>
-            <div class="ausentes-container" id="listaAusentes">
-                <p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR.</p>
-            </div>
-            <button class="close-btn" onclick="document.getElementById('modalAusentes').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -197,6 +214,9 @@
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let dadosAgenda = [];
         let tempAgendamento = {};
+        
+        let faturamentoDia = 0; 
+        let transacoesExtras = [];
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
@@ -226,98 +246,98 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- RELATÓRIOS ---
-        function gerarRelatorio(tipo) {
-            let win = window.open("", "_blank");
-            win.document.write("<html><body style='background:#111;color:#fff;font-family:sans-serif;'><h2>Carregando...</h2></body></html>");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" }) })
+        // --- FINANCEIRO INTELIGENTE (ATUALIZADO) ---
+        function abrirModalFinanceiro() {
+            document.getElementById('modalFinanceiro').style.display = 'flex';
+            carregarFinanceiro();
+        }
+
+        function carregarFinanceiro() {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_financeiro" }) })
             .then(r => r.json())
             .then(data => {
-                let titulo = tipo === 'clientes' ? "Relatório de Clientes" : "Relatório da Lista Negra";
-                let html = `<html><head><title>${titulo}</title><style>body{font-family:'Segoe UI',sans-serif;background:#1a1a1a;color:#fff;padding:20px;}h1{color:#FFD700;border-bottom:2px solid #333;padding-bottom:10px;}table{width:100%;border-collapse:collapse;margin-top:20px;background:#222;}th,td{padding:12px;border:1px solid #444;text-align:left;}th{background:#FFD700;color:#000;font-weight:bold;}tr:nth-child(even){background:#2a2a2a;}tr:hover{background:#333;}</style></head><body><h1>${titulo}</h1><table>`;
-                if (tipo === 'clientes') {
-                    // ADICIONADA COLUNA ÚLTIMO AGENDAMENTO
-                    html += `<thead><tr><th>Data Cadastro</th><th>Nome</th><th>Telefone</th><th>Senha</th><th>Último Acesso</th><th>Último Agendamento</th></tr></thead><tbody>`;
-                    for(let i = 1; i < data.lista.length; i++) { 
-                        let r = data.lista[i]; 
-                        let d = r[0] ? new Date(r[0]).toLocaleDateString() : "-"; 
-                        let ultAgend = r[5] || "-"; // Coluna F
-                        html += `<tr><td>${d}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${ultAgend}</td></tr>`; 
-                    }
-                } else {
-                    html += `<thead><tr><th>Nome</th><th>Telefone</th></tr></thead><tbody>`;
-                    for(let i = 0; i < data.lista.length; i++) { let r = data.lista[i]; html += `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`; }
-                }
-                html += `</tbody></table></body></html>`;
-                win.document.open(); win.document.write(html); win.document.close();
+                transacoesExtras = data.lista || [];
+                renderizarFinanceiro();
             });
         }
 
-        // --- CLIENTES AUSENTES ---
-        function abrirModalAusentes() {
-            document.getElementById('modalAusentes').style.display = 'flex';
-            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:#777; padding:20px;">Clique em BUSCAR.</p>';
+        function salvarTransacao() {
+            const desc = document.getElementById('finDesc').value;
+            const valor = document.getElementById('finValor').value;
+            const tipo = document.getElementById('finTipo').value;
+            if(!desc || !valor) return alert("Preencha tudo");
+
+            document.getElementById('finDesc').value = "";
+            document.getElementById('finValor').value = "";
+
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "salvar_transacao", descricao: desc, valor: valor, tipo: tipo }) 
+            })
+            .then(() => carregarFinanceiro());
         }
 
-        function buscarAusentes() {
-            let dias = document.getElementById('inputDiasAusentes').value;
-            document.getElementById('listaAusentes').innerHTML = '<p style="text-align:center; color:var(--primary);">Carregando...</p>';
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "listar_ausentes", dias: dias })
-            })
-            .then(r => r.json())
-            .then(data => {
-                let lista = data.lista;
-                let html = "";
-                if (!lista || lista.length === 0) {
-                    html = '<p style="text-align:center; color:#aaa;">Nenhum cliente ausente nesse período.</p>';
-                } else {
-                    lista.forEach(c => {
-                        let msgZap = `Olá ${c.nome}! \uD83C\uDFBE\n\nFaz ${c.dias} dias que não te vemos na Arena Vitale. Aconteceu algo? Estamos com saudades!\n\nBora marcar um jogo para essa semana?`;
-                        let linkZap = `https://wa.me/55${c.telefone}?text=${encodeURIComponent(msgZap)}`;
-                        
-                        html += `
-                            <div class="ausente-item">
-                                <div class="ausente-info">
-                                    <b>${c.nome}</b><br>
-                                    <span>Sem jogar há <b style="color:var(--danger)">${c.dias} dias</b></span>
-                                </div>
-                                <button class="btn-icon btn-wa" onclick="window.open('${linkZap}', '_blank')" title="Enviar Mensagem">📩 Chamar no Zap</button>
-                            </div>
-                        `;
-                    });
-                }
-                document.getElementById('listaAusentes').innerHTML = html;
-            })
-            .catch(e => {
-                document.getElementById('listaAusentes').innerHTML = '<p style="color:red; text-align:center;">Erro ao buscar.</p>';
-            });
+        function apagarTransacao(index) {
+            if(confirm("Apagar transação?")) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "apagar_transacao", index: index }) })
+                .then(() => carregarFinanceiro());
+            }
         }
 
-        // --- OUTRAS FUNÇÕES ---
-        function abrirModalInterdicao() {
-            document.getElementById('modalInterdicao').style.display = 'flex';
+        function renderizarFinanceiro() {
             let html = "";
-            horas.forEach(h => {
-                html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Panificadora</label></div>`;
+            let totalDespesas = 0;
+            let totalEntradasExtras = 0;
+
+            transacoesExtras.forEach((t, i) => {
+                let data = t[0] ? new Date(t[0]).toLocaleDateString('pt-BR') : "-";
+                
+                // LÓGICA NOVA: LÊ "Despesa" E "Receita" DO FORTUNO
+                let tipoRaw = t[1] ? t[1].toString().toLowerCase() : "";
+                let isSaida = tipoRaw.includes('saida') || tipoRaw.includes('despesa');
+                let isEntrada = tipoRaw.includes('entrada') || tipoRaw.includes('receita');
+
+                let desc = t[2];
+                // Remove R$ e converte para número
+                let valorRaw = t[3] ? t[3].toString().replace("R$", "").replace(/\./g,"").replace(",",".") : "0";
+                let valor = parseFloat(valorRaw);
+                
+                if(isNaN(valor)) valor = 0;
+
+                let corDot = isSaida ? 'dot-out' : 'dot-in';
+                let sinal = isSaida ? '- ' : '+ ';
+                let corTexto = isSaida ? 'fc-red' : 'fc-green';
+
+                if(isSaida) totalDespesas += valor;
+                if(isEntrada) totalEntradasExtras += valor;
+
+                html += `<div class="fin-item">
+                    <div class="fin-item-left">
+                        <div class="dot ${corDot}"></div>
+                        <div><b>${desc}</b><br><span style="font-size:0.7rem;color:#777;">${data}</span></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="${corTexto}">${sinal}R$ ${valor.toFixed(2)}</span>
+                        <button class="btn-icon btn-del" onclick="apagarTransacao(${i})">🗑️</button>
+                    </div>
+                </div>`;
             });
-            document.getElementById('listaInterdicao').innerHTML = html;
-        }
-        function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
-        function confirmarInterdicao() {
-            let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); });
-            if(sel.length === 0) return alert("Selecione um horário.");
-            if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; }
+
+            document.getElementById('listaTransacoes').innerHTML = html || '<p style="text-align:center;color:#555;">Nenhuma transação.</p>';
+
+            let receitasTotais = faturamentoDia + totalEntradasExtras; 
+            let lucroLiquido = receitasTotais - totalDespesas;
+
+            document.getElementById('finReceitas').innerText = "R$ " + receitasTotais.toFixed(2);
+            document.getElementById('finDespesas').innerText = "R$ " + totalDespesas.toFixed(2);
+            document.getElementById('finLucro').innerText = "R$ " + lucroLiquido.toFixed(2);
         }
 
+        // --- AGENDA ---
         async function carregarAgenda() {
             const info = formatarData(dataAtual);
             document.getElementById('dateDisplay').innerText = info.texto;
             document.getElementById('printDate').innerText = info.texto;
-            document.getElementById('listaQ1').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
-            document.getElementById('listaQ2').innerHTML = '<div style="padding:10px;text-align:center;">↻</div>';
             try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); }
         }
         function processarCSV(csv, diaIndex) {
@@ -333,8 +353,9 @@
                 }
             });
             let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100);
+            faturamentoDia = ocupados * 45; 
             document.getElementById('statOcupacao').innerText = porc + "%";
-            document.getElementById('statFaturamento').innerText = "R$ " + (ocupados * 45).toFixed(2).replace('.', ',');
+            document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ',');
             renderizarGrid();
         }
         
@@ -350,31 +371,17 @@
         function criarSlotHTML(h, q, n) {
             let ocupado = n.length > 0;
             let isPendente = n.includes("⏳");
-            let nomeExibicao = n;
-            let classeExtra = isPendente ? "pending" : "booked";
+            let botoes = ocupado ? (isPendente ? 
+                `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n.replace('⏳','').trim()}', ${h})">📞</button>
+                 <button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${n}')">🆗</button>
+                 <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>` : 
+                `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button>
+                 <button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button>
+                 <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>`) 
+                : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
             
-            let conteudo = ocupado ? `<span class="${classeExtra}">${nomeExibicao}</span>` : "Livre";
-            let botoes = "";
-
-            if (ocupado) {
-                if (isPendente) {
-                    botoes = `
-                        <button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n.replace('⏳','').trim()}', ${h})">📞</button>
-                        <button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${n}')" title="Confirmar">🆗</button>
-                        <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>
-                    `;
-                } else {
-                    botoes = `
-                        <button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button>
-                        <button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button>
-                        <button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>
-                    `;
-                }
-            } else {
-                botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
-            }
-
-            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content">${conteudo}</div><div class="actions">${botoes}</div></div>`;
+            let classe = isPendente ? "pending" : (ocupado ? "booked" : "");
+            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
         }
 
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
@@ -386,14 +393,7 @@
         function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
-        
-        function confirmarAgendamento(h, q, n) {
-            let nomeLimpo = n.replace("⏳", "").trim();
-            if(confirm(`Confirmar agendamento de ${nomeLimpo}?`)) {
-                enviarComando("agendar", h, q, nomeLimpo);
-            }
-        }
-
+        function confirmarAgendamento(h, q, n) { if(confirm(`Confirmar?`)) enviarComando("agendar", h, q, n.replace("⏳", "").trim()); }
         function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Q${q}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
         function salvarManual() {
@@ -414,19 +414,29 @@
             horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
             navigator.clipboard.writeText(t).then(() => alert("Copiado!"));
         }
+        
+        function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Panificadora</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
+        function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
+        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; } }
 
-        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; document.getElementById('displaySorteio').innerText = "❓"; document.getElementById('confetti').style.display = 'none'; document.getElementById('btnSortear').disabled = false; document.getElementById('btnSortear').innerText = "SORTEAR AGORA"; }
+        function gerarRelatorio(tipo) { let win = window.open("", "_blank"); win.document.write("Carregando..."); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" }) }).then(r => r.json()).then(data => { 
+            let html = `<html><head><title>Relatório</title><style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px;}</style></head><body><h1>${tipo}</h1><table><tbody>`;
+            data.lista.forEach(r => { html += `<tr><td>${r.join('</td><td>')}</td></tr>`; });
+            html += `</tbody></table></body></html>`;
+            win.document.body.innerHTML = html;
+        }); }
+
+        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() {
             const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio');
             btn.disabled = true; btn.innerText = "Sorteando...";
-            let timer = setInterval(() => { display.innerText = "Sorteando..."; display.style.opacity = Math.random() > 0.5 ? 1 : 0.5; }, 100);
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) })
             .then(r => r.json())
             .then(data => {
-                clearInterval(timer); display.style.opacity = 1;
-                if (data.erro) { display.innerText = "Erro"; alert(data.erro); btn.disabled = false; btn.innerText = "Tentar Novamente"; }
-                else { let v = data.vencedor; display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; document.getElementById('confetti').style.display = 'block'; btn.innerText = "Sorteio Concluído"; }
-            }).catch(e => { clearInterval(timer); display.innerText = "Erro"; btn.disabled = false; });
+                if (data.erro) { display.innerText = "Erro"; alert(data.erro); }
+                else { let v = data.vencedor; display.innerHTML = `${v.nome}<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; }
+                btn.disabled = false; btn.innerText = "SORTEAR AGORA";
+            });
         }
     </script>
 </body>
