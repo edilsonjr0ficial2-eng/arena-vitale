@@ -7,11 +7,13 @@
     <link rel="icon" href="logo2.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS (Mantidos) --- */
+        /* --- ESTILOS GERAIS --- */
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+
+        /* HEADER & TOOLBAR */
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 70px; width: auto; display: block; }
@@ -19,11 +21,17 @@
         .tool-btn { padding: 8px 12px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-logout { background: var(--danger); border: none; color: white; }
+
+        /* STATUS BAR (AGENDA) */
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
         .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
+
+        /* CONTROLES DE DATA */
         .controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--card); padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; border-radius: 5px; }
         .date-display { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
+
+        /* GRID DA AGENDA */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.9rem; }
@@ -41,29 +49,49 @@
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
         .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* MODAIS E OVERLAYS */
         #loginOverlay, .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
         .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
-        .modal-wide { max-width: 600px; width: 95%; }
-        .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
-        .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        /* FINANCEIRO */
-        .fin-summary { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
-        .fin-card { background: #333; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #444; }
-        .fin-card h4 { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
-        .fin-card span { font-size: 1.2rem; font-weight: 900; }
-        .fc-green { color: var(--success); } .fc-red { color: var(--danger); } .fc-gold { color: var(--primary); }
-        .fin-list { max-height: 300px; overflow-y: auto; text-align: left; border-top: 1px solid #444; margin-top: 10px; }
-        .fin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; font-size: 0.9rem; }
-        .fin-item-left { display: flex; gap: 10px; align-items: center; flex: 1; }
-        .fin-info { display: flex; flex-direction: column; align-items: flex-start; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .dot-in { background: var(--success); } .dot-out { background: var(--danger); }
+        .modal-wide { max-width: 500px; width: 95%; height: 85vh; display: flex; flex-direction: column; } /* Estilo App */
+
+        /* --- ESTILO FINANCEIRO TIPO FORTUNO --- */
+        .fin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .fin-month-nav { display: flex; align-items: center; gap: 15px; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .fin-btn-nav { background: none; border: none; color: #777; font-size: 1.5rem; cursor: pointer; }
+        .fin-btn-nav:hover { color: var(--text); }
+
+        .fin-balance-card { background: linear-gradient(135deg, #222, #111); border: 1px solid #333; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .fin-balance-label { font-size: 0.9rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .fin-balance-value { font-size: 2.5rem; font-weight: 900; margin: 10px 0; color: white; }
+        
+        /* Barra de Progresso (Gráfico Simples) */
+        .progress-container { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 15px; display: flex; }
+        .progress-bar { height: 100%; transition: width 0.5s; }
+        .pb-green { background: var(--success); }
+        .pb-red { background: var(--danger); }
+
+        .fin-summary-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; }
+        
+        .fin-scroll-list { flex: 1; overflow-y: auto; text-align: left; border-top: 1px solid #333; padding-top: 10px; }
+        .fin-group-date { font-size: 0.8rem; color: #777; margin: 15px 0 5px 0; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        .fin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #222; }
+        .fin-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #333; margin-right: 15px; }
+        .fin-details { flex: 1; }
+        .fin-cat { font-weight: bold; font-size: 1rem; color: var(--text); }
+        .fin-desc { font-size: 0.8rem; color: #777; }
+        
+        .floating-add-btn { position: absolute; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; font-weight: bold; }
+        .floating-add-btn:hover { transform: scale(1.1); }
+
         .fin-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
         button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
+
         @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; } .col-header { background: #eee !important; color: black !important; -webkit-print-color-adjust: exact; } .slot-content { color: black; } #printHeader { display: block !important; } }
         #printHeader { display: none; }
     </style>
@@ -118,28 +146,47 @@
     </div>
 
     <div id="modalFinanceiro" class="modal-bg">
-        <div class="modal-box modal-wide">
-            <h3 style="color:var(--primary)">Gestão Financeira</h3>
+        <div class="modal-box modal-wide" style="position:relative;">
             
-            <div class="fin-summary">
-                <div class="fin-card"><h4>Receitas</h4><span id="finReceitas" class="fc-green">R$ 0,00</span></div>
-                <div class="fin-card"><h4>Despesas</h4><span id="finDespesas" class="fc-red">R$ 0,00</span></div>
-                <div class="fin-card"><h4>Lucro</h4><span id="finLucro" class="fc-gold">R$ 0,00</span></div>
+            <div class="fin-header">
+                <button class="fin-btn-nav" onclick="mudarMesFinanceiro(-1)">❮</button>
+                <div class="fin-month-nav" id="finMesDisplay">FEVEREIRO 2026</div>
+                <button class="fin-btn-nav" onclick="mudarMesFinanceiro(1)">❯</button>
+                <button class="close-btn" style="width:auto; margin:0;" onclick="document.getElementById('modalFinanceiro').style.display='none'">✕</button>
             </div>
 
-            <h4 style="text-align:left; color:#ccc; margin:10px 0;">Adicionar Lançamento</h4>
-            <div class="fin-inputs">
-                <select id="finTipo" style="width:30%"><option value="saida">🔴 Despesa</option><option value="entrada">🟢 Entrada Extra</option></select>
-                <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Água)" style="width:40%">
-                <input type="number" id="finValor" placeholder="Valor" style="width:30%">
-            </div>
-            <button class="primary-btn" style="margin-top:0;" onclick="salvarTransacao()">SALVAR</button>
+            <div class="fin-balance-card">
+                <div class="fin-balance-label">Saldo em Caixa</div>
+                <div class="fin-balance-value" id="finSaldoTotal">R$ 0,00</div>
+                
+                <div class="fin-summary-row">
+                    <span style="color:var(--success)">▲ <span id="finEntradas">R$ 0,00</span></span>
+                    <span style="color:var(--danger)">▼ <span id="finSaidas">R$ 0,00</span></span>
+                </div>
 
-            <div class="fin-list" id="listaTransacoes">
-                <p style="color:#777; padding:10px;">Carregando...</p>
+                <div class="progress-container">
+                    <div id="barReceita" class="progress-bar pb-green" style="width:50%"></div>
+                    <div id="barDespesa" class="progress-bar pb-red" style="width:50%"></div>
+                </div>
             </div>
 
-            <button class="close-btn" onclick="document.getElementById('modalFinanceiro').style.display='none'">Fechar</button>
+            <div class="fin-scroll-list" id="listaTransacoes">
+                <p style="text-align:center;color:#555;">Carregando...</p>
+            </div>
+
+            <div class="floating-add-btn" onclick="document.getElementById('modalAddTransacao').style.display='flex'">+</div>
+
+        </div>
+    </div>
+
+    <div id="modalAddTransacao" class="modal-bg" style="z-index: 2100;">
+        <div class="modal-box">
+            <h3 style="color:var(--primary)">Nova Transação</h3>
+            <select id="finTipo"><option value="saida">🔴 Despesa</option><option value="entrada">🟢 Entrada Extra</option></select>
+            <input type="text" id="finDesc" placeholder="Descrição (Ex: Luz, Água, Gatorade)">
+            <input type="number" id="finValor" placeholder="Valor (R$)">
+            <button class="primary-btn" onclick="salvarTransacao()">SALVAR</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddTransacao').style.display='none'">Cancelar</button>
         </div>
     </div>
 
@@ -197,10 +244,15 @@
         let dataAtual = new Date();
         const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+        const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        
         let dadosAgenda = [];
         let tempAgendamento = {};
         let faturamentoDia = 0; 
-        let transacoesExtras = [];
+        
+        // DADOS FINANCEIROS
+        let todasTransacoes = [];
+        let dataFinanceira = new Date(); // Controla o mês que estamos vendo no financeiro
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
@@ -230,17 +282,26 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- FINANCEIRO INTELIGENTE (CORRIGIDO PARA LER VALORES) ---
+        // --- FINANCEIRO AVANÇADO (TIPO FORTUNO) ---
         function abrirModalFinanceiro() {
             document.getElementById('modalFinanceiro').style.display = 'flex';
+            dataFinanceira = new Date(); // Reseta para mês atual
             carregarFinanceiro();
+        }
+
+        function mudarMesFinanceiro(delta) {
+            dataFinanceira.setMonth(dataFinanceira.getMonth() + delta);
+            renderizarFinanceiro(); // Só renderiza, não precisa baixar tudo de novo
         }
 
         function carregarFinanceiro() {
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_financeiro" }) })
             .then(r => r.json())
             .then(data => {
-                transacoesExtras = data.lista || [];
+                todasTransacoes = data.lista || [];
+                // Se tiver faturamento do dia (agenda), adiciona como transação virtual
+                // (Isso é complexo pois a agenda é diária e o financeiro é mensal, 
+                // vamos focar no financeiro explícito por enquanto).
                 renderizarFinanceiro();
             });
         }
@@ -253,6 +314,7 @@
 
             document.getElementById('finDesc').value = "";
             document.getElementById('finValor').value = "";
+            document.getElementById('modalAddTransacao').style.display = 'none';
 
             fetch(SCRIPT_URL, { 
                 method: "POST", 
@@ -269,75 +331,114 @@
         }
 
         function renderizarFinanceiro() {
-            let html = "";
-            let totalDespesas = 0;
-            let totalEntradasExtras = 0;
+            // 1. Filtro de Mês
+            let mesAtual = dataFinanceira.getMonth();
+            let anoAtual = dataFinanceira.getFullYear();
+            document.getElementById('finMesDisplay').innerText = `${nomesMeses[mesAtual]} ${anoAtual}`.toUpperCase();
 
-            transacoesExtras.forEach((t, i) => {
-                let data = t[0] ? new Date(t[0]).toLocaleDateString('pt-BR') : "-";
+            // 2. Filtrar e Processar Dados
+            let transacoesMes = [];
+            let totalReceita = 0;
+            let totalDespesa = 0;
+
+            todasTransacoes.forEach((t, indexOriginal) => {
+                // Parse da Data (DD/MM/AAAA ou YYYY-MM-DD do Google)
+                let dataStr = t[0] ? t[0].toString().split('T')[0] : "";
+                let dataObj = null;
                 
-                // 1. Identifica o Tipo (Entrada/Saída)
-                let tipoRaw = t[1] ? t[1].toString().toLowerCase() : "";
-                let isSaida = tipoRaw.includes('saida') || tipoRaw.includes('despesa');
-                let isEntrada = tipoRaw.includes('entrada') || tipoRaw.includes('receita');
-
-                let desc = t[2] || "Sem descrição";
-
-                // 2. CORREÇÃO INTELIGENTE DE VALOR
-                let valorRaw = t[3];
-                let valor = 0;
-
-                // Se já for número, usa direto
-                if (typeof valorRaw === 'number') {
-                    valor = valorRaw;
-                } 
-                // Se for texto (Ex: "R$ 1.500,50" ou "50,00"), limpa a formatação
-                else if (typeof valorRaw === 'string') {
-                    let v = valorRaw.replace("R$", "").trim();
-                    // Se tiver vírgula, assume formato Brasil (remove ponto de milhar, troca vírgula por ponto)
-                    if (v.includes(',')) {
-                        v = v.replace(/\./g, "").replace(",", ".");
-                    }
-                    valor = parseFloat(v);
+                if (dataStr.includes('/')) {
+                    let partes = dataStr.split('/'); // 10/02/2026
+                    dataObj = new Date(partes[2], partes[1]-1, partes[0]);
+                } else if (dataStr.includes('-')) {
+                    dataObj = new Date(dataStr);
                 }
 
-                if(isNaN(valor)) valor = 0;
+                if (dataObj && dataObj.getMonth() === mesAtual && dataObj.getFullYear() === anoAtual) {
+                    
+                    let tipoRaw = t[1] ? t[1].toString().toLowerCase() : "";
+                    let isSaida = tipoRaw.includes('saida') || tipoRaw.includes('despesa');
+                    let desc = t[2] || "Sem descrição";
+                    
+                    // Parse valor
+                    let valorRaw = t[3];
+                    let valor = 0;
+                    if (typeof valorRaw === 'number') valor = valorRaw;
+                    else if (typeof valorRaw === 'string') {
+                        let v = valorRaw.replace("R$", "").trim();
+                        if (v.includes(',')) v = v.replace(/\./g, "").replace(",", ".");
+                        valor = parseFloat(v);
+                    }
+                    if(isNaN(valor)) valor = 0;
 
-                // Define cores
-                let corDot = isSaida ? 'dot-out' : 'dot-in';
-                let sinal = isSaida ? '- ' : '+ ';
-                let corTexto = isSaida ? 'fc-red' : 'fc-green';
+                    if (isSaida) totalDespesa += valor;
+                    else totalReceita += valor;
 
-                if(isSaida) totalDespesas += valor;
-                if(isEntrada) totalEntradasExtras += valor;
+                    transacoesMes.push({ 
+                        data: dataObj, 
+                        desc: desc, 
+                        valor: valor, 
+                        isSaida: isSaida, 
+                        idx: indexOriginal 
+                    });
+                }
+            });
 
-                html += `<div class="fin-item">
-                    <div class="fin-item-left">
-                        <div class="dot ${corDot}"></div>
-                        <div class="fin-info">
-                            <b>${desc}</b>
-                            <span style="font-size:0.7rem;color:#777;">${data}</span>
-                        </div>
+            // 3. Ordenar por data (mais recente primeiro)
+            transacoesMes.sort((a,b) => b.data - a.data);
+
+            // 4. Renderizar Lista
+            let html = "";
+            let ultimaData = "";
+
+            transacoesMes.forEach(t => {
+                let diaFormatado = t.data.toLocaleDateString('pt-BR');
+                
+                if (diaFormatado !== ultimaData) {
+                    html += `<div class="fin-group-date">${diaFormatado}</div>`;
+                    ultimaData = diaFormatado;
+                }
+
+                let icone = t.isSaida ? "💸" : "💰";
+                let corValor = t.isSaida ? "color:var(--danger)" : "color:var(--success)";
+                let sinal = t.isSaida ? "- " : "+ ";
+
+                html += `
+                <div class="fin-item">
+                    <div class="fin-icon">${icone}</div>
+                    <div class="fin-details">
+                        <div class="fin-cat">${t.desc}</div>
+                        <div class="fin-desc">${t.isSaida ? 'Despesa' : 'Receita'}</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="${corTexto}">${sinal}R$ ${valor.toFixed(2)}</span>
-                        <button class="btn-icon btn-del" onclick="apagarTransacao(${i})">🗑️</button>
+                    <div style="text-align:right">
+                        <div style="font-weight:bold; ${corValor}">${sinal}R$ ${t.valor.toFixed(2)}</div>
+                        <div style="font-size:0.7rem; color:#555; cursor:pointer;" onclick="apagarTransacao(${t.idx})">Excluir</div>
                     </div>
                 </div>`;
             });
 
-            document.getElementById('listaTransacoes').innerHTML = html || '<p style="text-align:center;color:#555;">Nenhuma transação.</p>';
+            document.getElementById('listaTransacoes').innerHTML = html || '<div style="padding:20px; text-align:center; color:#555;">Sem lançamentos neste mês.</div>';
 
-            // Totais
-            let receitasTotais = faturamentoDia + totalEntradasExtras; 
-            let lucroLiquido = receitasTotais - totalDespesas;
+            // 5. Atualizar Totais e Gráfico
+            let saldo = totalReceita - totalDespesa;
+            document.getElementById('finEntradas').innerText = "R$ " + totalReceita.toFixed(2);
+            document.getElementById('finSaidas').innerText = "R$ " + totalDespesa.toFixed(2);
+            
+            let elSaldo = document.getElementById('finSaldoTotal');
+            elSaldo.innerText = "R$ " + saldo.toFixed(2);
+            elSaldo.style.color = saldo >= 0 ? "var(--success)" : "var(--danger)";
 
-            document.getElementById('finReceitas').innerText = "R$ " + receitasTotais.toFixed(2);
-            document.getElementById('finDespesas').innerText = "R$ " + totalDespesas.toFixed(2);
-            document.getElementById('finLucro').innerText = "R$ " + lucroLiquido.toFixed(2);
+            // Barra de Progresso
+            let totalGeral = totalReceita + totalDespesa;
+            let pReceita = totalGeral > 0 ? (totalReceita / totalGeral) * 100 : 50;
+            let pDespesa = totalGeral > 0 ? (totalDespesa / totalGeral) * 100 : 50;
+            
+            if (totalGeral === 0) { pReceita = 0; pDespesa = 0; } // Barra vazia se não tiver nada
+
+            document.getElementById('barReceita').style.width = pReceita + "%";
+            document.getElementById('barDespesa').style.width = pDespesa + "%";
         }
 
-        // --- AGENDA E OUTRAS FUNÇÕES (MANTIDAS) ---
+        // --- AGENDA E OUTRAS FUNÇÕES ---
         async function carregarAgenda() {
             const info = formatarData(dataAtual);
             document.getElementById('dateDisplay').innerText = info.texto;
