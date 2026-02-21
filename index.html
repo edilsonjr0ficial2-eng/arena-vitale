@@ -363,7 +363,7 @@
             <p style="font-size:0.7rem; margin-top:5px;">Desenvolvido por Edilson Renovato</p>
         </footer>
 
-        <a href="https://wa.me/5588993127830" class="wa-float" target="_blank">
+        <a href="https://wa.me/5588988229008" class="wa-float" target="_blank">
             <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
         </a>
     </div>
@@ -629,12 +629,12 @@
 
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(dadosBack) })
             .then(() => {
-                window.open(`https://wa.me/5588993127830?text=${encodeURIComponent(msg)}`, '_blank');
+                window.open(`https://wa.me/5588988229008?text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             })
             .catch(() => {
                  // Fallback se backend falhar, abre whats igual
-                 window.open(`https://wa.me/5588993127830?text=${encodeURIComponent(msg)}`, '_blank');
+                 window.open(`https://wa.me/5588988229008?text=${encodeURIComponent(msg)}`, '_blank');
                  location.reload();
             });
         }
