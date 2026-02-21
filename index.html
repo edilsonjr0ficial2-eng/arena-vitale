@@ -258,7 +258,7 @@
                     
                     <span class="step-label">1. Escolha a Quadra</span>
                     <button class="btn-option active" onclick="mudarQuadra(1, this)">Quadra Chicashoes</button>
-                    <button class="btn-option" onclick="mudarQuadra(2, this)">Quadra Panificadora</button>
+                    <button class="btn-option" onclick="mudarQuadra(2, this)">Arena Padaria do Helder</button>
                     
                     <span class="step-label" style="margin-top:20px;">2. Data</span>
                     <div class="day-nav">
@@ -606,7 +606,7 @@
             const h = parseInt(document.getElementById('selectHora').value);
             const taxa = parseInt(document.getElementById('selectPagamento').value);
             const total = taxa * duracaoSelecionada;
-            const qNome = quadraSelecionada === 1 ? "Quadra Chicashoes" : "Quadra Panificadora";
+            const qNome = quadraSelecionada === 1 ? "Quadra Chicashoes" : "Arena Padaria do Helder";
             
             // Envia direto para WhatsApp (Fluxo simplificado)
             const msg = `*NOVA RESERVA VIA APP* 🎾\n\n👤 *Cliente:* ${usuarioLogado.nome}\n📞 *Tel:* ${usuarioLogado.phone}\n🏟️ *Local:* ${qNome}\n🗓️ *Data:* ${formatarData(dataVisualizada)}\n⏰ *Horário:* ${h}:00 (${duracaoSelecionada}h)\n💰 *Valor:* R$ ${total},00\n💳 *Pagamento:* ${taxa === 45 ? 'Pix/Espécie' : 'Cartão'}`;
