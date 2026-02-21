@@ -1,579 +1,711 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Arena Vitale | Beach Tennis</title>
-<link rel="icon" href="logo.jpg" type="image/jpeg">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FFD700">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arena Vitale | Beach Tennis</title>
+    
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-<style>
-/* --- VARIÁVEIS E RESET --- */
-:root {
---bg-dark: #0a0a0a;
---card-bg: rgba(25, 25, 25, 0.95);
---primary: #FFD700; /* Ouro */
---primary-hover: #E6C300;
---text-main: #ffffff;
---text-muted: #a0a0a0;
---danger: #ff4d4d;
---success: #4dff88;
---glass: rgba(255, 255, 255, 0.05);
---border-glass: rgba(255, 255, 255, 0.1);
---shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
+    <style>
+        /* --- VARIÁVEIS E RESET --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --card-bg: rgba(25, 25, 25, 0.95);
+            --primary: #FFD700; /* Ouro */
+            --primary-hover: #E6C300;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --danger: #ff4d4d;
+            --success: #4dff88;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body {
-font-family: 'Montserrat', sans-serif;
-background-color: var(--bg-dark);
-color: var(--text-main);
-overflow-x: hidden;
-padding-top: 70px;
-padding-bottom: 80px; /* Espaço para footer mobile */
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            padding-top: 70px;
+            padding-bottom: 80px; /* Espaço para footer mobile */
+        }
 
-/* --- UTILITÁRIOS --- */
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-.hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.4s ease-in-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- UTILITÁRIOS --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- TOAST NOTIFICATION (Substitui o alert) --- */
-#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
-.toast { background: rgba(30, 30, 30, 0.95); border-left: 4px solid var(--primary); color: #fff; padding: 15px; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; backdrop-filter: blur(10px); animation: slideDown 0.3s ease; }
-.toast.error { border-left-color: var(--danger); }
-.toast.success { border-left-color: var(--success); }
-@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* --- TOAST NOTIFICATION (Substitui o alert) --- */
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
+        .toast { background: rgba(30, 30, 30, 0.95); border-left: 4px solid var(--primary); color: #fff; padding: 15px; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; backdrop-filter: blur(10px); animation: slideDown 0.3s ease; }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-/* --- UI COMPONENTS --- */
-button, .btn-main { cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
-.section-title {
-font-size: 1.8rem; font-weight: 800; text-transform: uppercase;
-color: var(--primary); text-align: center; margin: 40px 0 30px;
-position: relative; display: inline-block; width: 100%;
-}
-.section-title::after {
-content: ''; display: block; width: 60px; height: 3px;
-background: var(--primary); margin: 10px auto 0;
-}
+        /* --- UI COMPONENTS --- */
+        button, .btn-main { cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+        
+        .section-title { 
+            font-size: 1.8rem; font-weight: 800; text-transform: uppercase; 
+            color: var(--primary); text-align: center; margin: 40px 0 30px; 
+            position: relative; display: inline-block; width: 100%;
+        }
+        .section-title::after {
+            content: ''; display: block; width: 60px; height: 3px; 
+            background: var(--primary); margin: 10px auto 0;
+        }
 
-/* --- LOGIN & AUTH --- */
-.auth-overlay {
-position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('quadra1.jpeg') center/cover;
-z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px;
-}
-.auth-card {
-background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(15px);
-padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-glass);
-width: 100%; max-width: 400px; text-align: center; box-shadow: var(--shadow);
-}
-.auth-logo { width: 120px; margin-bottom: 20px; }
-.input-group { width: 100%; margin-bottom: 15px; }
-.input-modern {
-width: 100%; padding: 16px; background: rgba(255,255,255,0.05);
-border: 1px solid var(--border-glass); border-radius: 12px;
-color: #fff; font-size: 1rem; transition: 0.3s;
-}
-.input-modern:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.1); }
-.btn-full {
-width: 100%; padding: 16px; background: var(--primary); color: #000;
-border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
-text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
-}
-.btn-full:hover { background: var(--primary-hover); transform: translateY(-2px); }
-.auth-link { margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+        /* --- LOGIN & AUTH --- */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('quadra1.jpeg') center/cover;
+            z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .auth-card {
+            background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(15px);
+            padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-glass);
+            width: 100%; max-width: 400px; text-align: center; box-shadow: var(--shadow);
+        }
+        .auth-logo { width: 120px; margin-bottom: 20px; }
+        .input-group { width: 100%; margin-bottom: 15px; }
+        .input-modern {
+            width: 100%; padding: 16px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass); border-radius: 12px;
+            color: #fff; font-size: 1rem; transition: 0.3s;
+        }
+        .input-modern:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.1); }
+        .btn-full {
+            width: 100%; padding: 16px; background: var(--primary); color: #000;
+            border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+        }
+        .btn-full:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .auth-link { margin-top: 20px; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
 
-/* --- NAVBAR --- */
-.navbar {
-position: fixed; top: 0; left: 0; width: 100%; height: 70px;
-background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
-border-bottom: 1px solid var(--border-glass); z-index: 2000;
-display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-}
-.nav-brand img { height: 45px; }
-.nav-menu { display: flex; gap: 20px; list-style: none; }
-.nav-link { color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; position: relative; }
-.nav-link::after {
-content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
-background: var(--primary); transition: 0.3s;
-}
-.nav-link:hover::after { width: 100%; }
-.hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-glass); z-index: 2000;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        }
+        .nav-brand img { height: 45px; }
+        .nav-menu { display: flex; gap: 20px; list-style: none; }
+        .nav-link { color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
+            background: var(--primary); transition: 0.3s;
+        }
+        .nav-link:hover::after { width: 100%; }
+        
+        .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
 
-/* --- HERO SECTION --- */
-#tela-inicial {
-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-text-align: center; position: relative; padding: 20px;
-background: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--bg-dark)), url('quadra1.jpeg') center/cover;
-}
-.hero-logo-large { width: 100%; max-width: 500px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); margin-bottom: 20px; }
-.hero-text { font-size: 1.2rem; color: #e0e0e0; margin-bottom: 40px; max-width: 600px; line-height: 1.6; }
-/* --- AGENDAMENTO CARD --- */
-.agenda-card {
-background: var(--card-bg); border: 1px solid var(--border-glass);
-border-radius: 20px; padding: 25px; max-width: 600px; margin: 0 auto;
-box-shadow: var(--shadow);
-}
-.step-label { color: var(--primary); font-weight: 700; margin-bottom: 10px; display: block; font-size: 0.9rem; text-transform: uppercase; }
-.btn-option {
-background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
-color: #fff; padding: 15px; border-radius: 10px; width: 100%; text-align: left;
-margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-}
-.btn-option.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 700; }
-.btn-option.active::after { content: '✓'; }
+        /* --- HERO SECTION --- */
+        #tela-inicial {
+            height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; position: relative; padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--bg-dark)), url('quadra1.jpeg') center/cover;
+        }
+        .hero-logo-large { width: 100%; max-width: 500px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); margin-bottom: 20px; }
+        .hero-text { font-size: 1.2rem; color: #e0e0e0; margin-bottom: 40px; max-width: 600px; line-height: 1.6; }
+        
+        /* --- AGENDAMENTO CARD --- */
+        .agenda-card {
+            background: var(--card-bg); border: 1px solid var(--border-glass);
+            border-radius: 20px; padding: 25px; max-width: 600px; margin: 0 auto;
+            box-shadow: var(--shadow);
+        }
+        .step-label { color: var(--primary); font-weight: 700; margin-bottom: 10px; display: block; font-size: 0.9rem; text-transform: uppercase; }
+        
+        .btn-option {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+            color: #fff; padding: 15px; border-radius: 10px; width: 100%; text-align: left;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-option.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 700; }
+        .btn-option.active::after { content: '✓'; }
 
-/* Navegação Dias */
-.day-nav { display: flex; align-items: center; justify-content: space-between; background: #000; padding: 10px; border-radius: 50px; margin: 20px 0; border: 1px solid var(--border-glass); }
-.day-btn { background: none; border: none; color: var(--primary); font-size: 1.5rem; padding: 0 15px; cursor: pointer; }
-.current-day { font-weight: 700; text-transform: capitalize; }
+        /* Navegação Dias */
+        .day-nav { display: flex; align-items: center; justify-content: space-between; background: #000; padding: 10px; border-radius: 50px; margin: 20px 0; border: 1px solid var(--border-glass); }
+        .day-btn { background: none; border: none; color: var(--primary); font-size: 1.5rem; padding: 0 15px; }
+        .current-day { font-weight: 700; text-transform: capitalize; }
 
-/* Selects Modernos */
-.modern-select {
-width: 100%; padding: 15px; background: #000; color: #fff;
-border: 1px solid var(--border-glass); border-radius: 12px;
-font-size: 1rem; appearance: none; cursor: pointer; margin-top: 5px;
-}
+        /* Selects Modernos */
+        .modern-select {
+            width: 100%; padding: 15px; background: #000; color: #fff;
+            border: 1px solid var(--border-glass); border-radius: 12px;
+            font-size: 1rem; appearance: none; cursor: pointer; margin-top: 5px;
+        }
 
-/* --- BOTÕES FLUTUANTES --- */
-.social-float {
-position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 10px; z-index: 1000;
-}
-.wa-float, .ig-float {
-width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center;
-justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: transform 0.3s;
-}
-.wa-float { background: #25D366; }
-.ig-float { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-.wa-float:hover, .ig-float:hover { transform: scale(1.1); }
-.social-float img { width: 35px; height: 35px; }
+        /* --- MODAIS E EXTRAS --- */
+        .wa-float {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background: #25D366; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 1000; transition: transform 0.3s;
+        }
+        .wa-float:hover { transform: scale(1.1); }
+        .wa-float img { width: 35px; height: 35px; }
 
-.btn-refresh {
-position: fixed; top: 80px; right: 20px; background: rgba(0,0,0,0.8);
-color: var(--primary); width: 40px; height: 40px; border-radius: 50%;
-display: flex; align-items: center; justify-content: center;
-border: 1px solid var(--primary); z-index: 900; cursor: pointer;
-}
+        .btn-refresh {
+            position: fixed; top: 80px; right: 20px; background: rgba(0,0,0,0.8);
+            color: var(--primary); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--primary); z-index: 900; cursor: pointer;
+        }
 
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 900px) {
-.nav-menu {
-position: fixed; top: 70px; left: 0; width: 100%; height: calc(100vh - 70px);
-background: #0a0a0a; flex-direction: column; align-items: center;
-justify-content: center; gap: 30px; transform: translateX(100%);
-transition: 0.3s ease-in-out;
-}
-.nav-menu.active { transform: translateX(0); }
-.hamburger { display: block; }
-}
-/* Grids e Galeria */
-.grid-responsive { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-.card-info { background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--border-glass); transition: 0.3s; }
-.card-info:hover { border-color: var(--primary); transform: translateY(-5px); }
-.gallery-img { width: 100%; height: 220px; object-fit: cover; border-radius: 10px; opacity: 0.8; transition: 0.3s; }
-.gallery-img:hover { opacity: 1; transform: scale(1.02); }
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 900px) {
+            .nav-menu {
+                position: fixed; top: 70px; left: 0; width: 100%; height: calc(100vh - 70px);
+                background: #0a0a0a; flex-direction: column; align-items: center;
+                justify-content: center; gap: 30px; transform: translateX(100%);
+                transition: 0.3s ease-in-out;
+            }
+            .nav-menu.active { transform: translateX(0); }
+            .hamburger { display: block; }
+        }
+        
+        /* Grids e Galeria */
+        .grid-responsive { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card-info { background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--border-glass); transition: 0.3s; }
+        .card-info:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .gallery-img { width: 100%; height: 220px; object-fit: cover; border-radius: 10px; opacity: 0.8; transition: 0.3s; }
+        .gallery-img:hover { opacity: 1; transform: scale(1.02); }
 
-/* Footer */
-footer { background: #000; padding: 40px 20px; text-align: center; border-top: 1px solid #222; margin-top: 50px; font-size: 0.85rem; color: #666; }
-</style>
+        /* Footer */
+        footer { background: #000; padding: 40px 20px; text-align: center; border-top: 1px solid #222; margin-top: 50px; font-size: 0.85rem; color: #666; }
+    </style>
 </head>
 <body>
 
-<div id="toast-container"></div>
+    <div id="toast-container"></div>
 
-<div id="tela-auth" class="auth-overlay">
-<div id="box-login" class="auth-card fade-in">
-<img src="logo2.png" alt="Arena Vitale" class="auth-logo">
-<h2 style="color:white; margin-bottom:20px;">Bem-vindo</h2>
-<div class="input-group">
-<input type="tel" id="loginPhone" class="input-modern" placeholder="Telefone (Só números)" inputmode="numeric">
-</div>
-<div class="input-group">
-<input type="password" id="loginPass" class="input-modern" placeholder="Senha">
-</div>
-<button id="btnLogin" class="btn-full" onclick="fazerLogin()">Entrar</button>
-<div class="auth-link" onclick="mostrarCadastro()">Criar nova conta</div>
-<div class="auth-link" onclick="mostrarRecuperar()">Esqueci a senha</div>
-</div>
+    <div id="tela-auth" class="auth-overlay">
+        <div id="box-login" class="auth-card fade-in">
+            <img src="logo2.png" alt="Arena Vitale" class="auth-logo">
+            <h2 style="color:white; margin-bottom:20px;">Bem-vindo</h2>
+            <div class="input-group">
+                <input type="tel" id="loginPhone" class="input-modern" placeholder="Telefone (Só números)" inputmode="numeric">
+            </div>
+            <div class="input-group">
+                <input type="password" id="loginPass" class="input-modern" placeholder="Senha">
+            </div>
+            <button id="btnLogin" class="btn-full" onclick="fazerLogin()">Entrar</button>
+            <div class="auth-link" onclick="mostrarCadastro()">Criar nova conta</div>
+            <div class="auth-link" onclick="mostrarRecuperar()">Esqueci a senha</div>
+        </div>
 
-<div id="box-cadastro" class="auth-card fade-in hidden">
-<img src="logo2.png" alt="Arena Vitale" class="auth-logo">
-<h2 style="color:var(--primary); margin-bottom:20px;">Criar Conta</h2>
-<input type="text" id="cadNome" class="input-modern" placeholder="Nome Completo" style="margin-bottom:10px;">
-<input type="tel" id="cadPhone" class="input-modern" placeholder="DDD + 9 dígitos" inputmode="numeric" style="margin-bottom:10px;">
-<input type="password" id="cadPass" class="input-modern" placeholder="Crie uma Senha" style="margin-bottom:10px;">
-<button id="btnCadastrar" class="btn-full" onclick="realizarCadastro()">Cadastrar</button>
-<div class="auth-link" onclick="mostrarLogin()">Já tenho conta</div>
-</div>
+        <div id="box-cadastro" class="auth-card fade-in hidden">
+            <img src="logo2.png" alt="Arena Vitale" class="auth-logo">
+            <h2 style="color:var(--primary); margin-bottom:20px;">Criar Conta</h2>
+            <input type="text" id="cadNome" class="input-modern" placeholder="Nome Completo" style="margin-bottom:10px;">
+            <input type="tel" id="cadPhone" class="input-modern" placeholder="DDD + 9 dígitos" inputmode="numeric" style="margin-bottom:10px;">
+            <input type="password" id="cadPass" class="input-modern" placeholder="Crie uma Senha" style="margin-bottom:10px;">
+            <button id="btnCadastrar" class="btn-full" onclick="realizarCadastro()">Cadastrar</button>
+            <div class="auth-link" onclick="mostrarLogin()">Já tenho conta</div>
+        </div>
 
-<div id="box-recuperar" class="auth-card fade-in hidden">
-<h2 style="color:var(--primary);">Recuperar</h2>
-<p style="color:#aaa; font-size:0.9rem; margin:15px 0;">Digite seu telefone para receber o código.</p>
-<input type="tel" id="recPhone" class="input-modern" placeholder="Seu Telefone">
-<button class="btn-full" onclick="enviarCodigoRecuperacao()">Enviar Código</button>
-<div class="auth-link" onclick="mostrarLogin()">Cancelar</div>
-</div>
-</div>
+        <div id="box-recuperar" class="auth-card fade-in hidden">
+            <h2 style="color:var(--primary);">Recuperar</h2>
+            <p style="color:#aaa; font-size:0.9rem; margin:15px 0;">Digite seu telefone para receber o código.</p>
+            <input type="tel" id="recPhone" class="input-modern" placeholder="Seu Telefone">
+            <button class="btn-full" onclick="enviarCodigoRecuperacao()">Enviar Código</button>
+            <div class="auth-link" onclick="mostrarLogin()">Cancelar</div>
+        </div>
+    </div>
 
-<div id="app-content" class="hidden">
-<nav class="navbar">
-<a onclick="navegarPara('tela-inicial')" class="nav-brand"><img src="logo.jpg" alt="Logo"></a>
-<div class="hamburger" onclick="toggleMenu()">☰</div>
-<ul class="nav-menu" id="navMenu">
-<li><a onclick="navegarPara('tela-agendamento')" class="nav-link">Agendar</a></li>
-<li><a onclick="navegarPara('tela-modalidades')" class="nav-link">Modalidades</a></li>
-<li><a onclick="navegarPara('tela-arena')" class="nav-link">Arena</a></li>
-<li><a onclick="navegarPara('tela-times')" class="nav-link">Times</a></li>
-<li><a onclick="navegarPara('tela-placar')" class="nav-link">Placar</a></li>
-<li><a onclick="navegarPara('tela-local')" class="nav-link">Local</a></li>
-<li><a onclick="fazerLogout()" class="nav-link" style="color:var(--danger)">Sair</a></li>
-</ul>
-</nav>
+    <div id="app-content" class="hidden">
+        
+        <nav class="navbar">
+            <a onclick="navegarPara('tela-inicial')" class="nav-brand"><img src="logo.jpg" alt="Logo"></a>
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a onclick="navegarPara('tela-agendamento')" class="nav-link">Agendar</a></li>
+                <li><a onclick="navegarPara('tela-modalidades')" class="nav-link">Modalidades</a></li>
+                <li><a onclick="navegarPara('tela-arena')" class="nav-link">Arena</a></li>
+                <li><a onclick="navegarPara('tela-times')" class="nav-link">Times</a></li>
+                <li><a onclick="navegarPara('tela-placar')" class="nav-link">Placar</a></li>
+                <li><a onclick="navegarPara('tela-local')" class="nav-link">Local</a></li>
+                <li><a onclick="fazerLogout()" class="nav-link" style="color:var(--danger)">Sair</a></li>
+            </ul>
+        </nav>
 
-<div class="btn-refresh" onclick="location.reload()" title="Atualizar">🔄</div>
+        <div class="btn-refresh" onclick="location.reload()" title="Atualizar">🔄</div>
 
-<main>
-<section id="tela-inicial" class="fade-in">
-<img src="logo2.png" alt="Arena Vitale" class="hero-logo-large">
-<p class="hero-text">A experiência premium de Beach Tennis em Russas. Quadras oficiais, areia tratada e o melhor ambiente.</p>
-<button class="btn-full" style="max-width:300px;" onclick="navegarPara('tela-agendamento')">RESERVAR AGORA</button>
-</section>
+        <main>
+            <section id="tela-inicial" class="fade-in">
+                <img src="logo2.png" alt="Arena Vitale" class="hero-logo-large">
+                <p class="hero-text">A experiência premium de Beach Tennis em Russas. Quadras oficiais, areia tratada e o melhor ambiente.</p>
+                <button class="btn-full" style="max-width:300px;" onclick="navegarPara('tela-agendamento')">RESERVAR AGORA</button>
+            </section>
 
-<section id="tela-agendamento" class="container hidden fade-in">
-<h2 class="section-title">Nova Reserva</h2>
-<div class="agenda-card">
-<span class="step-label">1. Escolha a Quadra</span>
-<button class="btn-option active" onclick="mudarQuadra(1, this)">Quadra Chicashoes</button>
-<button class="btn-option" onclick="mudarQuadra(2, this)">Quadra Panificadora</button>
-<span class="step-label" style="margin-top:20px;">2. Data</span>
-<div class="day-nav">
-<button class="day-btn" onclick="mudarDia(-1)">❮</button>
-<span id="dateDisplay" class="current-day">...</span>
-<button class="day-btn" onclick="mudarDia(1)">❯</button>
-</div>
+            <section id="tela-agendamento" class="container hidden fade-in">
+                <h2 class="section-title">Nova Reserva</h2>
+                <div class="agenda-card">
+                    
+                    <span class="step-label">1. Escolha a Quadra</span>
+                    <button class="btn-option active" onclick="mudarQuadra(1, this)">Quadra Chicashoes</button>
+                    <button class="btn-option" onclick="mudarQuadra(2, this)">Quadra Panificadora</button>
+                    
+                    <span class="step-label" style="margin-top:20px;">2. Data</span>
+                    <div class="day-nav">
+                        <button class="day-btn" onclick="mudarDia(-1)">❮</button>
+                        <span id="dateDisplay" class="current-day">...</span>
+                        <button class="day-btn" onclick="mudarDia(1)">❯</button>
+                    </div>
 
-<div id="bloqueio-agenda" class="hidden" style="text-align:center; padding:20px; color:var(--danger); font-weight:700;">
-⚠️ A agenda da próxima semana abre apenas na Segunda-feira!
-</div>
+                    <span class="step-label">3. Duração e Pagamento</span>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <button class="btn-option active" onclick="setDuracao(1, this)" style="text-align:center; justify-content:center;">1h</button>
+                        <button class="btn-option" onclick="setDuracao(2, this)" style="text-align:center; justify-content:center;">2h</button>
+                    </div>
+                    
+                    <select id="selectPagamento" class="modern-select" onchange="atualizarPrecoDisplay()">
+                        <option value="45">Espécie / Pix - R$ 45,00/h</option>
+                        <option value="50">Cartão - R$ 50,00/h</option>
+                    </select>
+                    <div id="priceDisplay" style="text-align:right; color:var(--primary); font-weight:800; margin:10px 0;">R$ 45,00</div>
 
-<div id="area-reserva-ativa">
-<span class="step-label">3. Duração e Pagamento</span>
-<div style="display:flex; gap:10px; margin-bottom:10px;">
-<button class="btn-option active" onclick="setDuracao(1, this)" style="text-align:center; justify-content:center;">1h</button>
-<button class="btn-option" onclick="setDuracao(2, this)" style="text-align:center; justify-content:center;">2h</button>
-</div>
-<select id="selectPagamento" class="modern-select" onchange="atualizarPrecoDisplay()">
-<option value="45">Espécie / Pix - R$ 45,00/h</option>
-<option value="50">Cartão - R$ 50,00/h</option>
-</select>
-<div id="priceDisplay" style="text-align:right; color:var(--primary); font-weight:800; margin:10px 0;">R$ 45,00</div>
+                    <span class="step-label">4. Horário</span>
+                    <div id="loading" style="color:var(--primary); display:none;">🔍 Buscando horários...</div>
+                    <select id="selectHora" class="modern-select" onchange="verificarBotaoAgendar()">
+                        <option value="">Carregando...</option>
+                    </select>
 
-<span class="step-label">4. Horário</span>
-<div id="loading" style="color:var(--primary); display:none;">🔍 Buscando horários...</div>
-<select id="selectHora" class="modern-select" onchange="verificarBotaoAgendar()">
-<option value="">Carregando...</option>
-</select>
+                    <button id="btnAgendar" class="btn-full" style="margin-top:25px; display:none;" onclick="prepararAgendamento()">✅ CONFIRMAR</button>
+                </div>
+            </section>
 
-<button id="btnAgendar" class="btn-full" style="margin-top:25px; display:none;" onclick="prepararAgendamento()">✅ CONFIRMAR</button>
-</div>
-</div>
-</section>
+            <section id="tela-modalidades" class="container hidden fade-in">
+                <h2 class="section-title">Modalidades</h2>
+                <div class="grid-responsive">
+                    <div class="card-info"><h3>🎾 Beach Tennis</h3><p>O esporte que mais cresce no Brasil. Dinâmico e divertido.</p></div>
+                    <div class="card-info"><h3>🏐 Vôlei de Praia</h3><p>Quadra com medidas oficiais e areia de alta performance.</p></div>
+                    <div class="card-info"><h3>⚽ Futevôlei</h3><p>Espaço ideal para o treino de altinha e futevôlei.</p></div>
+                </div>
+            </section>
 
-<section id="tela-modalidades" class="container hidden fade-in">
-<h2 class="section-title">Modalidades</h2>
-<div class="grid-responsive">
-<div class="card-info"><h3>🎾 Beach Tennis</h3><p>O esporte que mais cresce no Brasil. Dinâmico e divertido.</p></div>
-<div class="card-info"><h3>🏐 Vôlei de Praia</h3><p>Quadra com medidas oficiais e areia de alta performance.</p></div>
-<div class="card-info"><h3>⚽ Futevôlei</h3><p>Espaço ideal para o treino de altinha e futevôlei.</p></div>
-</div>
-</section>
+            <section id="tela-arena" class="container hidden fade-in">
+                <h2 class="section-title">Estrutura</h2>
+                <div class="grid-responsive">
+                    <img src="fachada.jpeg" class="gallery-img">
+                    <img src="quadra2.jpeg" class="gallery-img">
+                    <img src="geral2.jpeg" class="gallery-img">
+                    <img src="foto4.jpg" class="gallery-img">
+                </div>
+                <div class="card-info" style="margin-top:30px;">
+                    <h3 style="color:var(--primary)">Nossa Areia</h3>
+                    <p style="color:#ccc;">Utilizamos areia tratada de granulometria específica, garantindo conforto térmico, absorção de impacto e higiene para os atletas.</p>
+                </div>
+            </section>
 
-<section id="tela-arena" class="container hidden fade-in">
-<h2 class="section-title">Estrutura</h2>
-<div class="grid-responsive">
-<img src="fachada.jpeg" class="gallery-img">
-<img src="quadra2.jpeg" class="gallery-img">
-<img src="geral2.jpeg" class="gallery-img">
-<img src="foto4.jpg" class="gallery-img">
-</div>
-<div class="card-info" style="margin-top:30px;">
-<h3 style="color:var(--primary)">Nossa Areia</h3>
-<p style="color:#ccc;">Utilizamos areia tratada de granulometria específica, garantindo conforto térmico, absorção de impacto e higiene para os atletas.</p>
-</div>
-</section>
+            <section id="tela-times" class="container hidden fade-in">
+                <h2 class="section-title">Sorteio de Duplas</h2>
+                <div class="agenda-card">
+                    <label style="color:#aaa;">Jogadores (separe por vírgula):</label>
+                    <textarea id="playerNames" class="input-modern" rows="3" placeholder="João, Maria, Pedro, Ana..."></textarea>
+                    <button class="btn-full" onclick="gerarTimes()">🎲 SORTEAR</button>
+                    <div id="resultArea" style="margin-top:20px; text-align:left;"></div>
+                </div>
+            </section>
 
-<section id="tela-times" class="container hidden fade-in">
-<h2 class="section-title">Sorteio de Duplas</h2>
-<div class="agenda-card">
-<label style="color:#aaa;">Jogadores (separe por vírgula):</label>
-<textarea id="playerNames" class="input-modern" rows="3" placeholder="João, Maria, Pedro, Ana..."></textarea>
-<button class="btn-full" onclick="gerarTimes()">🎲 SORTEAR</button>
-<div id="resultArea" style="margin-top:20px; text-align:left;"></div>
-</div>
-</section>
+            <section id="tela-placar" class="container hidden fade-in">
+                <h2 class="section-title">Marcador</h2>
+                <div class="agenda-card" style="text-align:center;">
+                    <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+                        <button class="btn-option active" id="btnModeBeach" onclick="mudarModo('beach')">Beach Tennis</button>
+                        <button class="btn-option" id="btnModeVolei" onclick="mudarModo('volei')">Vôlei</button>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="flex:1;">
+                            <input type="text" value="Time A" class="input-modern" style="text-align:center; padding:5px; margin-bottom:10px;">
+                            <div id="scoreA" style="font-size:3.5rem; font-weight:800; color:var(--primary); cursor:pointer;" onclick="addPonto('A')">0</div>
+                            <div style="font-size:0.8rem; color:#aaa;">Games: <span id="gameA">0</span></div>
+                        </div>
+                        <div style="font-size:2rem; color:#555;">X</div>
+                        <div style="flex:1;">
+                            <input type="text" value="Time B" class="input-modern" style="text-align:center; padding:5px; margin-bottom:10px;">
+                            <div id="scoreB" style="font-size:3.5rem; font-weight:800; color:var(--primary); cursor:pointer;" onclick="addPonto('B')">0</div>
+                            <div style="font-size:0.8rem; color:#aaa;">Games: <span id="gameB">0</span></div>
+                        </div>
+                    </div>
+                    <button class="btn-full" style="background:#333; color:#fff; margin-top:20px;" onclick="zerarPlacar()">Zerar</button>
+                </div>
+            </section>
 
-<section id="tela-placar" class="container hidden fade-in">
-<h2 class="section-title">Marcador</h2>
-<div class="agenda-card" style="text-align:center;">
-<div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
-<button class="btn-option active" id="btnModeBeach" onclick="mudarModo('beach')">Beach Tennis</button>
-<button class="btn-option" id="btnModeVolei" onclick="mudarModo('volei')">Vôlei</button>
-</div>
-<div style="display:flex; justify-content:space-between; align-items:center;">
-<div style="flex:1;">
-<input type="text" value="Time A" class="input-modern" style="text-align:center; padding:5px; margin-bottom:10px;">
-<div id="scoreA" style="font-size:3.5rem; font-weight:800; color:var(--primary); cursor:pointer;" onclick="addPonto('A')">0</div>
-<div style="font-size:0.8rem; color:#aaa;">Games: <span id="gameA">0</span></div>
-</div>
-<div style="font-size:2rem; color:#555;">X</div>
-<div style="flex:1;">
-<input type="text" value="Time B" class="input-modern" style="text-align:center; padding:5px; margin-bottom:10px;">
-<div id="scoreB" style="font-size:3.5rem; font-weight:800; color:var(--primary); cursor:pointer;" onclick="addPonto('B')">0</div>
-<div style="font-size:0.8rem; color:#aaa;">Games: <span id="gameB">0</span></div>
-</div>
-</div>
-<button class="btn-full" style="background:#333; color:#fff; margin-top:20px;" onclick="zerarPlacar()">Zerar</button>
-</div>
-</section>
+            <section id="tela-local" class="container hidden fade-in">
+                <h2 class="section-title">Localização</h2>
+                <div style="text-align:center; margin-bottom:20px;">
+                    <p style="font-size:1.1rem; color:var(--text-main);">Av. Cel Antônio Cordeiro, N°2261</p>
+                    <p style="color:var(--text-muted);">Tabuleiro do Catavento, Russas - CE</p>
+                </div>
+                <iframe src="https://maps.google.com/maps?q=Av.+Cel+Antônio+Cordeiro,+N°2261,+Russas+-+Ceará&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="400" style="border:0; border-radius:15px; filter:grayscale(100%) invert(92%) contrast(83%);" allowfullscreen="" loading="lazy"></iframe>
+            </section>
 
-<section id="tela-local" class="container hidden fade-in">
-<h2 class="section-title">Localização</h2>
-<div style="text-align:center; margin-bottom:20px;">
-<p style="font-size:1.1rem; color:var(--text-main);">Av. Cel Antônio Cordeiro, N°2261</p>
-<p style="color:var(--text-muted);">Tabuleiro do Catavento, Russas - CE</p>
-</div>
-<iframe src="https://maps.google.com/maps?q=Av.+Cel+Antônio+Cordeiro,+N°2261,+Russas+-+Ceará&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="400" style="border:0; border-radius:15px; filter:grayscale(100%) invert(92%) contrast(83%);" allowfullscreen="" loading="lazy"></iframe>
-</section>
+        </main>
 
-</main>
+        <footer>
+            <p>Arena Vitale © 2026</p>
+            <p style="font-size:0.7rem; margin-top:5px;">Desenvolvido por Edilson Renovato</p>
+        </footer>
 
-<footer>
-<p>Arena Vitale © 2026</p>
-<p style="font-size:0.7rem; margin-top:5px;">Desenvolvido por Edilson Renovato</p>
-</footer>
+        <a href="https://wa.me/5588993127830" class="wa-float" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+        </a>
+    </div>
 
-<div class="social-float">
-<a href="https://www.instagram.com/arenavitale/" class="ig-float" target="_blank">
-<img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram">
-</a>
-<a href="https://wa.me/5588988229008" class="wa-float" target="_blank">
-<img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-</a>
-</div>
-</div>
+    <script>
+        // CONFIGURAÇÃO
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec";
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
+        
+        let usuarioLogado = null;
+        let dataVisualizada = new Date();
+        let quadraSelecionada = 1;
+        let duracaoSelecionada = 1;
+        let horariosCache = [];
 
-<script>
-// CONFIGURAÇÃO
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec";
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-let usuarioLogado = null;
-let dataVisualizada = new Date();
-let quadraSelecionada = 1;
-let duracaoSelecionada = 1;
+        // INICIALIZAÇÃO
+        window.onload = function() {
+            // Verifica Login
+            const savedUser = localStorage.getItem('usuarioArenaVitale');
+            if(savedUser) {
+                usuarioLogado = JSON.parse(savedUser);
+                mostrarApp();
+            } else {
+                document.getElementById('tela-auth').classList.remove('hidden');
+            }
+            
+            // PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erro SW:', err));
+            }
+        };
 
-// INICIALIZAÇÃO
-window.onload = function() {
-const savedUser = localStorage.getItem('usuarioArenaVitale');
-if(savedUser) {
-usuarioLogado = JSON.parse(savedUser);
-mostrarApp();
-} else {
-document.getElementById('tela-auth').classList.remove('hidden');
-}
+        // --- SISTEMA DE TOAST (Notificações) ---
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-// EXTERMINADOR DE CACHE
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.getRegistrations().then(regs => {
-for(let r of regs) r.unregister();
-});
-navigator.serviceWorker.register('./sw.js?v=' + Date.now());
-}
-};
+        // --- NAVEGAÇÃO SPA ---
+        function mostrarApp() {
+            document.getElementById('tela-auth').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            navegarPara('tela-inicial');
+        }
 
-// --- SISTEMA DE TOAST ---
-function showToast(msg, type = 'info') {
-const container = document.getElementById('toast-container');
-const toast = document.createElement('div');
-toast.className = `toast ${type}`;
-toast.innerHTML = `<span>${msg}</span>`;
-container.appendChild(toast);
-setTimeout(() => {
-toast.style.opacity = '0';
-setTimeout(() => toast.remove(), 300);
-}, 3000);
-}
+        function navegarPara(idTela) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(idTela).classList.remove('hidden');
+            document.getElementById('navMenu').classList.remove('active'); // Fecha menu mobile
+            window.scrollTo(0, 0);
+            
+            if(idTela === 'tela-agendamento') {
+                carregarAgenda();
+            }
+        }
 
-// --- NAVEGAÇÃO SPA ---
-function mostrarApp() {
-document.getElementById('tela-auth').classList.add('hidden');
-document.getElementById('app-content').classList.remove('hidden');
-navegarPara('tela-inicial');
-}
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
 
-function navegarPara(idTela) {
-document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-document.getElementById(idTela).classList.remove('hidden');
-document.getElementById('navMenu').classList.remove('active');
-window.scrollTo(0, 0);
-if(idTela === 'tela-agendamento') carregarAgenda();
-}
+        function mostrarCadastro() {
+            document.getElementById('box-login').classList.add('hidden');
+            document.getElementById('box-cadastro').classList.remove('hidden');
+        }
 
-function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
-function mostrarCadastro() { document.getElementById('box-login').classList.add('hidden'); document.getElementById('box-cadastro').classList.remove('hidden'); }
-function mostrarLogin() { document.getElementById('box-cadastro').classList.add('hidden'); document.getElementById('box-recuperar').classList.add('hidden'); document.getElementById('box-login').classList.remove('hidden'); }
-function mostrarRecuperar() { document.getElementById('box-login').classList.add('hidden'); document.getElementById('box-recuperar').classList.remove('hidden'); }
+        function mostrarLogin() {
+            document.getElementById('box-cadastro').classList.add('hidden');
+            document.getElementById('box-recuperar').classList.add('hidden');
+            document.getElementById('box-login').classList.remove('hidden');
+        }
 
-// --- AUTH ---
-function fazerLogin() {
-const phone = document.getElementById('loginPhone').value.replace(/\D/g, "");
-const pass = document.getElementById('loginPass').value;
-const btn = document.getElementById('btnLogin');
-if(!phone || !pass) return showToast("Preencha todos os campos", "error");
-btn.innerText = "Verificando..."; btn.disabled = true;
-fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "login", telefone: phone, senha: pass }) })
-.then(res => res.json()).then(data => {
-if (data.sucesso) {
-usuarioLogado = { nome: data.nome, phone: data.telefone };
-localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
-mostrarApp();
-} else showToast(data.erro || "Dados incorretos", "error");
-}).catch(() => showToast("Erro de conexão", "error")).finally(() => { btn.innerText = "ENTRAR"; btn.disabled = false; });
-}
+        function mostrarRecuperar() {
+            document.getElementById('box-login').classList.add('hidden');
+            document.getElementById('box-recuperar').classList.remove('hidden');
+        }
 
-function fazerLogout() { localStorage.removeItem('usuarioArenaVitale'); location.reload(); }
+        // --- AUTH ---
+        function fazerLogin() {
+            const phone = document.getElementById('loginPhone').value.replace(/\D/g, "");
+            const pass = document.getElementById('loginPass').value;
+            const btn = document.getElementById('btnLogin');
 
-// --- AGENDAMENTO ---
-function mudarQuadra(id, btn) {
-quadraSelecionada = id;
-btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-carregarAgenda();
-}
+            if(!phone || !pass) return showToast("Preencha todos os campos", "error");
 
-function setDuracao(h, btn) {
-duracaoSelecionada = h;
-btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-atualizarPrecoDisplay();
-carregarAgenda();
-}
+            btn.innerText = "Verificando...";
+            btn.disabled = true;
 
-function mudarDia(delta) {
-const hoje = new Date(); hoje.setHours(0,0,0,0);
-const novaData = new Date(dataVisualizada);
-novaData.setDate(novaData.getDate() + delta);
-if(novaData < hoje) return showToast("Data passada não permitida", "error");
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ acao: "login", telefone: phone, senha: pass })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.sucesso) {
+                    usuarioLogado = { nome: data.nome, phone: data.telefone };
+                    localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
+                    showToast(`Bem-vindo, ${data.nome}!`, "success");
+                    mostrarApp();
+                } else {
+                    showToast(data.erro || "Dados incorretos", "error");
+                }
+            })
+            .catch(() => showToast("Erro de conexão", "error"))
+            .finally(() => {
+                btn.innerText = "ENTRAR";
+                btn.disabled = false;
+            });
+        }
 
-// REGRA: Agenda da semana só abre na segunda
-let diaHoje = hoje.getDay(); // 0 (Dom) a 6 (Sab)
-let diasAteDomingo = diaHoje === 0 ? 0 : 7 - diaHoje;
-let ultimoDiaPermitido = new Date(hoje);
-ultimoDiaPermitido.setDate(hoje.getDate() + diasAteDomingo);
-ultimoDiaPermitido.setHours(23,59,59);
+        function fazerLogout() {
+            localStorage.removeItem('usuarioArenaVitale');
+            location.reload();
+        }
 
-if (novaData > ultimoDiaPermitido) {
-showToast("A agenda da próxima semana abre segunda-feira!", "error");
-document.getElementById('area-reserva-ativa').classList.add('hidden');
-document.getElementById('bloqueio-agenda').classList.remove('hidden');
-} else {
-document.getElementById('area-reserva-ativa').classList.remove('hidden');
-document.getElementById('bloqueio-agenda').classList.add('hidden');
-}
+        // --- AGENDAMENTO ---
+        function mudarQuadra(id, btn) {
+            quadraSelecionada = id;
+            document.querySelectorAll('.step-label + button, .step-label + button + button').forEach(b => b.classList.remove('active')); // Reset visual simples
+            // Reaplicar classe active visualmente (simplificado para este exemplo)
+            btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            carregarAgenda();
+        }
 
-dataVisualizada = novaData;
-carregarAgenda();
-}
+        function setDuracao(h, btn) {
+            duracaoSelecionada = h;
+            btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            atualizarPrecoDisplay();
+            carregarAgenda();
+        }
 
-function formatarData(date) {
-const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-return `${dias[date.getDay()]} (${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')})`;
-}
+        function mudarDia(delta) {
+            const novaData = new Date(dataVisualizada);
+            novaData.setDate(novaData.getDate() + delta);
+            
+            // Regra simples: não permite passado
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            if(novaData < hoje) return showToast("Data passada não permitida", "error");
 
-async function carregarAgenda() {
-document.getElementById('dateDisplay').innerText = formatarData(dataVisualizada);
-if (document.getElementById('area-reserva-ativa').classList.contains('hidden')) return;
-const loading = document.getElementById('loading');
-const select = document.getElementById('selectHora');
-loading.style.display = 'block'; select.innerHTML = '<option>Carregando...</option>';
-document.getElementById('btnAgendar').style.display = 'none';
+            dataVisualizada = novaData;
+            carregarAgenda();
+        }
 
-try {
-const res = await fetch(SHEET_URL + '&t=' + Date.now());
-const csv = await res.text();
-processarCSV(csv);
-} catch (e) { showToast("Erro ao carregar agenda", "error"); }
-finally { loading.style.display = 'none'; }
-}
+        function formatarData(date) {
+            const dias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            const d = date.getDate().toString().padStart(2, '0');
+            const m = (date.getMonth()+1).toString().padStart(2, '0');
+            return `${dias[date.getDay()]} (${d}/${m})`;
+        }
 
-function processarCSV(csv) {
-const rows = csv.split('\n').map(r => r.split(','));
-const diaIndex = dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1;
-const baseCol = quadraSelecionada === 1 ? 1 : 9;
-const targetCol = baseCol + diaIndex;
-const select = document.getElementById('selectHora');
-select.innerHTML = '<option value="">Selecione o horário...</option>';
-const horas = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-horas.forEach(h => {
-const row = rows.find(r => parseInt(r[0]) === h);
-let ocupado = false; let nome = "";
-if(row) {
-for(let i=0; i<duracaoSelecionada; i++) {
-const rowCheck = rows.find(r => parseInt(r[0]) === (h+i));
-if(rowCheck) {
-const val = rowCheck[targetCol] ? rowCheck[targetCol].replace(/[\r\n"]/g, '').trim() : "";
-if(val !== "") { ocupado = true; nome = val; break; }
-}
-}
-}
-const option = document.createElement('option');
-option.value = h;
-if(ocupado) { option.text = `${h}:00 - ⛔ Ocupado (${nome})`; option.disabled = true; }
-else { option.text = `${h}:00 - Livre`; }
-select.appendChild(option);
-});
-}
+        async function carregarAgenda() {
+            document.getElementById('dateDisplay').innerText = formatarData(dataVisualizada);
+            const loading = document.getElementById('loading');
+            const select = document.getElementById('selectHora');
+            
+            loading.style.display = 'block';
+            select.innerHTML = '<option>Carregando...</option>';
+            document.getElementById('btnAgendar').style.display = 'none';
 
-function verificarBotaoAgendar() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; }
-function atualizarPrecoDisplay() { const taxa = parseInt(document.getElementById('selectPagamento').value); document.getElementById('priceDisplay').innerText = `R$ ${taxa * duracaoSelecionada},00`; }
+            try {
+                // Cache buster com timestamp
+                const res = await fetch(SHEET_URL + '&t=' + new Date().getTime());
+                const csv = await res.text();
+                processarCSV(csv);
+            } catch (e) {
+                console.error(e);
+                showToast("Erro ao carregar agenda", "error");
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
 
-function prepararAgendamento() {
-const h = parseInt(document.getElementById('selectHora').value);
-const taxa = parseInt(document.getElementById('selectPagamento').value);
-const qNome = quadraSelecionada === 1 ? "Quadra Chicashoes" : "Quadra Panificadora";
-const msg = `*NOVA RESERVA VIA APP* 🎾\n\n👤 *Cliente:* ${usuarioLogado.nome}\n📞 *Tel:* ${usuarioLogado.phone}\n🏟️ *Local:* ${qNome}\n🗓️ *Data:* ${formatarData(dataVisualizada)}\n⏰ *Horário:* ${h}:00 (${duracaoSelecionada}h)\n💰 *Valor:* R$ ${taxa * duracaoSelecionada},00`;
-const btn = document.getElementById('btnAgendar');
-btn.innerText = "Processando..."; btn.disabled = true;
-fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome + " (App)", telefone: usuarioLogado.phone, diaIndex: dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: "pendente" }) })
-.finally(() => { window.open(`https://wa.me/5588988229008?text=${encodeURIComponent(msg)}`, '_blank'); location.reload(); });
-}
+        function processarCSV(csv) {
+            const rows = csv.split('\n').map(r => r.split(','));
+            const diaIndex = dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1; // Ajuste para 0-6 (Seg-Dom)
+            
+            // Define coluna base: Quadra 1 começa na B (idx 1), Quadra 2 começa na J (idx 9)
+            // Lógica ajustada baseada no seu código original
+            const baseCol = quadraSelecionada === 1 ? 1 : 9;
+            const targetCol = baseCol + diaIndex;
 
-// --- UTILITÁRIOS ---
-function gerarTimes() {
-const txt = document.getElementById('playerNames').value;
-if(!txt) return showToast("Digite os nomes", "error");
-let players = txt.split(',').map(n => n.trim()).filter(n => n);
-if(players.length < 2) return showToast("Mínimo 2 jogadores", "error");
-for (let i = players.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [players[i], players[j]] = [players[j], players[i]]; }
-let html = "";
-for(let i=0; i<players.length; i+=2) { html += `<div style='padding:10px; border-bottom:1px solid #333;'>Dupla: ${players[i]} & ${players[i+1] || "Sozinho"}</div>`; }
-document.getElementById('resultArea').innerHTML = html;
-}
+            const select = document.getElementById('selectHora');
+            select.innerHTML = '<option value="">Selecione o horário...</option>';
 
-let pontos = { A: 0, B: 0 }; let games = { A: 0, B: 0 }; let beachMode = true; const seqBeach = [0, 15, 30, 40];
-function mudarModo(m) { beachMode = (m === 'beach'); document.getElementById('btnModeBeach').className = beachMode ? 'btn-option active' : 'btn-option'; document.getElementById('btnModeVolei').className = !beachMode ? 'btn-option active' : 'btn-option'; zerarPlacar(); }
-function addPonto(time) {
-const adv = time === 'A' ? 'B' : 'A';
-if(beachMode) { if(pontos[time] < 3) pontos[time]++; else { games[time]++; pontos['A'] = 0; pontos['B'] = 0; } document.getElementById(`score${time}`).innerText = seqBeach[pontos[time]]; document.getElementById(`score${adv}`).innerText = seqBeach[pontos[adv]]; }
-else { games[time]++; document.getElementById(`score${time}`).innerText = games[time]; }
-document.getElementById(`gameA`).innerText = beachMode ? games['A'] : '-'; document.getElementById(`gameB`).innerText = beachMode ? games['B'] : '-';
-}
-function zerarPlacar() { pontos = { A: 0, B: 0 }; games = { A: 0, B: 0 }; document.getElementById('scoreA').innerText = '0'; document.getElementById('scoreB').innerText = '0'; document.getElementById('gameA').innerText = '0'; document.getElementById('gameB').innerText = '0'; }
-</script>
+            // Horários de 7h as 22h
+            const horas = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
+
+            horas.forEach(h => {
+                // Procura a linha que começa com essa hora
+                // Assumindo que a col 0 tem a hora
+                const row = rows.find(r => parseInt(r[0]) === h);
+                let ocupado = false;
+                let nome = "";
+
+                if(row) {
+                    // Verifica blocos baseados na duração
+                    for(let i=0; i<duracaoSelecionada; i++) {
+                         // Precisamos achar a linha da hora + i
+                         const rowCheck = rows.find(r => parseInt(r[0]) === (h+i));
+                         if(rowCheck) {
+                             const val = rowCheck[targetCol] ? rowCheck[targetCol].replace(/[\r\n"]/g, '').trim() : "";
+                             if(val !== "") { ocupado = true; nome = val; break; }
+                         }
+                    }
+                }
+
+                const option = document.createElement('option');
+                option.value = h;
+                if(ocupado) {
+                    option.text = `${h}:00 - ⛔ Ocupado (${nome})`;
+                    option.disabled = true;
+                } else {
+                    option.text = `${h}:00 - Livre`;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        function verificarBotaoAgendar() {
+            const val = document.getElementById('selectHora').value;
+            document.getElementById('btnAgendar').style.display = val ? 'block' : 'none';
+        }
+
+        function atualizarPrecoDisplay() {
+            const taxa = parseInt(document.getElementById('selectPagamento').value);
+            const total = taxa * duracaoSelecionada;
+            document.getElementById('priceDisplay').innerText = `R$ ${total},00`;
+        }
+
+        function prepararAgendamento() {
+            const h = parseInt(document.getElementById('selectHora').value);
+            const taxa = parseInt(document.getElementById('selectPagamento').value);
+            const total = taxa * duracaoSelecionada;
+            const qNome = quadraSelecionada === 1 ? "Quadra Chicashoes" : "Quadra Panificadora";
+            
+            // Envia direto para WhatsApp (Fluxo simplificado)
+            const msg = `*NOVA RESERVA VIA APP* 🎾\n\n👤 *Cliente:* ${usuarioLogado.nome}\n📞 *Tel:* ${usuarioLogado.phone}\n🏟️ *Local:* ${qNome}\n🗓️ *Data:* ${formatarData(dataVisualizada)}\n⏰ *Horário:* ${h}:00 (${duracaoSelecionada}h)\n💰 *Valor:* R$ ${total},00\n💳 *Pagamento:* ${taxa === 45 ? 'Pix/Espécie' : 'Cartão'}`;
+            
+            // Envia para o backend para registrar "Pendente"
+            const btn = document.getElementById('btnAgendar');
+            btn.innerText = "Processando...";
+            btn.disabled = true;
+
+            const dadosBack = {
+                acao: "agendar", // Precisa ajustar seu Script GAS para aceitar isso ou "salvar_pendente"
+                nome: usuarioLogado.nome + " (App)",
+                telefone: usuarioLogado.phone,
+                diaIndex: dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1,
+                hora: h,
+                quadra: quadraSelecionada,
+                duracao: duracaoSelecionada,
+                status: "pendente"
+            };
+
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(dadosBack) })
+            .then(() => {
+                window.open(`https://wa.me/5588993127830?text=${encodeURIComponent(msg)}`, '_blank');
+                location.reload();
+            })
+            .catch(() => {
+                 // Fallback se backend falhar, abre whats igual
+                 window.open(`https://wa.me/5588993127830?text=${encodeURIComponent(msg)}`, '_blank');
+                 location.reload();
+            });
+        }
+
+        // --- UTILITÁRIOS ---
+        function gerarTimes() {
+            const txt = document.getElementById('playerNames').value;
+            if(!txt) return showToast("Digite os nomes", "error");
+            
+            let players = txt.split(',').map(n => n.trim()).filter(n => n);
+            if(players.length < 2) return showToast("Mínimo 2 jogadores", "error");
+            
+            // Fisher-Yates Shuffle
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
+            }
+
+            let html = "";
+            for(let i=0; i<players.length; i+=2) {
+                const p1 = players[i];
+                const p2 = players[i+1] || "Sozinho/Revezamento";
+                html += `<div style='padding:10px; border-bottom:1px solid #333;'>🎾 <strong>Dupla:</strong> ${p1} & ${p2}</div>`;
+            }
+            document.getElementById('resultArea').innerHTML = html;
+        }
+
+        // Funções de Placar (Lógica mantida, UI melhorada no HTML)
+        let pontos = { A: 0, B: 0 };
+        let games = { A: 0, B: 0 };
+        let beachMode = true;
+        const seqBeach = [0, 15, 30, 40];
+
+        function mudarModo(m) {
+            beachMode = (m === 'beach');
+            document.getElementById('btnModeBeach').className = beachMode ? 'btn-option active' : 'btn-option';
+            document.getElementById('btnModeVolei').className = !beachMode ? 'btn-option active' : 'btn-option';
+            zerarPlacar();
+        }
+
+        function addPonto(time) {
+            const adv = time === 'A' ? 'B' : 'A';
+            
+            if(beachMode) {
+                // Lógica Beach Tennis (0, 15, 30, 40, Game) - Simplificado No-Ad
+                if(pontos[time] < 3) {
+                    pontos[time]++;
+                } else {
+                    games[time]++;
+                    pontos['A'] = 0; pontos['B'] = 0;
+                }
+                document.getElementById(`score${time}`).innerText = seqBeach[pontos[time]];
+                document.getElementById(`score${adv}`).innerText = seqBeach[pontos[adv]];
+            } else {
+                // Lógica Vôlei (1 em 1)
+                games[time]++; // Usando variável games para contar pontos corridos no vôlei
+                document.getElementById(`score${time}`).innerText = games[time];
+            }
+            
+            document.getElementById(`gameA`).innerText = beachMode ? games['A'] : '-';
+            document.getElementById(`gameB`).innerText = beachMode ? games['B'] : '-';
+        }
+
+        function zerarPlacar() {
+            pontos = { A: 0, B: 0 }; games = { A: 0, B: 0 };
+            document.getElementById('scoreA').innerText = '0';
+            document.getElementById('scoreB').innerText = '0';
+            document.getElementById('gameA').innerText = '0';
+            document.getElementById('gameB').innerText = '0';
+        }
+
+    </script>
 </body>
 </html>
