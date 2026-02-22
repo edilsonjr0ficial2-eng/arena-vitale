@@ -87,7 +87,7 @@
         <div class="toolbar">
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
-            <button class="tool-btn" onclick="gerarRelatorio('blacklist')">📜 Lista Negra</button>
+            <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
@@ -135,6 +135,16 @@
             <input type="tel" id="blTel" placeholder="Telefone (apenas números)">
             <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">CONFIRMAR BLOQUEIO</button>
             <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalGerenciarBlacklist" class="modal-bg">
+        <div class="modal-box" style="max-width:500px;">
+            <h3 style="color:var(--danger)">Gerenciar Lista Negra</h3>
+            <div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">Carregando dados...</div>
+            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                </div>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -252,11 +262,63 @@
         }
 
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
+        
         function adicionarBloqueio() {
             const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value;
             if(!n) return alert("Nome?");
             if(confirm(`Bloquear ${n}?`)) { enviarFetch({ acao: "bloquear", nome: n, telefone: t }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; }
         }
+
+        // --- GERENCIAR LISTA NEGRA (VER E REMOVER) ---
+        function abrirGerenciarBlacklist() {
+            document.getElementById('modalGerenciarBlacklist').style.display = 'flex';
+            document.getElementById('loadingBlacklist').style.display = 'block';
+            document.getElementById('listaBlacklistConteudo').innerHTML = '';
+
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('loadingBlacklist').style.display = 'none';
+                let html = "";
+                
+                if(data.lista && data.lista.length > 0) {
+                    let isHeader = true;
+                    data.lista.forEach((r, idx) => {
+                        // Ignora o cabeçalho se existir (assumindo que seja 'Nome' na primeira coluna)
+                        if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return;
+                        
+                        let nome = r[0];
+                        let tel = r[1] || "Sem telefone";
+                        html += `
+                            <div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;">
+                                <span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span>
+                                <button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')" title="Remover da lista negra">🗑️</button>
+                            </div>
+                        `;
+                    });
+                }
+                
+                if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>";
+                document.getElementById('listaBlacklistConteudo').innerHTML = html;
+            })
+            .catch(e => {
+                document.getElementById('loadingBlacklist').style.display = 'none';
+                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>";
+            });
+        }
+
+        function removerDaBlacklist(nome) {
+            if(confirm(`Tem certeza que deseja remover "${nome}" da Lista Negra?`)) {
+                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>";
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ acao: "remover_blacklist", nome: nome })
+                })
+                .then(() => abrirGerenciarBlacklist()) // Recarrega a lista após remover
+                .catch(() => { alert("Erro ao tentar remover."); abrirGerenciarBlacklist(); });
+            }
+        }
+
         function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
@@ -286,12 +348,16 @@
         function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
         function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; } }
 
-        function gerarRelatorio(tipo) { let win = window.open("", "_blank"); win.document.write("Carregando..."); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: tipo === 'clientes' ? "listar_clientes" : "listar_blacklist" }) }).then(r => r.json()).then(data => { 
-            let html = `<html><head><title>Relatório</title><style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px;}</style></head><body><h1>${tipo}</h1><table><tbody>`;
-            data.lista.forEach(r => { html += `<tr><td>${r.join('</td><td>')}</td></tr>`; });
-            html += `</tbody></table></body></html>`;
-            win.document.body.innerHTML = html;
-        }); }
+        // Apenas o relatório de clientes continua abrindo a nova aba
+        function gerarRelatorio(tipo) { 
+            let win = window.open("", "_blank"); win.document.write("Carregando..."); 
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
+                let html = `<html><head><title>Relatório</title><style>table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px;}</style></head><body><h1>${tipo}</h1><table><tbody>`;
+                data.lista.forEach(r => { html += `<tr><td>${r.join('</td><td>')}</td></tr>`; });
+                html += `</tbody></table></body></html>`;
+                win.document.body.innerHTML = html;
+            }); 
+        }
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() {
