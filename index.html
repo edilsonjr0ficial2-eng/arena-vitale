@@ -113,9 +113,10 @@
         .super8-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card-super8 { background: var(--card-color); border: 1px solid var(--primary); padding: 25px; border-radius: 15px; text-align: center; }
         .card-super8 h3 { color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
-        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
-        .inscritos-lista { font-size: 0.85rem; color: #aaa; margin-top: 10px; text-align: left; padding-top: 10px; border-top: 1px solid #333; }
-        .inscritos-lista strong { color: var(--primary); display: block; margin-bottom: 5px; }
+        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; }
+        .lista-inscritos { text-align: left; margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 0.9rem; color: #ccc; }
+        .lista-inscritos strong { color: var(--primary); display: block; margin-bottom: 5px; }
+        .lista-inscritos div { margin-bottom: 3px; padding-left: 5px; border-left: 2px solid var(--primary); }
 
         /* Flutuantes */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
@@ -308,36 +309,51 @@
         <div id="super8-masculino" class="super8-grid">
             <div class="card-super8">
                 <h3>Iniciante</h3>
-                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <div class="vagas-box" id="vagas-masc-iniciante">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Masculino - Iniciante')">INSCREVER-SE</button>
-                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-masc-iniciante">Aguardando inscrições...</div></div>
+                <div class="lista-inscritos">
+                    <strong>Inscritos:</strong>
+                    <div id="lista-masc-iniciante">Carregando...</div>
+                </div>
             </div>
             <div class="card-super8">
                 <h3>Masculino D</h3>
-                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <div class="vagas-box" id="vagas-masc-d">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Masculino D')">INSCREVER-SE</button>
-                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-masc-d">Aguardando inscrições...</div></div>
+                <div class="lista-inscritos">
+                    <strong>Inscritos:</strong>
+                    <div id="lista-masc-d">Carregando...</div>
+                </div>
             </div>
         </div>
 
         <div id="super8-feminino" class="super8-grid" style="display:none;">
             <div class="card-super8">
                 <h3>Principiante</h3>
-                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <div class="vagas-box" id="vagas-fem-principiante">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino - Principiante')">INSCREVER-SE</button>
-                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-principiante">Aguardando inscrições...</div></div>
+                <div class="lista-inscritos">
+                    <strong>Inscritos:</strong>
+                    <div id="lista-fem-principiante">Carregando...</div>
+                </div>
             </div>
             <div class="card-super8">
                 <h3>Iniciante</h3>
-                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <div class="vagas-box" id="vagas-fem-iniciante">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino - Iniciante')">INSCREVER-SE</button>
-                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-iniciante">Aguardando inscrições...</div></div>
+                <div class="lista-inscritos">
+                    <strong>Inscritos:</strong>
+                    <div id="lista-fem-iniciante">Carregando...</div>
+                </div>
             </div>
             <div class="card-super8">
                 <h3>Feminino D</h3>
-                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <div class="vagas-box" id="vagas-fem-d">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino D')">INSCREVER-SE</button>
-                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-d">Aguardando inscrições...</div></div>
+                <div class="lista-inscritos">
+                    <strong>Inscritos:</strong>
+                    <div id="lista-fem-d">Carregando...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -474,6 +490,7 @@
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
             localStorage.setItem('ultimaTelaArena', idTela);
+            if(idTela === 'tela-superoito') carregarInscritosSuper8();
         }
 
         function atualizarPagina() {
@@ -580,7 +597,7 @@
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
             .then(res => res.text()) 
             .then(txt => {
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
@@ -599,15 +616,67 @@
             document.getElementById('tabFem').classList.toggle('active', cat === 'feminino');
         }
 
-        function inscreverSuper8(categoria) {
-            const msg = `Olá! Gostaria de realizar minha inscrição no torneio *Super Oito Power Launch* na categoria *${categoria}*.`;
-            window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
+        async function carregarInscritosSuper8() {
+            const listas = ["lista-masc-iniciante", "lista-masc-d", "lista-fem-principiante", "lista-fem-iniciante", "lista-fem-d"];
+            listas.forEach(id => document.getElementById(id).innerText = "Carregando...");
+            
+            try {
+                // Aqui você deve usar a URL de publicação em CSV da sua nova aba da planilha de inscrições
+                const URL_INSCRIÇÕES = SHEET_URL + "&gid=SEU_GID_AQUI"; // Substitua SEU_GID_AQUI pelo GID da aba Super Oito
+                const res = await fetch(URL_INSCRIÇÕES + '&t=' + Date.now());
+                const csv = await res.text();
+                const rows = csv.split('\n').map(r => r.split(','));
+                
+                // Exemplo de mapeamento (ajuste conforme as colunas da sua planilha de inscrição)
+                // A planilha deve ter colunas como: Nome | Categoria
+                const dadosPorCategoria = {
+                    'Masculino - Iniciante': [],
+                    'Masculino D': [],
+                    'Feminino - Principiante': [],
+                    'Feminino - Iniciante': [],
+                    'Feminino D': []
+                };
+
+                rows.forEach((row, idx) => {
+                    if(idx === 0) return;
+                    let nome = row[0] ? row[0].trim() : "";
+                    let cat = row[1] ? row[1].trim() : "";
+                    if(nome && dadosPorCategoria[cat]) dadosPorCategoria[cat].push(nome);
+                });
+
+                // Atualiza o HTML
+                Object.keys(dadosPorCategoria).forEach(cat => {
+                    let idLista = "";
+                    let idVagas = "";
+                    if(cat === 'Masculino - Iniciante') { idLista = "lista-masc-iniciante"; idVagas = "vagas-masc-iniciante"; }
+                    else if(cat === 'Masculino D') { idLista = "lista-masc-d"; idVagas = "vagas-masc-d"; }
+                    else if(cat === 'Feminino - Principiante') { idLista = "lista-fem-principiante"; idVagas = "vagas-fem-principiante"; }
+                    else if(cat === 'Feminino - Iniciante') { idLista = "lista-fem-iniciante"; idVagas = "vagas-fem-iniciante"; }
+                    else if(cat === 'Feminino D') { idLista = "lista-fem-d"; idVagas = "vagas-fem-d"; }
+
+                    const inscritos = dadosPorCategoria[cat];
+                    document.getElementById(idLista).innerHTML = inscritos.length > 0 ? inscritos.map(n => `<div>${n}</div>`).join("") : "Nenhum inscrito ainda.";
+                    document.getElementById(idVagas).innerText = `${8 - inscritos.length} VAGAS DISPONÍVEIS`;
+                });
+
+            } catch (e) {
+                listas.forEach(id => document.getElementById(id).innerText = "Erro ao carregar.");
+            }
         }
 
-        function mudarModo(m) { /* Placar */ }
-        function addPonto(t) { /* Placar */ }
-        function zerarPlacar() { /* Placar */ }
-        function gerarTimes() { /* Sorteio */ }
+        function inscreverSuper8(categoria) {
+            if(!usuarioLogado) return alert("Faça login primeiro.");
+            const msg = `Olá! Eu, *${usuarioLogado.nome}*, gostaria de realizar minha inscrição no torneio *Super Oito Power Launch* na categoria *${categoria}*.`;
+            
+            // Envia para o backend para salvar na planilha de Super Oito
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "inscrever_super8", nome: usuarioLogado.nome, categoria: categoria }) 
+            }).then(() => {
+                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
+                location.reload();
+            });
+        }
     </script>
 </body>
 </html>
