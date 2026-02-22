@@ -113,7 +113,9 @@
         .super8-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
         .card-super8 { background: var(--card-color); border: 1px solid var(--primary); padding: 25px; border-radius: 15px; text-align: center; }
         .card-super8 h3 { color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
-        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; }
+        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .inscritos-lista { font-size: 0.85rem; color: #aaa; margin-top: 10px; text-align: left; padding-top: 10px; border-top: 1px solid #333; }
+        .inscritos-lista strong { color: var(--primary); display: block; margin-bottom: 5px; }
 
         /* Flutuantes */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
@@ -308,11 +310,13 @@
                 <h3>Iniciante</h3>
                 <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Masculino - Iniciante')">INSCREVER-SE</button>
+                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-masc-iniciante">Aguardando inscrições...</div></div>
             </div>
             <div class="card-super8">
                 <h3>Masculino D</h3>
                 <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Masculino D')">INSCREVER-SE</button>
+                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-masc-d">Aguardando inscrições...</div></div>
             </div>
         </div>
 
@@ -321,16 +325,19 @@
                 <h3>Principiante</h3>
                 <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino - Principiante')">INSCREVER-SE</button>
+                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-principiante">Aguardando inscrições...</div></div>
             </div>
             <div class="card-super8">
                 <h3>Iniciante</h3>
                 <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino - Iniciante')">INSCREVER-SE</button>
+                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-iniciante">Aguardando inscrições...</div></div>
             </div>
             <div class="card-super8">
                 <h3>Feminino D</h3>
                 <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
                 <button class="auth-btn" onclick="inscreverSuper8('Feminino D')">INSCREVER-SE</button>
+                <div class="inscritos-lista"><strong>Inscritos:</strong><div id="lista-fem-d">Aguardando inscrições...</div></div>
             </div>
         </div>
     </div>
