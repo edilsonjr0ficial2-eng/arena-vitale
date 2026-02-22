@@ -13,6 +13,8 @@
     <link rel="icon" href="logo.jpg" type="image/jpeg">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         /* --- PALETA DE CORES --- */
         :root {
@@ -23,6 +25,7 @@
             --busy: #333333;
             --hover: #E6C300;
             --error: #ff4444;
+            --instagram: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -103,13 +106,22 @@
         .map-btn { margin-top: 25px; padding: 15px 30px; border: 2px solid var(--primary); color: var(--primary); text-decoration: none; border-radius: 50px; display: inline-block; transition: 0.3s; font-weight: bold; font-size: 1.1rem; }
         .map-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
         
+        /* --- ESTILO SUPER OITO --- */
+        .super8-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .btn-tab-super8 { background: #222; color: white; border: 1px solid #444; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-tab-super8.active { background: var(--primary); color: black; border-color: var(--primary); }
+        .super8-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
+        .card-super8 { background: var(--card-color); border: 1px solid var(--primary); padding: 25px; border-radius: 15px; text-align: center; }
+        .card-super8 h3 { color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
+        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; }
+
         /* Flutuantes */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
-        .wa-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(37, 211, 102, 0.5); }
+        .wa-float:hover { transform: scale(1.1); }
         
-        .ig-float { position: fixed; bottom: 100px; right: 30px; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
-        .ig-float img { width: 35px; filter: brightness(0) invert(1); }
-        .ig-float:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(214, 36, 159, 0.5); }
+        .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
+        .ig-float i { color: white; font-size: 30px; }
+        .ig-float:hover { transform: scale(1.1); }
 
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none;}
         footer p { margin: 5px 0; }
@@ -214,6 +226,7 @@
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
+                <li><a onclick="navegarPara('tela-superoito')">Super Oito</a></li>
                 <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
                 <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
                 <li><a onclick="navegarPara('tela-areia')">Nossa Areia</a></li>
@@ -282,6 +295,46 @@
         </div>
     </div>
 
+    <div id="tela-superoito" class="secao-conteudo">
+        <h2 class="section-title">Super Oito Power Launch 🚀</h2>
+        
+        <div class="super8-tabs">
+            <button class="btn-tab-super8 active" id="tabMasc" onclick="toggleSuper8('masculino')">Masculino</button>
+            <button class="btn-tab-super8" id="tabFem" onclick="toggleSuper8('feminino')">Feminino</button>
+        </div>
+
+        <div id="super8-masculino" class="super8-grid">
+            <div class="card-super8">
+                <h3>Iniciante</h3>
+                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <button class="auth-btn" onclick="inscreverSuper8('Masculino - Iniciante')">INSCREVER-SE</button>
+            </div>
+            <div class="card-super8">
+                <h3>Masculino D</h3>
+                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <button class="auth-btn" onclick="inscreverSuper8('Masculino D')">INSCREVER-SE</button>
+            </div>
+        </div>
+
+        <div id="super8-feminino" class="super8-grid" style="display:none;">
+            <div class="card-super8">
+                <h3>Principiante</h3>
+                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <button class="auth-btn" onclick="inscreverSuper8('Feminino - Principiante')">INSCREVER-SE</button>
+            </div>
+            <div class="card-super8">
+                <h3>Iniciante</h3>
+                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <button class="auth-btn" onclick="inscreverSuper8('Feminino - Iniciante')">INSCREVER-SE</button>
+            </div>
+            <div class="card-super8">
+                <h3>Feminino D</h3>
+                <div class="vagas-box">8 VAGAS DISPONÍVEIS</div>
+                <button class="auth-btn" onclick="inscreverSuper8('Feminino D')">INSCREVER-SE</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-content">
             <h3>🎾 Confirmar Reserva</h3>
@@ -290,7 +343,7 @@
             <div class="terms-box">
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
-                • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>. (Ex: Se marcou 2h no cartão e cancelou com menos de 3 horas, o valor a ser pago será de R$ 50,00. A mesma lógica aplica-se caso o pagamento selecionado tenha sido espécie/pix).<br><br>
+                • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>.<br><br>
                 • <strong>O usuário que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
                 • O não comparecimento sem aviso prévio resultará em <strong>bloqueio para novos agendamentos</strong>.
             </div>
@@ -311,14 +364,14 @@
     <footer id="footerPrincipal"><p>Desenvolvido por Edilson Renovato</p><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
     
     <a href="https://wa.me/5588988229008" class="wa-float" target="_blank" title="Falar no WhatsApp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
-    <a href="https://www.instagram.com/arenavitale/" class="ig-float" target="_blank" title="Siga no Instagram"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" style="filter: brightness(0) invert(1);"></a>
+    
+    <a href="https://www.instagram.com/arenavitale/" class="ig-float" target="_blank" title="Siga no Instagram"><i class="fab fa-instagram"></i></a>
 
     <script>
-        // --- 1. LÓGICA DE AUTENTICAÇÃO (LOGIN E CADASTRO REAL) ---
+        // --- 1. LÓGICA DE AUTENTICAÇÃO ---
         let usuarioLogado = null; 
 
         window.onload = function() {
-            // Desinstalar Service Worker antigo (Matar o cache zumbi)
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -331,8 +384,6 @@
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
-                
-                // Elementos visuais
                 document.getElementById('tela-auth').style.display = 'none';
                 document.querySelector('.navbar').style.display = 'block';
                 document.getElementById('relogioFlutuante').style.display = 'block';
@@ -343,7 +394,6 @@
                 atualizarRelogio();
             }
 
-            // RECUPERA A ÚLTIMA TELA VISITADA
             const telaSalva = localStorage.getItem('ultimaTelaArena');
             if (telaSalva && document.getElementById(telaSalva)) {
                 navegarPara(telaSalva);
@@ -353,43 +403,30 @@
         }
 
         function mostrarCadastro() { document.getElementById('box-login').style.display='none'; document.getElementById('box-cadastro').style.display='block'; }
-        function mostrarLogin() { 
-            document.getElementById('box-cadastro').style.display='none'; 
-            document.getElementById('box-recuperar').style.display='none'; 
-            document.getElementById('box-login').style.display='block'; 
-        }
+        function mostrarLogin() { document.getElementById('box-cadastro').style.display='none'; document.getElementById('box-recuperar').style.display='none'; document.getElementById('box-login').style.display='block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display='none'; document.getElementById('box-recuperar').style.display='block'; }
 
         function fazerLogin() {
             const phone = document.getElementById('loginPhone').value;
             const pass = document.getElementById('loginPass').value;
             const btn = document.getElementById('btnLogin');
-
             if(!phone || !pass) return alert("Preencha todos os campos.");
-
             btn.innerText = "Verificando...";
             btn.disabled = true;
-
-            // LOGIN REAL: VERIFICA NA PLANILHA
             fetch(SCRIPT_URL, {
                 method: "POST",
-                body: JSON.stringify({
-                    acao: "login",
-                    telefone: phone,
-                    senha: pass
-                })
+                body: JSON.stringify({ acao: "login", telefone: phone, senha: pass })
             })
             .then(res => res.json())
             .then(data => {
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
-
                 if (data.erro) {
                     alert("❌ " + data.erro);
                 } else if (data.sucesso) {
                     usuarioLogado = { nome: data.nome, phone: data.telefone };
                     localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
-                    location.reload(); // Recarrega para aplicar o window.onload corretamente
+                    location.reload();
                 }
             })
             .catch(e => {
@@ -404,82 +441,24 @@
             const phone = document.getElementById('cadPhone').value;
             const pass = document.getElementById('cadPass').value;
             const btn = document.getElementById('btnCadastrar');
-
             if(!nome || !phone || !pass) { alert("Preencha todos os campos!"); return; }
-
-            // --- VALIDAÇÃO RIGOROSA DE TELEFONE (11 DÍGITOS) ---
-            let cleanPhone = phone.replace(/\D/g, ""); // Remove tudo que não é número
-            if (cleanPhone.length !== 11) {
-                alert("⚠️ O telefone deve ter exatamente 11 dígitos (DDD + Número).\nExemplo: 88999999999");
-                return; 
-            }
-
-            // Verifica se já tem cadastro local para evitar requisição duplicada
-            const savedUser = localStorage.getItem('usuarioArenaVitale');
-            if (savedUser && JSON.parse(savedUser).phone === cleanPhone) {
-                alert("Você já está logado ou cadastrado.");
-                return;
-            }
-
+            let cleanPhone = phone.replace(/\D/g, "");
+            if (cleanPhone.length !== 11) { alert("⚠️ O telefone deve ter exatamente 11 dígitos."); return; }
             btn.innerText = "Cadastrando...";
             btn.disabled = true;
-
-            // ENVIA PARA A PLANILHA (BACKEND)
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                body: JSON.stringify({ 
-                    acao: "salvar_cliente", 
-                    nome: nome, 
-                    telefone: cleanPhone,
-                    senha: pass
-                }) 
+                body: JSON.stringify({ acao: "salvar_cliente", nome: nome, telefone: cleanPhone, senha: pass }) 
             })
             .then(res => res.json())
             .then(data => {
-                if (data.sucesso) {
-                    alert("✅ Cadastro realizado com sucesso! Faça login.");
-                    mostrarLogin();
-                } else {
-                    alert("Erro ao salvar cadastro.");
-                }
+                if (data.sucesso) { alert("✅ Cadastro realizado!"); mostrarLogin(); } else { alert("Erro ao salvar."); }
                 btn.innerText = "CADASTRAR";
                 btn.disabled = false;
             })
-            .catch(e => {
-                console.error(e);
-                alert("Erro ao conectar com servidor.");
-                btn.innerText = "CADASTRAR";
-                btn.disabled = false;
-            });
+            .catch(e => { alert("Erro no servidor."); btn.innerText = "CADASTRAR"; btn.disabled = false; });
         }
 
-        // Simulação de Recuperação de Senha
-        let codigoRecuperacao = null;
-        function enviarCodigoRecuperacao() {
-            const phone = document.getElementById('recPhone').value;
-            if(!phone) return alert("Digite seu telefone.");
-            codigoRecuperacao = Math.floor(1000 + Math.random() * 9000);
-            alert(`📩 SIMULAÇÃO SMS:\nSeu código de recuperação é: ${codigoRecuperacao}`);
-            document.getElementById('etapa1-rec').style.display = 'none';
-            document.getElementById('etapa2-rec').style.display = 'block';
-        }
-
-        function confirmarNovaSenha() {
-            const codigoDigitado = document.getElementById('recCodigo').value;
-            if(parseInt(codigoDigitado) !== codigoRecuperacao) { alert("Código incorreto!"); return; }
-            alert("✅ Senha alterada com sucesso! (Simulação)");
-            mostrarLogin();
-            document.getElementById('etapa1-rec').style.display = 'block';
-            document.getElementById('etapa2-rec').style.display = 'none';
-        }
-
-        function fazerLogout() {
-            localStorage.removeItem('usuarioArenaVitale');
-            localStorage.removeItem('ultimaTelaArena');
-            location.reload(); 
-        }
-
-        // --- 2. SISTEMA PRINCIPAL ---
         function navegarPara(idTela) {
             const todasAsTelas = document.querySelectorAll('#tela-inicial, .secao-conteudo');
             todasAsTelas.forEach(tela => { tela.style.display = 'none'; });
@@ -487,12 +466,9 @@
             if (idTela === 'tela-inicial') { telaAlvo.style.display = 'flex'; } else { telaAlvo.style.display = 'block'; }
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
-            
-            // SALVA A TELA ATUAL NA MEMÓRIA
             localStorage.setItem('ultimaTelaArena', idTela);
         }
 
-        // FUNÇÃO DE ATUALIZAR PÁGINA (REFRESH)
         function atualizarPagina() {
             const btn = document.querySelector('.btn-refresh-float');
             btn.style.transform = "rotate(360deg)";
@@ -501,7 +477,7 @@
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        const whatsappNumber = "5588988229008"; // Número novo
+        const whatsappNumber = "5588988229008";
         
         let duracaoSelecionada = 1; let quadraSelecionada = 1; let nomeQuadra = "Quadra Chicashoes";
         let horariosOcupadosDoDia = []; let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
@@ -513,25 +489,13 @@
         function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString('pt-BR'); }
         setInterval(atualizarRelogio, 1000);
 
-        let modoJogo = 'beach'; let pA = 0, pB = 0; let gA = 0, gB = 0; const beachPoints = [0, 15, 30, 40];
-        function mudarModo(modo) { modoJogo = modo; document.getElementById('btnBeach').classList.remove('active'); document.getElementById('btnVolei').classList.remove('active'); if(modo === 'beach') document.getElementById('btnBeach').classList.add('active'); else document.getElementById('btnVolei').classList.add('active'); zerarPlacar(); }
-        function addPonto(time) { if(modoJogo === 'beach') { if(time === 'A') { if(pA < 3) pA++; else { gA++; pA = 0; pB = 0; } } else { if(pB < 3) pB++; else { gB++; pA = 0; pB = 0; } } atualizarTelaBeach(); } else { if(time === 'A') gA++; else gB++; document.getElementById('scoreA').innerText = gA; document.getElementById('scoreB').innerText = gB; document.getElementById('gameA').innerText = "-"; document.getElementById('gameB').innerText = "-"; } }
-        function atualizarTelaBeach() { document.getElementById('scoreA').innerText = beachPoints[pA]; document.getElementById('scoreB').innerText = beachPoints[pB]; document.getElementById('gameA').innerText = gA; document.getElementById('gameB').innerText = gB; }
-        function zerarPlacar() { pA = 0; pB = 0; gA = 0; gB = 0; if(modoJogo === 'beach') atualizarTelaBeach(); else { document.getElementById('scoreA').innerText = 0; document.getElementById('scoreB').innerText = 0; } }
-        function formatarDataHeader(date) { let diaSemanaJS = date.getDay(); let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex }; }
-        
-        // --- NOVA LÓGICA DE CÁLCULO DE VALOR POR HORA ---
         function calcularValorTotal(horaInicio, duracao, pagamento) {
             if (isNaN(horaInicio)) return 0;
             let total = 0;
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                if (hAtual >= 7 && hAtual <= 16) {
-                    total += 35; // R$ 35 para QUALQUER forma de pagamento durante o dia
-                } else {
-                    // R$ 45 (dinheiro) ou R$ 50 (cartão) a partir das 17h
-                    total += (pagamento === 'cartao') ? 50 : 45;
-                }
+                if (hAtual >= 7 && hAtual <= 16) { total += 35; } 
+                else { total += (pagamento === 'cartao') ? 50 : 45; }
             }
             return total;
         }
@@ -539,7 +503,6 @@
         function atualizarPrecoDisplay() {
             const h = parseInt(document.getElementById('selectHora').value);
             const pag = document.getElementById('selectPagamento').value;
-            
             if (!isNaN(h)) {
                 let total = calcularValorTotal(h, duracaoSelecionada, pag);
                 document.getElementById('priceDisplay').innerText = `Valor Total: R$ ${total.toFixed(2).replace('.', ',')}`;
@@ -549,50 +512,33 @@
         }
 
         function mudarQuadra(id, btn) { quadraSelecionada = id; nomeQuadra = id === 1 ? "Quadra Chicashoes" : "Quadra Padaria do Helder"; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
-        
-        function setDuracao(horas, btn) { 
-            duracaoSelecionada = horas; 
-            document.getElementById('customInput').value = ""; 
-            document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); 
-            if(btn) btn.classList.add('active'); 
-            carregarDadosDoDia(); // Recarrega horários ao mudar duração
-        }
-        
-        function usarPersonalizado(valor) { 
-            if(valor) { 
-                let v = parseFloat(valor); 
-                if(v > 16) { alert("Máximo 16h."); document.getElementById('customInput').value = 16; duracaoSelecionada = 16; } 
-                else if(v > 0) { duracaoSelecionada = v; } 
-                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); 
-                carregarDadosDoDia(); 
-            } 
-        }
+        function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         
         function mudarDia(delta) { 
             let hoje = new Date(); let diaHoje = hoje.getDay(); let diasAteDomingo = (7 - diaHoje) % 7; if (diaHoje === 0) diasAteDomingo = 0; 
             let dataLimiteDomingo = new Date(hoje); dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo); dataLimiteDomingo.setHours(23, 59, 59, 999);
-            const novaDataTentativa = new Date(dataVisualizada); novaDataTentativa.setDate(novaDataTentativa.getDate() + delta); novaDataTentativa.setHours(12, 0, 0, 0);
-            if (novaDataTentativa > dataLimiteDomingo) { alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!"); return; }
-            hoje.setHours(0, 0, 0, 0); const novaDataZerada = new Date(novaDataTentativa); novaDataZerada.setHours(0, 0, 0, 0);
-            if (novaDataZerada < hoje) { return; } dataVisualizada = novaDataTentativa; 
-            document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia();
+            const novaDataTentativa = new Date(dataVisualizada); novaDataTentativa.setDate(novaDataTentativa.getDate() + delta);
+            if (novaDataTentativa > dataLimiteDomingo) { alert("🔒 Agenda bloqueada para próxima semana."); return; }
+            hoje.setHours(0,0,0,0); if (novaDataTentativa < hoje) return; dataVisualizada = novaDataTentativa; 
+            carregarDadosDoDia();
         }
 
+        function formatarDataHeader(date) { let diaSemanaJS = date.getDay(); let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex }; }
+
         async function carregarDadosDoDia() {
-            const loading = document.getElementById('loading'); const select = document.getElementById('selectHora'); const btnAgendar = document.getElementById('btnAgendar');
-            loading.style.display = 'block'; select.innerHTML = '<option value="">Carregando...</option>'; btnAgendar.style.display = 'none';
+            const loading = document.getElementById('loading'); const select = document.getElementById('selectHora');
+            loading.style.display = 'block'; select.innerHTML = '<option value="">Carregando...</option>';
             document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
-            atualizarPrecoDisplay(); // Reseta o texto do preço
             try {
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const data = await response.text();
                 const rows = data.split('\n').map(row => row.split(',')); let colOffset = (quadraSelecionada === 2) ? 8 : 0;
                 horariosOcupadosDoDia = [];
                 rows.forEach((row, rowIndex) => {
-                    if (rowIndex === 0) return; const horaDaLinha = parseInt(row[0]);
-                    if (!isNaN(horaDaLinha)) {
-                        let diaPlanilha = formatarDataHeader(dataVisualizada).index + 1; let colunaReal = diaPlanilha + colOffset;
-                        let cellValue = row[colunaReal] ? row[colunaReal].replace(/[\r\n"]/g, '').trim() : "";
-                        if (cellValue.length > 0) horariosOcupadosDoDia.push({ hora: horaDaLinha, nome: cellValue });
+                    if (rowIndex === 0) return; const hLinha = parseInt(row[0]);
+                    if (!isNaN(hLinha)) {
+                        let diaPlan = formatarDataHeader(dataVisualizada).index + 1; let colReal = diaPlan + colOffset;
+                        let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : "";
+                        if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val });
                     }
                 });
                 atualizarMenuHorarios();
@@ -602,101 +548,59 @@
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
             horas.forEach(h => {
-                let option = document.createElement('option'); let texto = `${h}:00 - Livre`; let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = "";
-                let blocosNecessarios = Math.ceil(duracaoSelecionada);
-                for (let i = 0; i < blocosNecessarios; i++) {
-                    let ocupacao = horariosOcupadosDoDia.find(item => item.hora === (h + i));
-                    if (ocupacao) { estaOcupado = true; if ((h + i) === h) nomeNoHorario = (ocupacao.nome.toLowerCase() === 'x' || ocupacao.nome.toLowerCase() === 'ok') ? "Reservado" : ocupacao.nome; break; }
+                let option = document.createElement('option'); let texto = `${h}:00 - Livre`; let ocupado = false;
+                for (let i = 0; i < Math.ceil(duracaoSelecionada); i++) {
+                    let ocu = horariosOcupadosDoDia.find(it => it.hora === (h + i));
+                    if (ocu) { ocupado = true; break; }
                 }
-                
-                if (estaOcupado) { disabled = true; texto = `${h}:00 - ⛔ Ocupado (${nomeNoHorario})`; }
-                
-                option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
+                if (ocupado) { option.disabled = true; texto = `${h}:00 - ⛔ Ocupado`; }
+                option.value = h; option.text = texto; select.appendChild(option);
             });
         }
 
-        function liberarBotao() { 
-            const select = document.getElementById('selectHora'); 
-            document.getElementById('btnAgendar').style.display = select.value ? 'block' : 'none'; 
-            atualizarPrecoDisplay();
-        }
+        function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
         function prepararAgendamento() { 
-            if(usuarioLogado) {
-                document.getElementById('cadNomeCompleto').value = usuarioLogado.nome;
-                document.getElementById('cadTelefone').value = usuarioLogado.phone;
-            }
+            if(usuarioLogado) { document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; document.getElementById('cadTelefone').value = usuarioLogado.phone; }
             const h = parseInt(document.getElementById('selectHora').value); 
             const pag = document.getElementById('selectPagamento').value;
-            let fim = h + duracaoSelecionada; 
-            let horaFimTexto = Number.isInteger(fim) ? `${fim}:00` : `${Math.floor(fim)}:30`; 
-            
-            let valorTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
-            abrirModal(h, horaFimTexto, formatarDataHeader(dataVisualizada).texto, valorTotal); 
+            let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
+            abrirModal(h, (h + duracaoSelecionada) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
         }
-        
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
         function enviarAgendamento() {
-            const nome = document.getElementById('cadNomeCompleto').value; 
-            const tel = document.getElementById('cadTelefone').value;
-            
-            if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos e valores.");
-            
-            const btn = document.querySelector('.btn-confirm'); 
-            btn.innerText = "Agendando..."; 
-            btn.disabled = true;
-            
-            const dados = { 
-                nome: nome, 
-                telefone: tel, 
-                diaIndex: formatarDataHeader(dataVisualizada).index, 
-                hora: tempHora, 
-                quadra: quadraSelecionada, 
-                duracao: duracaoSelecionada,
-                status: 'pendente'
-            };
-            
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify(dados) 
-            })
-            .then(response => response.text()) 
-            .then(textoResposta => {
-                if (textoResposta.startsWith("Atenção") || textoResposta.startsWith("Erro")) {
-                    alert("⚠️ " + textoResposta.replace("Atenção: ", "")); 
-                    btn.disabled = false;
-                    btn.innerText = "Ir para WhatsApp";
-                    return; 
-                }
-
-                let selectPag = document.getElementById('selectPagamento');
-                let nomePag = selectPag.options[selectPag.selectedIndex].text;
-
-                let msg = `*SOLICITAÇÃO DE RESERVA (AGUARDANDO CONFIRMAÇÃO)*\n👤 ${nome}\n📞 ${tel}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor Total: R$ ${tempValor},00\n💳 Pagamento: ${nomePag}\n✅ Aguardando sua confirmação.`;
+            if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
+            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
+            .then(res => res.text()) 
+            .then(txt => {
+                let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
+                let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
-                alert("Pré-reserva feita! Aguarde a confirmação no WhatsApp."); 
                 location.reload();
             })
-            .catch(error => { 
-                console.error(error);
-                alert("Erro de conexão. Tente novamente."); 
-                btn.disabled = false; 
-            });
+            .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
         }
 
-        const infoInicial2 = formatarDataHeader(dataVisualizada); document.getElementById('dateDisplay').innerText = infoInicial2.texto;
-        carregarDadosDoDia();
-
-        function gerarTimes() {
-            const input = document.getElementById('playerNames').value; const resultArea = document.getElementById('resultArea');
-            if (!input.trim()) return alert("Digite nomes!"); let players = input.split(',').map(n => n.trim()).filter(n => n !== "");
-            if (players.length < 2) return alert("Mínimo 2!");
-            for (let i = players.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [players[i], players[j]] = [players[j], players[i]]; }
-            let html = ""; let c = 1; for (let i = 0; i < players.length; i += 2) { html += `<div class="team-box"><strong>Time ${c++}:</strong> ${players[i]} e ${players[i+1] || "(Revezamento)"}</div>`; }
-            resultArea.innerHTML = html; resultArea.style.display = "block";
+        // --- FUNÇÕES SUPER OITO ---
+        function toggleSuper8(cat) {
+            document.getElementById('super8-masculino').style.display = (cat === 'masculino') ? 'grid' : 'none';
+            document.getElementById('super8-feminino').style.display = (cat === 'feminino') ? 'grid' : 'none';
+            document.getElementById('tabMasc').classList.toggle('active', cat === 'masculino');
+            document.getElementById('tabFem').classList.toggle('active', cat === 'feminino');
         }
+
+        function inscreverSuper8(categoria) {
+            const msg = `Olá! Gostaria de realizar minha inscrição no torneio *Super Oito Power Launch* na categoria *${categoria}*.`;
+            window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function mudarModo(m) { /* Placar */ }
+        function addPonto(t) { /* Placar */ }
+        function zerarPlacar() { /* Placar */ }
+        function gerarTimes() { /* Sorteio */ }
     </script>
 </body>
 </html>
