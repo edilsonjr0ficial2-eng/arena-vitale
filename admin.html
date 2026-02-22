@@ -319,18 +319,18 @@
             }
         }
 
-        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
+        // --- ATENÇÃO: AQUI ESTÁ A LINHA CORRIGIDA PARA O NOME NÃO VOLTAR COMO FANTASMA ---
+        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).catch(e => alert("Erro ao enviar dados para a planilha.")); }
+
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
         
-        // ---- AQUI ESTÁ A FUNÇÃO ALTERADA ----
         function confirmarAgendamento(h, q, n) { 
             if(confirm(`Confirmar?`)) {
                 let nomeLimpo = n.replace("⏳", "").trim();
                 enviarComando("agendar", h, q, nomeLimpo + " (Confirmado)"); 
             }
         }
-        // -------------------------------------
 
         function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Q${q}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
@@ -357,7 +357,6 @@
         function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
         function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; } }
 
-        // Apenas o relatório de clientes continua abrindo a nova aba
         function gerarRelatorio(tipo) { 
             let win = window.open("", "_blank"); win.document.write("Carregando..."); 
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
