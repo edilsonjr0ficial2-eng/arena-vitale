@@ -322,7 +322,16 @@
         function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).then(() => setTimeout(carregarAgenda, 2000)).catch(e => alert("Erro.")); }
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando ${h}h`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
-        function confirmarAgendamento(h, q, n) { if(confirm(`Confirmar?`)) enviarComando("agendar", h, q, n.replace("⏳", "").trim()); }
+        
+        // ---- AQUI ESTÁ A FUNÇÃO ALTERADA ----
+        function confirmarAgendamento(h, q, n) { 
+            if(confirm(`Confirmar?`)) {
+                let nomeLimpo = n.replace("⏳", "").trim();
+                enviarComando("agendar", h, q, nomeLimpo + " (Confirmado)"); 
+            }
+        }
+        // -------------------------------------
+
         function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Q${q}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
         function salvarManual() {
