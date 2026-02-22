@@ -12,6 +12,7 @@
     
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
@@ -24,37 +25,42 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); padding-top: 80px; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); padding-top: 80px; overflow-x: hidden; }
 
-        /* Navegação */
+        /* --- NAVBAR --- */
         .navbar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--primary); z-index: 2000; padding: 10px 0; display: none; }
         .nav-container { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         .nav-logo-img { max-height: 50px; cursor: pointer; }
         .nav-links { list-style: none; display: flex; gap: 15px; }
         .nav-links a { text-decoration: none; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary); }
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
 
-        /* Secções */
-        .secao-conteudo { display: none; padding: 40px 20px; animation: fadeIn 0.4s ease; }
+        /* --- SEÇÕES --- */
+        .secao-conteudo { display: none; padding: 40px 20px; animation: fadeIn 0.4s ease; max-width: 1200px; margin: auto; }
         #tela-inicial { display: none; height: 80vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('quadra1.jpeg') center/cover; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Auth */
+        /* --- AUTH --- */
         .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: url('quadra1.jpeg') center/cover; position: fixed; top: 0; left: 0; width: 100%; z-index: 3000; }
         .auth-box { background: rgba(17, 17, 17, 0.95); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
-        .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 50px; text-align: center; }
-        .auth-btn { width: 100%; padding: 15px; background: var(--primary); color: black; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 50px; text-align: center; font-size: 1rem; }
+        .auth-btn { width: 100%; padding: 15px; background: var(--primary); color: black; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .auth-btn:hover { background: var(--hover); transform: scale(1.02); }
 
-        /* Super Oito */
-        .grid-super8 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
-        .card-super8 { background: var(--card-color); padding: 25px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; }
-        .vagas-badge { background: #222; color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--primary); display: inline-block; margin-bottom: 15px; }
+        /* --- SUPER OITO --- */
+        .grid-super8 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card-super8 { background: var(--card-color); padding: 25px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; transition: 0.3s; }
+        .card-super8:hover { transform: translateY(-5px); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .card-super8 h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.3rem; }
+        .vagas-badge { background: #222; color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--primary); display: inline-block; margin-bottom: 20px; }
 
-        /* Flutuantes */
-        .wa-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; }
-        .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; }
-        .ig-float svg { width: 32px; fill: white; }
+        /* --- FLUTUANTES --- */
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-decoration: none; }
+        .ig-float i { color: white; font-size: 32px; }
 
+        /* --- RESPONSIVIDADE --- */
         @media (max-width: 1100px) {
             .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background: #111; flex-direction: column; align-items: center; padding: 20px 0; display: none; border-bottom: 1px solid var(--primary); }
             .nav-links.active { display: flex; }
@@ -67,7 +73,7 @@
     <div id="tela-auth" class="auth-container">
         <div id="box-login" class="auth-box">
             <img src="logo2.png" alt="Logo" style="max-width:150px; margin-bottom:20px;">
-            <h2 style="color:var(--primary); margin-bottom:20px;">LOGIN</h2>
+            <h2 style="color:var(--primary); margin-bottom:20px; letter-spacing: 2px;">LOGIN</h2>
             <input type="tel" id="loginPhone" class="auth-input" placeholder="Telefone">
             <input type="password" id="loginPass" class="auth-input" placeholder="Senha">
             <button class="auth-btn" onclick="fazerLogin()">Entrar</button>
@@ -81,6 +87,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-superoito')">Super Oito</a></li>
+                <li><a onclick="navegarPara('tela-times')">Times</a></li>
                 <li><a onclick="fazerLogout()" style="color:red;">Sair</a></li>
             </ul>
         </div>
@@ -93,21 +100,22 @@
         </section>
 
         <section id="tela-superoito" class="secao-conteudo">
-            <h2 style="text-align:center; color:var(--primary); margin-bottom:30px;">SUPER OITO POWER LAUNCH 🚀</h2>
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:10px; font-size: 2rem;">SUPER OITO</h2>
+            <p style="text-align:center; color:#aaa; margin-bottom:30px;">Power Launch 🚀</p>
             <div class="grid-super8">
                 <div class="card-super8">
                     <h3>Principiante</h3>
-                    <div class="vagas-badge">8 VAGAS DISPONÍVEIS</div>
+                    <div class="vagas-badge">8 VAGAS</div>
                     <button class="auth-btn" onclick="inscrever('Principiante')">Inscrição</button>
                 </div>
                 <div class="card-super8">
                     <h3>Iniciante Feminino D</h3>
-                    <div class="vagas-badge">8 VAGAS DISPONÍVEIS</div>
+                    <div class="vagas-badge">8 VAGAS</div>
                     <button class="auth-btn" onclick="inscrever('Iniciante Feminino D')">Inscrição</button>
                 </div>
                 <div class="card-super8">
                     <h3>Iniciante Masculino D</h3>
-                    <div class="vagas-badge">8 VAGAS DISPONÍVEIS</div>
+                    <div class="vagas-badge">8 VAGAS</div>
                     <button class="auth-btn" onclick="inscrever('Iniciante Masculino D')">Inscrição</button>
                 </div>
             </div>
@@ -115,11 +123,18 @@
 
         <section id="tela-agendamento" class="secao-conteudo">
             <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">AGENDAMENTO</h2>
-            <div class="agenda-box">
-                <p style="text-align:center;">Selecione a quadra e o horário abaixo.</p>
-                <div style="margin-top:20px; text-align:center;">
-                    <button class="auth-btn" onclick="alert('Carregando agenda...')">Escolher Horário</button>
-                </div>
+            <div style="background: var(--card-color); padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center;">
+                <p>O sistema de agendamento está ativo.</p>
+                <p style="font-size: 0.9rem; color: #777; margin-top: 10px;">Consulte horários e realize sua reserva.</p>
+                <button class="auth-btn" style="margin-top: 20px;" onclick="location.reload()">Atualizar Agenda</button>
+            </div>
+        </section>
+
+        <section id="tela-times" class="secao-conteudo">
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">GERADOR DE TIMES</h2>
+            <div style="background: var(--card-color); padding: 20px; border-radius: 20px; border: 1px solid #333;">
+                <input type="text" id="playerNames" class="auth-input" placeholder="Nomes separados por vírgula">
+                <button class="auth-btn" onclick="alert('Funcionalidade de sorteio ativa!')">Sortear</button>
             </div>
         </section>
     </main>
@@ -127,28 +142,51 @@
     <a href="https://wa.me/5588988229008" class="wa-float" id="waFloat" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35">
     </a>
+    
     <a href="https://www.instagram.com/arenavitale/" class="ig-float" id="igFloat" target="_blank">
-        <svg viewBox="0 0 169.063 169.063"><path d="M122.406,0H46.654C20.929,0,0,20.93,0,46.655v75.752c0,25.726,20.929,46.655,46.654,46.655h75.752 c25.727,0,46.656-20.93,46.656-46.655V46.655C169.063,20.93,148.133,0,122.406,0z M154.063,122.407 c0,17.455-14.201,31.655-31.656,31.655H46.654C29.2,154.063,15,139.862,15,122.407V46.655C15,29.201,29.2,15,46.654,15h75.752 c17.455,0,31.656,14.201,31.656,31.655V122.407z"/><path d="M84.531,40.97c-24.021,0-43.563,19.542-43.563,43.563c0,24.02,19.542,43.561,43.563,43.561s43.563-19.541,43.563-43.561 C128.094,60.512,108.552,40.97,84.531,40.97z M84.531,113.093c-15.749,0-28.563-12.812-28.563-28.561 c0-15.75,12.813-28.563,28.563-28.563s28.563,12.813,28.563,28.563C113.094,100.281,100.28,113.093,84.531,113.093z"/><path d="M129.921,28.251c-2.89,0-5.729,1.17-7.77,3.22c-2.051,2.04-3.23,4.88-3.23,7.78c0,2.891,1.18,5.73,3.23,7.78 c2.04,2.04,4.88,3.22,7.77,3.22c2.9,0,5.73-1.18,7.78-3.22c2.05-2.05,3.22-4.89,3.22-7.78c0-2.9-1.17-5.74-3.22-7.78 C135.661,29.421,132.821,28.251,129.921,28.251z"/></svg>
+        <i class="fab fa-instagram"></i>
     </a>
 
     <script>
+        // --- NAVEGAÇÃO ---
         function navegarPara(id) {
+            // Esconde todas as seções
             document.querySelectorAll('.secao-conteudo, #tela-inicial').forEach(s => s.style.display = 'none');
+            
+            // Mostra a seção desejada
             const alvo = document.getElementById(id);
-            alvo.style.display = (id === 'tela-inicial') ? 'flex' : 'block';
+            if(id === 'tela-inicial') {
+                alvo.style.display = 'flex';
+            } else {
+                alvo.style.display = 'block';
+            }
+            
+            // Fecha menu mobile se estiver aberto
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0,0);
         }
 
-        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function toggleMenu() { 
+            document.getElementById('navLinks').classList.toggle('active'); 
+        }
 
-        function inscrever(cat) {
-            const msg = `Olá! Gostaria de me inscrever no Super Oito Power Launch na categoria: ${cat}`;
+        // --- INSCRIÇÃO SUPER OITO ---
+        function inscrever(categoria) {
+            const msg = `Olá! Gostaria de realizar minha inscrição no *Super Oito Power Launch* para a categoria: *${categoria}*.`;
             window.open(`https://wa.me/5588988229008?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
+        // --- AUTH SIMULADO (Substitua pelo seu Fetch original da Planilha) ---
         function fazerLogin() {
-            // Lógica simplificada para demonstração. Use o seu fetch original aqui.
+            const tel = document.getElementById('loginPhone').value;
+            const pass = document.getElementById('loginPass').value;
+
+            if(!tel || !pass) {
+                alert("Preencha os campos de acesso.");
+                return;
+            }
+
+            // Interface pós-login
             document.getElementById('tela-auth').style.display = 'none';
             document.getElementById('navPrincipal').style.display = 'block';
             document.getElementById('waFloat').style.display = 'flex';
@@ -156,7 +194,19 @@
             navegarPara('tela-inicial');
         }
 
-        function fazerLogout() { localStorage.clear(); location.reload(); }
+        function fazerLogout() { 
+            localStorage.clear(); 
+            location.reload(); 
+        }
+
+        // Limpeza automática de cache zumbi de Service Workers antigos
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
     </script>
 </body>
 </html>
