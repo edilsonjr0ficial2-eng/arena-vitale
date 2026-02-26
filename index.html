@@ -272,18 +272,19 @@
     
     <div class="chatbot-window" id="chatbotWindow">
         <div class="chat-header">
-            Assistente Virtual Vitale
+            Areninha Vitalezinha 🎾
             <span onclick="toggleChat()">✖</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg-bot">Olá! Eu sou a assistente de Inteligência Artificial da Arena Vitale 🎾. Como posso te ajudar hoje?</div>
+            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha, a inteligência artificial da Arena Vitale. Como posso te ajudar hoje? 😊</div>
         </div>
-        <div class="typing-indicator" id="typingIndicator">A assistente está digitando...</div>
+        <div class="typing-indicator" id="typingIndicator">A Areninha está digitando...</div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Digite sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
             <button onclick="enviarMensagemChat()">➤</button>
         </div>
     </div>
+
     <div id="tela-agendamento" class="secao-conteudo">
         <h2 class="section-title">Agendamento</h2>
         <div class="agenda-box">
@@ -422,7 +423,7 @@
 
     <script>
         // --- CHAVE DA API DA INTELIGÊNCIA ARTIFICIAL ---
-        const GEMINI_API_KEY = "gen-lang-client-0698611803"; 
+        const GEMINI_API_KEY = "AIzaSyBmJABYodyAroV3iAXwIRQgqcoSXriUv6Y"; 
         // -----------------------------------------------
 
         // --- 1. LÓGICA DE AUTENTICAÇÃO ---
@@ -488,8 +489,8 @@
 
             // 3. Fazer a requisição para a IA do Google Gemini
             try {
-                // Instruções para a IA saber quem ela é
-                const systemPrompt = "Você é a assistente virtual da Arena Vitale, uma arena de Beach Tennis, Vôlei e Futevôlei em Russas, Ceará. Você deve ser educada, simpática, usar emojis e dar respostas curtas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. Se perguntarem algo que você não sabe, peça para o cliente chamar no WhatsApp.";
+                // AQUI DEFINIMOS A NOVA PERSONALIDADE DELA
+                const systemPrompt = "Seu nome é Areninha Vitalezinha. Você é a assistente virtual da Arena Vitale, uma arena de Beach Tennis, Vôlei e Futevôlei em Russas, Ceará. Seja super carismática, fofa, educada, use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. Se perguntarem algo que você não sabe, peça para o cliente chamar no WhatsApp.";
                 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
@@ -503,21 +504,28 @@
                 const data = await response.json();
                 document.getElementById('typingIndicator').style.display = 'none';
 
+                // Tratamento de erro detalhado para ajudar a descobrir se a chave está errada
+                if (data.error) {
+                    console.error("Erro da API:", data.error.message);
+                    if (data.error.message.includes("API key not valid")) {
+                        adicionarMensagemUI('bot', "⚠️ Ops! A chave da API informada no código é inválida. Verifique lá no Google AI Studio!");
+                    } else {
+                        adicionarMensagemUI('bot', "⚠️ Ocorreu um erro na IA: " + data.error.message);
+                    }
+                    return;
+                }
+
                 if (data.candidates && data.candidates.length > 0) {
                     const aiResponse = data.candidates[0].content.parts[0].text;
                     adicionarMensagemUI('bot', aiResponse);
                 } else {
-                    adicionarMensagemUI('bot', "Desculpe, deu um errinho na minha conexão. Pode tentar novamente? 😕");
+                    adicionarMensagemUI('bot', "Poxa, me deu um branco agora. Pode repetir a pergunta? 😕");
                 }
 
             } catch (error) {
-                console.error("Erro na IA:", error);
+                console.error("Erro no Chatbot:", error);
                 document.getElementById('typingIndicator').style.display = 'none';
-                if(GEMINI_API_KEY === "SUA_CHAVE_API_AQUI") {
-                    adicionarMensagemUI('bot', "⚠️ Ops! A chave de acesso da IA ainda não foi configurada no sistema. Fale com o desenvolvedor.");
-                } else {
-                    adicionarMensagemUI('bot', "Estou com problemas para me conectar agora. Por favor, chame a gente no WhatsApp!");
-                }
+                adicionarMensagemUI('bot', "Estou sem internet para pensar agora. Por favor, chame a gente no WhatsApp!");
             }
         }
 
