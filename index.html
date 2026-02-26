@@ -422,8 +422,7 @@
 
     <script>
         // --- CHAVE DA API DA INTELIGÊNCIA ARTIFICIAL ---
-        // VOCÊ PRECISA SUBSTITUIR O TEXTO ABAIXO PELA SUA CHAVE GRATUITA DO GOOGLE AI STUDIO
-        const GEMINI_API_KEY = gen-lang-client-0698611803; 
+        const GEMINI_API_KEY = "gen-lang-client-0698611803"; 
         // -----------------------------------------------
 
         // --- 1. LÓGICA DE AUTENTICAÇÃO ---
@@ -543,29 +542,41 @@
             const phone = document.getElementById('loginPhone').value;
             const pass = document.getElementById('loginPass').value;
             const btn = document.getElementById('btnLogin');
+            
             if(!phone || !pass) return alert("Preencha todos os campos.");
+            
             btn.innerText = "Verificando...";
             btn.disabled = true;
+
             fetch(SCRIPT_URL, {
                 method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ acao: "login", telefone: phone, senha: pass })
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.text()) // Agora ele lê o texto puro primeiro para não engasgar
+            .then(text => {
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
-                if (data.erro) {
-                    alert("❌ " + data.erro);
-                } else if (data.sucesso) {
-                    usuarioLogado = { nome: data.nome, phone: data.telefone };
-                    localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
-                    location.reload();
+                
+                try {
+                    const data = JSON.parse(text); // Tenta transformar em dados
+                    if (data.erro) {
+                        alert("❌ " + data.erro);
+                    } else if (data.sucesso) {
+                        usuarioLogado = { nome: data.nome, phone: data.telefone };
+                        localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
+                        location.reload();
+                    }
+                } catch(e) {
+                    // Se o Google não retornar JSON (ex: erro no código ou falta de permissão)
+                    console.log("Erro interno do Google:", text);
+                    alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "...");
                 }
             })
             .catch(e => {
-                alert("Erro de conexão.");
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
+                alert("Erro de conexão. Verifique sua internet.");
             });
         }
 
@@ -574,22 +585,42 @@
             const phone = document.getElementById('cadPhone').value;
             const pass = document.getElementById('cadPass').value;
             const btn = document.getElementById('btnCadastrar');
+            
             if(!nome || !phone || !pass) { alert("Preencha todos os campos!"); return; }
             let cleanPhone = phone.replace(/\D/g, "");
             if (cleanPhone.length !== 11) { alert("⚠️ O telefone deve ter exatamente 11 dígitos."); return; }
+            
             btn.innerText = "Cadastrando...";
             btn.disabled = true;
+
             fetch(SCRIPT_URL, { 
-                method: "POST", 
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ acao: "salvar_cliente", nome: nome, telefone: cleanPhone, senha: pass }) 
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.sucesso) { alert("✅ Cadastro realizado!"); mostrarLogin(); } else { alert("Erro ao salvar."); }
+            .then(res => res.text())
+            .then(text => {
                 btn.innerText = "CADASTRAR";
                 btn.disabled = false;
+                
+                try {
+                    const data = JSON.parse(text);
+                    if (data.sucesso) { 
+                        alert("✅ Cadastro realizado! Agora você já pode fazer login."); 
+                        mostrarLogin(); 
+                    } else { 
+                        alert("Erro ao salvar: " + data.erro); 
+                    }
+                } catch(e) {
+                    console.log("Erro interno do Google:", text);
+                    alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "...");
+                }
             })
-            .catch(e => { alert("Erro no servidor."); btn.innerText = "CADASTRAR"; btn.disabled = false; });
+            .catch(e => { 
+                btn.innerText = "CADASTRAR"; 
+                btn.disabled = false;
+                alert("Erro de conexão com o sistema."); 
+            });
         }
 
         function navegarPara(idTela) {
