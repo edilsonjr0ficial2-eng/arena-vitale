@@ -276,7 +276,7 @@
             <span onclick="toggleChat()">✖</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena ou até mesmo te contar curiosidades e charadas sobre o Beach Tennis! Quer tentar adivinhar uma? 😊</div>
+            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena ou até mesmo te contar curiosidades incríveis sobre o Beach Tennis! Quer ouvir uma? 😊</div>
         </div>
         <div class="typing-indicator" id="typingIndicator">A Areninha está digitando...</div>
         <div class="chat-input-area">
@@ -490,9 +490,9 @@
             document.getElementById('typingIndicator').style.display = 'block';
 
             try {
-                // A personalidade vai embutida junto com a pergunta do usuário para não dar conflito no sistema
-                // AGORA ELA TEM A INSTRUÇÃO PARA FAZER CHARADAS E CONTAR CURIOSIDADES
-                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Para engajar o usuário, sempre que fizer sentido na conversa (ou quando ele pedir), termine sua resposta lançando um desafio: faça uma charada divertida sobre esportes de areia ou conte uma curiosidade super interessante sobre o Beach Tennis. Provoque o cliente a tentar adivinhar a charada antes de dar a resposta na próxima mensagem! Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
+                // A personalidade vai embutida junto com a pergunta do usuário
+                // AGORA FOCADA APENAS EM CURIOSIDADES (SEM CHARADAS)
+                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Para engajar o usuário, sempre que fizer sentido na conversa (ou quando ele pedir), termine sua resposta contando uma curiosidade super interessante e rápida sobre o esporte Beach Tennis! Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
                 
                 const promptFinal = systemPrompt + "\n\nResponda à seguinte mensagem do cliente: " + userMessage;
 
