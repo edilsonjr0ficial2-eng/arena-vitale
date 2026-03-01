@@ -120,18 +120,6 @@
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
         .fidelidade-nota { margin-top: 25px; font-size: 0.85rem; color: #888; border-top: 1px solid #333; padding-top: 15px;}
 
-        /* --- ESTILO SUPER OITO --- */
-        .super8-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        .btn-tab-super8 { background: #222; color: white; border: 1px solid #444; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-tab-super8.active { background: var(--primary); color: black; border-color: var(--primary); }
-        .super8-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
-        .card-super8 { background: var(--card-color); border: 1px solid var(--primary); padding: 25px; border-radius: 15px; text-align: center; }
-        .card-super8 h3 { color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
-        .vagas-box { background: #222; display: inline-block; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; }
-        .lista-inscritos { text-align: left; margin-top: 15px; padding-top: 10px; border-top: 1px solid #333; font-size: 0.9rem; color: #ccc; }
-        .lista-inscritos strong { color: var(--primary); display: block; margin-bottom: 5px; }
-        .lista-inscritos div { margin-bottom: 3px; padding-left: 5px; border-left: 2px solid var(--primary); text-transform: capitalize; }
-
         /* Flutuantes */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
         .wa-float:hover { transform: scale(1.1); }
@@ -260,7 +248,6 @@
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
-                <li><a onclick="navegarPara('tela-superoito')">Super Oito</a></li>
                 <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
                 <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
                 <li><a onclick="navegarPara('tela-areia')">Nossa Areia</a></li>
@@ -361,66 +348,6 @@
                 </select>
                 <div id="priceDisplay" class="price-display" style="margin-top: 15px;">Valor: Selecione o horário</div>
                 <button id="btnAgendar" class="btn-agendar-final" onclick="prepararAgendamento()">✅ CONFIRMAR HORÁRIO</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="tela-superoito" class="secao-conteudo">
-        <h2 class="section-title">Super Oito Power Launch 🚀</h2>
-        
-        <div class="super8-tabs">
-            <button class="btn-tab-super8 active" id="tabMasc" onclick="toggleSuper8('masculino')">Masculino</button>
-            <button class="btn-tab-super8" id="tabFem" onclick="toggleSuper8('feminino')">Feminino</button>
-        </div>
-
-        <div id="super8-masculino" class="super8-grid">
-            <div class="card-super8">
-                <h3>Iniciante</h3>
-                <div class="vagas-box" id="vagas-masc-iniciante">8 VAGAS DISPONÍVEIS</div>
-                <button class="auth-btn" onclick="inscreverSuper8('Masculino - Iniciante')">INSCREVER-SE</button>
-                <div class="lista-inscritos">
-                    <strong>Inscritos:</strong>
-                    <div id="lista-masc-iniciante">Carregando...</div>
-                </div>
-            </div>
-            <div class="card-super8">
-                <h3>Masculino D</h3>
-                <div class="vagas-box" id="vagas-masc-d">8 VAGAS DISPONÍVEIS</div>
-                <button class="auth-btn" onclick="inscreverSuper8('Masculino D')">INSCREVER-SE</button>
-                <div class="lista-inscritos">
-                    <strong>Inscritos:</strong>
-                    <div id="lista-masc-d">Carregando...</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="super8-feminino" class="super8-grid" style="display:none;">
-            <div class="card-super8">
-                <h3>Principiante</h3>
-                <div class="vagas-box" id="vagas-fem-principiante">8 VAGAS DISPONÍVEIS</div>
-                <button class="auth-btn" onclick="inscreverSuper8('Feminino - Principiante')">INSCREVER-SE</button>
-                <div class="lista-inscritos">
-                    <strong>Inscritos:</strong>
-                    <div id="lista-fem-principiante">Carregando...</div>
-                </div>
-            </div>
-            <div class="card-super8">
-                <h3>Iniciante</h3>
-                <div class="vagas-box" id="vagas-fem-iniciante">8 VAGAS DISPONÍVEIS</div>
-                <button class="auth-btn" onclick="inscreverSuper8('Feminino - Iniciante')">INSCREVER-SE</button>
-                <div class="lista-inscritos">
-                    <strong>Inscritos:</strong>
-                    <div id="lista-fem-iniciante">Carregando...</div>
-                </div>
-            </div>
-            <div class="card-super8">
-                <h3>Feminino D</h3>
-                <div class="vagas-box" id="vagas-fem-d">8 VAGAS DISPONÍVEIS</div>
-                <button class="auth-btn" onclick="inscreverSuper8('Feminino D')">INSCREVER-SE</button>
-                <div class="lista-inscritos">
-                    <strong>Inscritos:</strong>
-                    <div id="lista-fem-d">Carregando...</div>
-                </div>
             </div>
         </div>
     </div>
@@ -682,7 +609,6 @@
             sessionStorage.setItem('ultimaTelaArena', idTela);
             
             if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
-            if(idTela === 'tela-superoito') carregarInscritosSuper8();
             if(idTela === 'tela-fidelidade') renderizarFidelidade();
         }
 
@@ -694,7 +620,6 @@
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        const URL_SUPER8_CSV = "COLE_AQUI_O_LINK_CSV_DA_ABA_SUPER8";
         const whatsappNumber = "5588988229008";
         
         let duracaoSelecionada = 1; let quadraSelecionada = 1; let nomeQuadra = "Quadra Chicashoes";
@@ -816,42 +741,6 @@
                 location.reload();
             })
             .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
-        }
-
-        // --- FUNÇÕES SUPER OITO ---
-        function toggleSuper8(cat) {
-            document.getElementById('super8-masculino').style.display = (cat === 'masculino') ? 'grid' : 'none';
-            document.getElementById('super8-feminino').style.display = (cat === 'feminino') ? 'grid' : 'none';
-            document.getElementById('tabMasc').classList.toggle('active', cat === 'masculino');
-            document.getElementById('tabFem').classList.toggle('active', cat === 'feminino');
-        }
-
-        async function carregarInscritosSuper8() {
-            const listas = ["lista-masc-iniciante", "lista-masc-d", "lista-fem-principiante", "lista-fem-iniciante", "lista-fem-d"];
-            listas.forEach(id => document.getElementById(id).innerText = "Carregando...");
-            try {
-                const res = await fetch(URL_SUPER8_CSV + '&t=' + Date.now()); const csv = await res.text();
-                const rows = csv.split('\n').map(r => r.split(','));
-                const dados = { 'Masculino - Iniciante': [], 'Masculino D': [], 'Feminino - Principiante': [], 'Feminino - Iniciante': [], 'Feminino D': [] };
-                rows.forEach((row, idx) => { if(idx === 0) return; let nome = row[0] ? row[0].trim() : ""; let cat = row[1] ? row[1].trim() : ""; if(nome && dados[cat]) dados[cat].push(nome); });
-                atualizarInterfaceSuper8(dados);
-            } catch (e) { console.error(e); }
-        }
-
-        function atualizarInterfaceSuper8(dados) {
-            const mapeamento = { 'Masculino - Iniciante': ['lista-masc-iniciante', 'vagas-masc-iniciante'], 'Masculino D': ['lista-masc-d', 'vagas-masc-d'], 'Feminino - Principiante': ['lista-fem-principiante', 'vagas-fem-principiante'], 'Feminino - Iniciante': ['lista-fem-iniciante', 'vagas-fem-iniciante'], 'Feminino D': ['lista-fem-d', 'vagas-fem-d'] };
-            Object.keys(mapeamento).forEach(cat => {
-                const [idLista, idVagas] = mapeamento[cat]; const inscritos = dados[cat] || [];
-                document.getElementById(idLista).innerHTML = inscritos.length > 0 ? inscritos.map(n => `<div>${n}</div>`).join("") : "Nenhum inscrito.";
-                document.getElementById(idVagas).innerText = `${Math.max(0, 8 - inscritos.length)} VAGAS DISPONÍVEIS`;
-            });
-        }
-
-        function inscreverSuper8(categoria) {
-            if(!usuarioLogado) return alert("Faça login primeiro.");
-            if(!confirm(`Inscrever ${usuarioLogado.nome} na categoria ${categoria}?`)) return;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "inscrever_super8", nome: usuarioLogado.nome, categoria: categoria }) })
-            .then(() => { window.open(`https://wa.me/5588988229008?text=Olá! Inscrição no Super Oito: ${categoria}. Nome: ${usuarioLogado.nome}`, '_blank'); carregarInscritosSuper8(); });
         }
 
         // --- MANUTENÇÃO PLACAR ---
