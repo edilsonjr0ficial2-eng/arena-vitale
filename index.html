@@ -39,7 +39,7 @@
         .navbar { position: fixed; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary); z-index: 2000; padding: 10px 0; backdrop-filter: blur(5px); display: none; }
         .nav-container { max-width: 1300px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         .nav-logo-img { max-height: 50px; width: auto; display: block; cursor: pointer; }
-        .nav-links { list-style: none; display: flex; gap: 15px; } 
+        .nav-links { list-style: none; display: flex; gap: 15px; align-items: center;} 
         .nav-links a { text-decoration: none; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; cursor: pointer; white-space: nowrap; }
         .nav-links a:hover { color: var(--primary); }
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
@@ -77,6 +77,11 @@
         #tela-inicial::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(6px) brightness(0.6); transform: scale(1.1); z-index: 1; }
         #tela-inicial > * { position: relative; z-index: 2; }
         .hero-logo { max-width: 90%; width: 600px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
+        
+        /* WIDGET DO CLIMA */
+        .weather-widget { background: rgba(0, 0, 0, 0.7); border: 1px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); font-weight: bold; color: var(--primary); display: none;}
+        .weather-widget i { font-size: 1.2rem; }
+
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
         .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
         .btn-main:hover { transform: scale(1.05); background-color: var(--hover); }
@@ -106,6 +111,15 @@
         .map-btn { margin-top: 25px; padding: 15px 30px; border: 2px solid var(--primary); color: var(--primary); text-decoration: none; border-radius: 50px; display: inline-block; transition: 0.3s; font-weight: bold; font-size: 1.1rem; }
         .map-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
         
+        /* --- ESTILO FIDELIDADE --- */
+        .fidelidade-box { background: var(--card-color); border: 2px solid var(--primary); padding: 30px; border-radius: 20px; max-width: 500px; margin: auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .fidelidade-box p { color: #ccc; margin-bottom: 20px; font-size: 1.1rem; }
+        .stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-top: 25px; }
+        .stamp-box { background: #222; border: 2px dashed #555; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #555; font-weight: 900; margin: auto; transition: 0.3s; }
+        .stamp-box.stamped { background: var(--primary); border-color: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); transform: scale(1.1); animation: popIn 0.4s ease; }
+        @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
+        .fidelidade-nota { margin-top: 25px; font-size: 0.85rem; color: #888; border-top: 1px solid #333; padding-top: 15px;}
+
         /* --- ESTILO SUPER OITO --- */
         .super8-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
         .btn-tab-super8 { background: #222; color: white; border: 1px solid #444; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
@@ -245,6 +259,7 @@
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
+                <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
                 <li><a onclick="navegarPara('tela-superoito')">Super Oito</a></li>
                 <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
                 <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
@@ -252,7 +267,6 @@
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
                 <li><a onclick="navegarPara('tela-placar')">Marcar Placar</a></li>
                 <li><a onclick="navegarPara('tela-parceiros')">Nossos Parceiros</a></li>
-                <li><a onclick="navegarPara('tela-faq')">Dúvidas Frequentes</a></li>
                 <li><a onclick="fazerLogout()" style="color:red;">SAIR</a></li>
             </ul>
         </div>
@@ -263,6 +277,11 @@
     <div class="btn-refresh-float" onclick="atualizarPagina()" title="Atualizar Dados">🔄</div>
 
     <div id="tela-inicial">
+        <div class="weather-widget" id="weather-widget">
+            <i class="fas fa-sun"></i>
+            <span id="clima-temp">--°C</span>
+            <span id="clima-desc" style="font-weight:normal; font-size:0.9rem;">Carregando...</span>
+        </div>
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <button class="btn-main" onclick="navegarPara('tela-agendamento')">🔍 VERIFICAR HORÁRIOS</button>
@@ -276,12 +295,28 @@
             <span onclick="toggleChat()">✖</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena ou até mesmo te contar curiosidades incríveis sobre o Beach Tennis! Quer ouvir uma? 😊</div>
+            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena e no final das nossas conversas sempre te conto uma curiosidade incrível sobre o Beach Tennis! Como posso te ajudar hoje? 😊</div>
         </div>
         <div class="typing-indicator" id="typingIndicator">A Areninha está digitando...</div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Digite sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
             <button onclick="enviarMensagemChat()">➤</button>
+        </div>
+    </div>
+
+    <div id="tela-fidelidade" class="secao-conteudo">
+        <h2 class="section-title">Programa de Fidelidade ⭐</h2>
+        <div class="fidelidade-box">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
+            <p>Jogue conosco, acumule carimbos virtuais e ganhe prêmios!</p>
+            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
+            
+            <div class="stamp-grid" id="stampGrid">
+                </div>
+            
+            <div class="fidelidade-nota">
+                * Você ganha 1 carimbo automático no seu celular a cada reserva de quadra finalizada pelo site.
+            </div>
         </div>
     </div>
 
@@ -450,20 +485,63 @@
                 document.querySelector('.btn-refresh-float').style.display = 'flex';
                 document.querySelector('.wa-float').style.display = 'flex';
                 document.querySelector('.ig-float').style.display = 'flex';
-                document.querySelector('.chat-float-btn').style.display = 'flex'; // Exibe o botão do Chatbot
+                document.querySelector('.chat-float-btn').style.display = 'flex';
                 document.querySelector('footer').style.display = 'block';
                 atualizarRelogio();
                 
-                // INICIALIZA DATA AO CARREGAR PARA EVITAR OS 3 PONTINHOS
                 document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
                 carregarDadosDoDia();
             }
 
-            const telaSalva = localStorage.getItem('ultimaTelaArena');
-            if (telaSalva && document.getElementById(telaSalva)) {
-                navegarPara(telaSalva);
-            } else {
-                navegarPara('tela-inicial');
+            // FORÇA O SITE A SEMPRE ABRIR NA TELA INICIAL
+            navegarPara('tela-inicial');
+            
+            // Inicia Clima e Fidelidade
+            carregarClima();
+            renderizarFidelidade();
+        }
+        
+        // --- FUNÇÃO DO CLIMA TEMPO REAL ---
+        async function carregarClima() {
+            try {
+                // wttr.in é uma API livre que não precisa de chave
+                const res = await fetch('https://wttr.in/Russas?format=j1');
+                const data = await res.json();
+                const temp = data.current_condition[0].temp_C;
+                const desc = data.current_condition[0].lang_pt ? data.current_condition[0].lang_pt[0].value : "Céu Limpo";
+                
+                document.getElementById('clima-temp').innerText = temp + '°C';
+                document.getElementById('clima-desc').innerText = desc;
+                document.getElementById('weather-widget').style.display = 'inline-flex';
+            } catch (error) {
+                console.log("Erro ao carregar clima", error);
+            }
+        }
+
+        // --- FUNÇÃO DE FIDELIDADE VIRTUAL ---
+        function renderizarFidelidade() {
+            const grid = document.getElementById('stampGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            // Recupera os pontos do cliente logado no celular dele
+            let pontosAtuais = parseInt(localStorage.getItem('pontosVitale')) || 0;
+            
+            for(let i = 1; i <= 10; i++) {
+                const box = document.createElement('div');
+                if(i <= pontosAtuais) {
+                    box.className = 'stamp-box stamped';
+                    box.innerHTML = '🎾'; // Carimbado
+                } else {
+                    box.className = 'stamp-box';
+                    box.innerHTML = i; // Vazio
+                }
+                grid.appendChild(box);
+            }
+            
+            if (pontosAtuais >= 10) {
+                alert("🎉 Parabéns! Você completou 10 jogos e ganhou 1 hora grátis! Apresente esta tela na recepção da Arena Vitale.");
+                // Opcional: localStorage.setItem('pontosVitale', 0); para resetar após ganhar
             }
         }
 
@@ -482,21 +560,16 @@
             const userMessage = inputField.value.trim();
             if (!userMessage) return;
 
-            // 1. Adicionar mensagem do usuário na tela
             adicionarMensagemUI('user', userMessage);
             inputField.value = '';
-
-            // 2. Mostrar indicador de digitando
             document.getElementById('typingIndicator').style.display = 'block';
 
             try {
-                // A personalidade vai embutida junto com a pergunta do usuário
-                // AGORA FOCADA APENAS EM CURIOSIDADES (SEM CHARADAS)
-                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Para engajar o usuário, sempre que fizer sentido na conversa (ou quando ele pedir), termine sua resposta contando uma curiosidade super interessante e rápida sobre o esporte Beach Tennis! Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
+                // A personalidade foca APENAS EM CURIOSIDADES SOBRE O ESPORTE
+                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Sempre que fizer sentido na conversa, ou no final das suas respostas, conte uma curiosidade muito interessante e rápida sobre a história do Beach Tennis, regras do esporte, raquetes ou sobre jogar na areia! Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
                 
                 const promptFinal = systemPrompt + "\n\nResponda à seguinte mensagem do cliente: " + userMessage;
 
-                // Usando o modelo super moderno e ativo (gemini-2.5-flash)
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -532,15 +605,12 @@
             const chatMessages = document.getElementById('chatMessages');
             const msgDiv = document.createElement('div');
             msgDiv.classList.add(tipo === 'user' ? 'msg-user' : 'msg-bot');
-            
-            // Aceita formatação básica de markdown do Gemini
             msgDiv.innerHTML = texto.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); 
-            
             chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Desce a barra de rolagem
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        // -----------------------------------------
 
+        // --- SISTEMA ORIGINAL ---
         function mostrarCadastro() { document.getElementById('box-login').style.display='none'; document.getElementById('box-cadastro').style.display='block'; }
         function mostrarLogin() { document.getElementById('box-cadastro').style.display='none'; document.getElementById('box-recuperar').style.display='none'; document.getElementById('box-login').style.display='block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display='none'; document.getElementById('box-recuperar').style.display='block'; }
@@ -549,42 +619,23 @@
             const phone = document.getElementById('loginPhone').value;
             const pass = document.getElementById('loginPass').value;
             const btn = document.getElementById('btnLogin');
-            
             if(!phone || !pass) return alert("Preencha todos os campos.");
-            
-            btn.innerText = "Verificando...";
-            btn.disabled = true;
-
+            btn.innerText = "Verificando..."; btn.disabled = true;
             fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ acao: "login", telefone: phone, senha: pass })
             })
-            .then(res => res.text()) // Agora ele lê o texto puro primeiro para não engasgar
-            .then(text => {
-                btn.innerText = "ENTRAR";
-                btn.disabled = false;
-                
+            .then(res => res.text()).then(text => {
+                btn.innerText = "ENTRAR"; btn.disabled = false;
                 try {
-                    const data = JSON.parse(text); // Tenta transformar em dados
-                    if (data.erro) {
-                        alert("❌ " + data.erro);
-                    } else if (data.sucesso) {
+                    const data = JSON.parse(text);
+                    if (data.erro) { alert("❌ " + data.erro); } else if (data.sucesso) {
                         usuarioLogado = { nome: data.nome, phone: data.telefone };
                         localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                         location.reload();
                     }
-                } catch(e) {
-                    // Se o Google não retornar JSON (ex: erro no código ou falta de permissão)
-                    console.log("Erro interno do Google:", text);
-                    alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "...");
-                }
-            })
-            .catch(e => {
-                btn.innerText = "ENTRAR";
-                btn.disabled = false;
-                alert("Erro de conexão. Verifique sua internet.");
-            });
+                } catch(e) { alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "..."); }
+            }).catch(e => { btn.innerText = "ENTRAR"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
         function realizarCadastro() {
@@ -592,42 +643,21 @@
             const phone = document.getElementById('cadPhone').value;
             const pass = document.getElementById('cadPass').value;
             const btn = document.getElementById('btnCadastrar');
-            
             if(!nome || !phone || !pass) { alert("Preencha todos os campos!"); return; }
             let cleanPhone = phone.replace(/\D/g, "");
             if (cleanPhone.length !== 11) { alert("⚠️ O telefone deve ter exatamente 11 dígitos."); return; }
-            
-            btn.innerText = "Cadastrando...";
-            btn.disabled = true;
-
+            btn.innerText = "Cadastrando..."; btn.disabled = true;
             fetch(SCRIPT_URL, { 
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ acao: "salvar_cliente", nome: nome, telefone: cleanPhone, senha: pass }) 
             })
-            .then(res => res.text())
-            .then(text => {
-                btn.innerText = "CADASTRAR";
-                btn.disabled = false;
-                
+            .then(res => res.text()).then(text => {
+                btn.innerText = "CADASTRAR"; btn.disabled = false;
                 try {
                     const data = JSON.parse(text);
-                    if (data.sucesso) { 
-                        alert("✅ Cadastro realizado! Agora você já pode fazer login."); 
-                        mostrarLogin(); 
-                    } else { 
-                        alert("Erro ao salvar: " + data.erro); 
-                    }
-                } catch(e) {
-                    console.log("Erro interno do Google:", text);
-                    alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "...");
-                }
-            })
-            .catch(e => { 
-                btn.innerText = "CADASTRAR"; 
-                btn.disabled = false;
-                alert("Erro de conexão com o sistema."); 
-            });
+                    if (data.sucesso) { alert("✅ Cadastro realizado!"); mostrarLogin(); } else { alert("Erro ao salvar: " + data.erro); }
+                } catch(e) { alert("⚠️ Erro no servidor."); }
+            }).catch(e => { btn.innerText = "CADASTRAR"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
         function navegarPara(idTela) {
@@ -637,14 +667,11 @@
             if (idTela === 'tela-inicial') { telaAlvo.style.display = 'flex'; } else { telaAlvo.style.display = 'block'; }
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
-            localStorage.setItem('ultimaTelaArena', idTela);
+            // Removido o salvamento da última tela, pois agora o site sempre abre na tela-inicial
             
-            // GARANTIR QUE A DATA/HORÁRIOS CARREGUEM NO AGENDAMENTO (CORREÇÃO DE BUG)
-            if(idTela === 'tela-agendamento') {
-                document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
-                carregarDadosDoDia();
-            }
+            if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
             if(idTela === 'tela-superoito') carregarInscritosSuper8();
+            if(idTela === 'tela-fidelidade') renderizarFidelidade(); // Garante que as bolinhas carreguem certinho
         }
 
         function atualizarPagina() {
@@ -673,8 +700,7 @@
             let total = 0;
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                if (hAtual >= 7 && hAtual <= 16) { total += 35; } 
-                else { total += (pagamento === 'cartao') ? 50 : 45; }
+                if (hAtual >= 7 && hAtual <= 16) { total += 35; } else { total += (pagamento === 'cartao') ? 50 : 45; }
             }
             return total;
         }
@@ -682,12 +708,8 @@
         function atualizarPrecoDisplay() {
             const h = parseInt(document.getElementById('selectHora').value);
             const pag = document.getElementById('selectPagamento').value;
-            if (!isNaN(h)) {
-                let total = calcularValorTotal(h, duracaoSelecionada, pag);
-                document.getElementById('priceDisplay').innerText = `Valor Total: R$ ${total.toFixed(2).replace('.', ',')}`;
-            } else {
-                document.getElementById('priceDisplay').innerText = `Valor: Selecione o horário acima`;
-            }
+            if (!isNaN(h)) { let total = calcularValorTotal(h, duracaoSelecionada, pag); document.getElementById('priceDisplay').innerText = `Valor Total: R$ ${total.toFixed(2).replace('.', ',')}`; } 
+            else { document.getElementById('priceDisplay').innerText = `Valor: Selecione o horário acima`; }
         }
 
         function mudarQuadra(id, btn) { quadraSelecionada = id; nomeQuadra = id === 1 ? "Quadra Chicashoes" : "Quadra Padaria do Helder"; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
@@ -698,10 +720,7 @@
             let hoje = new Date(); let diaHoje = hoje.getDay(); let diasAteDomingo = (7 - diaHoje) % 7; if (diaHoje === 0) diasAteDomingo = 0; 
             let dataLimiteDomingo = new Date(hoje); dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo); dataLimiteDomingo.setHours(23, 59, 59, 999);
             const novaDataTentativa = new Date(dataVisualizada); novaDataTentativa.setDate(novaDataTentativa.getDate() + delta); novaDataTentativa.setHours(12, 0, 0, 0);
-            
-            // BLOQUEIO PARA NÃO PERMITIR AVANÇAR DA SEMANA ATUAL
             if (novaDataTentativa > dataLimiteDomingo) { alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!"); return; }
-            
             hoje.setHours(0,0,0,0); const novaDataZerada = new Date(novaDataTentativa); novaDataZerada.setHours(0,0,0,0);
             if (novaDataZerada < hoje) return; dataVisualizada = novaDataTentativa; 
             document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
@@ -730,45 +749,27 @@
             } catch (error) { console.error(error); horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
-        // --- VERIFICAÇÃO RIGOROSA DE SOBREPOSIÇÃO DE HORÁRIOS E TEXTO DINÂMICO ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
             horas.forEach(h => {
                 let option = document.createElement('option'); let texto = `${h}:00 - Livre`; let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = "";
                 let blocosNecessarios = Math.ceil(duracaoSelecionada);
-                
                 for (let i = 0; i < blocosNecessarios; i++) {
                     let horaVerificada = h + i;
-                    
-                    if (horaVerificada > 22) { 
-                        estaOcupado = true;
-                        break;
-                    }
-                    
+                    if (horaVerificada > 22) { estaOcupado = true; break; }
                     let ocupacao = horariosOcupadosDoDia.find(item => item.hora === horaVerificada);
-                    if (ocupacao) { 
-                        estaOcupado = true; 
-                        if (i === 0) nomeNoHorario = ocupacao.nome; 
-                        break; 
-                    }
+                    if (ocupacao) { estaOcupado = true; if (i === 0) nomeNoHorario = ocupacao.nome; break; }
                 }
-                
                 if (estaOcupado) { 
-                    disabled = true;
-                    let displayTexto = "INDISPONÍVEL";
+                    disabled = true; let displayTexto = "INDISPONÍVEL";
                     if (nomeNoHorario) {
                         let nl = nomeNoHorario.toLowerCase().trim();
-                        if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado') {
-                            displayTexto = "INDISPONÍVEL";
-                        } else if (nl.includes("confirmado") || nl.includes("aguardando") || nl.includes("pendente")) {
-                            displayTexto = nomeNoHorario;
-                        } else {
-                            displayTexto = `${nomeNoHorario} (Aguardando Confirmação)`;
-                        }
+                        if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado') { displayTexto = "INDISPONÍVEL"; } 
+                        else if (nl.includes("confirmado") || nl.includes("aguardando") || nl.includes("pendente")) { displayTexto = nomeNoHorario; } 
+                        else { displayTexto = `${nomeNoHorario} (Aguardando Confirmação)`; }
                     }
                     texto = `${h}:00 - ⛔ ${displayTexto}`; 
                 }
-                
                 option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
             });
         }
@@ -791,6 +792,12 @@
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
             .then(res => res.text()) 
             .then(txt => {
+                
+                // --- PONTUAÇÃO DO CARTÃO FIDELIDADE ---
+                let ptsAtual = parseInt(localStorage.getItem('pontosVitale')) || 0;
+                if(ptsAtual < 10) { localStorage.setItem('pontosVitale', ptsAtual + 1); }
+                // --------------------------------------
+
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
@@ -810,40 +817,19 @@
         async function carregarInscritosSuper8() {
             const listas = ["lista-masc-iniciante", "lista-masc-d", "lista-fem-principiante", "lista-fem-iniciante", "lista-fem-d"];
             listas.forEach(id => document.getElementById(id).innerText = "Carregando...");
-
             try {
-                const res = await fetch(URL_SUPER8_CSV + '&t=' + Date.now());
-                const csv = await res.text();
+                const res = await fetch(URL_SUPER8_CSV + '&t=' + Date.now()); const csv = await res.text();
                 const rows = csv.split('\n').map(r => r.split(','));
-                
-                const dados = {
-                    'Masculino - Iniciante': [], 'Masculino D': [],
-                    'Feminino - Principiante': [], 'Feminino - Iniciante': [], 'Feminino D': []
-                };
-
-                rows.forEach((row, idx) => {
-                    if(idx === 0) return;
-                    let nome = row[0] ? row[0].trim() : "";
-                    let cat = row[1] ? row[1].trim() : "";
-                    if(nome && dados[cat]) dados[cat].push(nome);
-                });
-
+                const dados = { 'Masculino - Iniciante': [], 'Masculino D': [], 'Feminino - Principiante': [], 'Feminino - Iniciante': [], 'Feminino D': [] };
+                rows.forEach((row, idx) => { if(idx === 0) return; let nome = row[0] ? row[0].trim() : ""; let cat = row[1] ? row[1].trim() : ""; if(nome && dados[cat]) dados[cat].push(nome); });
                 atualizarInterfaceSuper8(dados);
             } catch (e) { console.error(e); }
         }
 
         function atualizarInterfaceSuper8(dados) {
-            const mapeamento = {
-                'Masculino - Iniciante': ['lista-masc-iniciante', 'vagas-masc-iniciante'],
-                'Masculino D': ['lista-masc-d', 'vagas-masc-d'],
-                'Feminino - Principiante': ['lista-fem-principiante', 'vagas-fem-principiante'],
-                'Feminino - Iniciante': ['lista-fem-iniciante', 'vagas-fem-iniciante'],
-                'Feminino D': ['lista-fem-d', 'vagas-fem-d']
-            };
-
+            const mapeamento = { 'Masculino - Iniciante': ['lista-masc-iniciante', 'vagas-masc-iniciante'], 'Masculino D': ['lista-masc-d', 'vagas-masc-d'], 'Feminino - Principiante': ['lista-fem-principiante', 'vagas-fem-principiante'], 'Feminino - Iniciante': ['lista-fem-iniciante', 'vagas-fem-iniciante'], 'Feminino D': ['lista-fem-d', 'vagas-fem-d'] };
             Object.keys(mapeamento).forEach(cat => {
-                const [idLista, idVagas] = mapeamento[cat];
-                const inscritos = dados[cat] || [];
+                const [idLista, idVagas] = mapeamento[cat]; const inscritos = dados[cat] || [];
                 document.getElementById(idLista).innerHTML = inscritos.length > 0 ? inscritos.map(n => `<div>${n}</div>`).join("") : "Nenhum inscrito.";
                 document.getElementById(idVagas).innerText = `${Math.max(0, 8 - inscritos.length)} VAGAS DISPONÍVEIS`;
             });
@@ -852,13 +838,8 @@
         function inscreverSuper8(categoria) {
             if(!usuarioLogado) return alert("Faça login primeiro.");
             if(!confirm(`Inscrever ${usuarioLogado.nome} na categoria ${categoria}?`)) return;
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "inscrever_super8", nome: usuarioLogado.nome, categoria: categoria })
-            }).then(() => {
-                window.open(`https://wa.me/5588988229008?text=Olá! Inscrição no Super Oito: ${categoria}. Nome: ${usuarioLogado.nome}`, '_blank');
-                carregarInscritosSuper8();
-            });
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "inscrever_super8", nome: usuarioLogado.nome, categoria: categoria }) })
+            .then(() => { window.open(`https://wa.me/5588988229008?text=Olá! Inscrição no Super Oito: ${categoria}. Nome: ${usuarioLogado.nome}`, '_blank'); carregarInscritosSuper8(); });
         }
 
         // --- MANUTENÇÃO PLACAR ---
