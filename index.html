@@ -79,7 +79,7 @@
         .hero-logo { max-width: 90%; width: 600px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
         
         /* WIDGET DO CLIMA */
-        .weather-widget { background: rgba(0, 0, 0, 0.7); border: 1px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); font-weight: bold; color: var(--primary); display: none;}
+        .weather-widget { background: rgba(0, 0, 0, 0.7); border: 1px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); font-weight: bold; color: var(--primary); }
         .weather-widget i { font-size: 1.2rem; }
 
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
@@ -278,9 +278,9 @@
 
     <div id="tela-inicial">
         <div class="weather-widget" id="weather-widget">
-            <i class="fas fa-sun"></i>
+            <i class="fas fa-sun" id="weather-icon"></i>
             <span id="clima-temp">--°C</span>
-            <span id="clima-desc" style="font-weight:normal; font-size:0.9rem;">Carregando...</span>
+            <span id="clima-desc" style="font-weight:normal; font-size:0.9rem;">Russas-CE</span>
         </div>
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
@@ -485,36 +485,47 @@
                 document.querySelector('.btn-refresh-float').style.display = 'flex';
                 document.querySelector('.wa-float').style.display = 'flex';
                 document.querySelector('.ig-float').style.display = 'flex';
-                document.querySelector('.chat-float-btn').style.display = 'flex';
+                document.querySelector('.chat-float-btn').style.display = 'flex'; 
                 document.querySelector('footer').style.display = 'block';
                 atualizarRelogio();
                 
                 document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
                 carregarDadosDoDia();
+                
+                carregarClima();
+                renderizarFidelidade();
+                
+                // SISTEMA DE RETORNO (SESSION STORAGE)
+                // Mantém na mesma aba se atualizar a página, mas volta ao inicio se fechar e abrir de novo.
+                const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
+                if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) {
+                    navegarPara(telaSalvaSessao);
+                } else {
+                    navegarPara('tela-inicial');
+                }
+            } else {
+                navegarPara('tela-inicial');
             }
-
-            // FORÇA O SITE A SEMPRE ABRIR NA TELA INICIAL
-            navegarPara('tela-inicial');
-            
-            // Inicia Clima e Fidelidade
-            carregarClima();
-            renderizarFidelidade();
         }
         
-        // --- FUNÇÃO DO CLIMA TEMPO REAL ---
+        // --- FUNÇÃO DO CLIMA TEMPO REAL (OPEN-METEO) ---
         async function carregarClima() {
             try {
-                // wttr.in é uma API livre que não precisa de chave
-                const res = await fetch('https://wttr.in/Russas?format=j1');
+                // Coordenadas exatas de Russas-CE
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-4.9383&longitude=-37.9761&current_weather=true');
                 const data = await res.json();
-                const temp = data.current_condition[0].temp_C;
-                const desc = data.current_condition[0].lang_pt ? data.current_condition[0].lang_pt[0].value : "Céu Limpo";
+                const temp = data.current_weather.temperature;
+                const isDay = data.current_weather.is_day;
                 
-                document.getElementById('clima-temp').innerText = temp + '°C';
-                document.getElementById('clima-desc').innerText = desc;
-                document.getElementById('weather-widget').style.display = 'inline-flex';
+                document.getElementById('clima-temp').innerText = Math.round(temp) + '°C';
+                
+                if(!isDay) {
+                    document.getElementById('weather-icon').className = 'fas fa-moon';
+                    document.getElementById('weather-icon').style.color = '#fff';
+                }
             } catch (error) {
                 console.log("Erro ao carregar clima", error);
+                document.getElementById('clima-temp').innerText = "28°C"; // Fallback caso dê erro
             }
         }
 
@@ -541,7 +552,6 @@
             
             if (pontosAtuais >= 10) {
                 alert("🎉 Parabéns! Você completou 10 jogos e ganhou 1 hora grátis! Apresente esta tela na recepção da Arena Vitale.");
-                // Opcional: localStorage.setItem('pontosVitale', 0); para resetar após ganhar
             }
         }
 
@@ -566,7 +576,7 @@
 
             try {
                 // A personalidade foca APENAS EM CURIOSIDADES SOBRE O ESPORTE
-                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Sempre que fizer sentido na conversa, ou no final das suas respostas, conte uma curiosidade muito interessante e rápida sobre a história do Beach Tennis, regras do esporte, raquetes ou sobre jogar na areia! Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
+                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Sempre que fizer sentido na conversa, ou no final das suas respostas, conte uma curiosidade muito interessante e rápida sobre a história do Beach Tennis, regras do esporte, raquetes ou sobre jogar na areia! Não faça charadas, apenas curiosidades. Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
                 
                 const promptFinal = systemPrompt + "\n\nResponda à seguinte mensagem do cliente: " + userMessage;
 
@@ -667,11 +677,13 @@
             if (idTela === 'tela-inicial') { telaAlvo.style.display = 'flex'; } else { telaAlvo.style.display = 'block'; }
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
-            // Removido o salvamento da última tela, pois agora o site sempre abre na tela-inicial
+            
+            // AGORA SALVA APENAS NA SESSÃO ATUAL (Reseta ao fechar aba)
+            sessionStorage.setItem('ultimaTelaArena', idTela);
             
             if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
             if(idTela === 'tela-superoito') carregarInscritosSuper8();
-            if(idTela === 'tela-fidelidade') renderizarFidelidade(); // Garante que as bolinhas carreguem certinho
+            if(idTela === 'tela-fidelidade') renderizarFidelidade();
         }
 
         function atualizarPagina() {
