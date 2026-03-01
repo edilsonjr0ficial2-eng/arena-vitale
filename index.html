@@ -388,6 +388,11 @@
     <a href="https://www.instagram.com/arenavitale/" class="ig-float" target="_blank" title="Siga no Instagram"><i class="fab fa-instagram"></i></a>
 
     <script>
+        // --- CONFIGURAÇÕES GERAIS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
+        const whatsappNumber = "5588988229008";
+
         // --- CHAVE DA API (TRUQUE ANTI-GITHUB) ---
         const parte1 = "AIzaSyBsgWwp9jjgjhp"; 
         const parte2 = "MyXtXskPNIcYCAEnneR0";
@@ -396,9 +401,11 @@
 
         // --- 1. LÓGICA DE AUTENTICAÇÃO ---
         let usuarioLogado = null; 
-        
-// --- RASTREADOR DE ACESSOS ---
-        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "registrar_acesso" }) });
+
+        // --- RASTREADOR DE ACESSOS ---
+        // Faz o "ping" silencioso ao abrir o site para registar a visita no painel de estatísticas
+        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
+
         window.onload = function() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -657,10 +664,6 @@
             setTimeout(() => location.reload(), 300);
         }
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-        const whatsappNumber = "5588988229008";
-        
         let duracaoSelecionada = 1; let quadraSelecionada = 1; let nomeQuadra = "Quadra Chicashoes";
         let horariosOcupadosDoDia = []; let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
