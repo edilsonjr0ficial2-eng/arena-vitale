@@ -119,6 +119,8 @@
         .stamp-box.stamped { background: var(--primary); border-color: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); transform: scale(1.1); animation: popIn 0.4s ease; }
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
         .fidelidade-nota { margin-top: 25px; font-size: 0.85rem; color: #888; border-top: 1px solid #333; padding-top: 15px;}
+        .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
+        .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
 
         /* Flutuantes */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
@@ -282,11 +284,11 @@
             <span onclick="toggleChat()">✖</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena e no final das nossas conversas sempre te conto uma curiosidade incrível sobre o Beach Tennis! Como posso te ajudar hoje? 😊</div>
+            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena e no final das nossas conversas sempre te conto uma curiosidade incrível sobre o Beach Tennis! Como posso ajudar hoje? 😊</div>
         </div>
-        <div class="typing-indicator" id="typingIndicator">A Areninha está digitando...</div>
+        <div class="typing-indicator" id="typingIndicator">A Areninha está a digitar...</div>
         <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Digite sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
+            <input type="text" id="chatInput" placeholder="Escreva a sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
             <button onclick="enviarMensagemChat()">➤</button>
         </div>
     </div>
@@ -295,14 +297,16 @@
         <h2 class="section-title">Programa de Fidelidade ⭐</h2>
         <div class="fidelidade-box">
             <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
-            <p>Jogue conosco, acumule carimbos virtuais e ganhe prêmios!</p>
-            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
+            <p>Jogue connosco, acumule carimbos e ganhe prémios!</p>
+            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">um coco 🥥</span>!</strong>
             
             <div class="stamp-grid" id="stampGrid">
                 </div>
             
+            <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🌴 Resgatar Meu Coco</button>
+
             <div class="fidelidade-nota">
-                * Você ganha 1 carimbo automático no seu celular a cada reserva de quadra finalizada pelo site.
+                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar o seu coco.
             </div>
         </div>
     </div>
@@ -317,7 +321,7 @@
             </div>
             <div class="day-navigation">
                 <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
-                <div class="current-date-display" id="dateDisplay">Carregando...</div>
+                <div class="current-date-display" id="dateDisplay">A carregar...</div>
                 <button class="nav-btn" onclick="mudarDia(1)">❯</button>
             </div>
             <div class="duration-selector">
@@ -342,9 +346,9 @@
             </div>
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
-                <div id="loading" class="loading-msg">Carregando disponibilidade...</div>
+                <div id="loading" class="loading-msg">A carregar disponibilidade...</div>
                 <select id="selectHora" class="time-select" onchange="liberarBotao()">
-                    <option value="">Aguarde, carregando agenda...</option>
+                    <option value="">Aguarde, a carregar agenda...</option>
                 </select>
                 <div id="priceDisplay" class="price-display" style="margin-top: 15px;">Valor: Selecione o horário</div>
                 <button id="btnAgendar" class="btn-agendar-final" onclick="prepararAgendamento()">✅ CONFIRMAR HORÁRIO</button>
@@ -361,7 +365,7 @@
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
                 • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>. (Ex: Se marcou 2h no cartão e cancelou com menos de 3 horas, o valor a ser pago será de R$ 50,00. A mesma lógica aplica-se caso o pagamento selecionado tenha sido espécie/pix).<br><br>
-                • <strong>O usuário que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
+                • <strong>O utilizador que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
                 • O não comparecimento sem aviso prévio resultará em <strong>bloqueio para novos agendamentos</strong>.
             </div>
             <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos e valores.</label></div>
@@ -371,11 +375,11 @@
 
     <div id="tela-modalidades" class="secao-conteudo"><h2 class="section-title">Nossas Modalidades</h2><div class="grid-cards"><div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada.</p></div><div class="card"><h3>🏐 Vôlei de Praia</h3><p>Espaço perfeito para o set disputado.</p></div><div class="card"><h3>⚽ Futevôlei</h3><p>Treine com amigos.</p></div></div></div>
     <div id="tela-arena" class="secao-conteudo"><h2 class="section-title">Conheça Nossa Arena</h2><div class="gallery-grid"><img src="fachada.jpeg" alt="Arena Vitale" class="gallery-item"><img src="quadra2.jpeg" alt="Quadra de Beach Tennis" class="gallery-item"><img src="geral2.jpeg" alt="Lounge" class="gallery-item"><img src="foto4.jpg" alt="Iluminação Noturna" class="gallery-item"></div></div>
-    <div id="tela-areia" class="secao-conteudo"><h2 class="section-title">Nossa Areia</h2><div style="max-width: 800px; margin: auto; background: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: left; line-height: 1.6;"><img src="quadra2.jpeg" alt="Areia de Alta Qualidade" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 25px; filter: brightness(0.8);"><p>A quadra de Beach Tennis utiliza areia de alta qualidade, cuidadosamente selecionada para garantir segurança, conforto e melhor desempenho esportivo.</p><br><p>Com granulometria ideal, essa areia proporciona o equilíbrio perfeito entre estabilidade do solo e absorção de impacto, favorecendo movimentos rápidos, precisos e seguros.</p><br><p style="text-align: center; font-weight: bold; color: var(--primary); font-size: 1.2rem; margin-top: 10px;">Aproveite o jogo com mais qualidade! 🎾</p></div></div>
+    <div id="tela-areia" class="secao-conteudo"><h2 class="section-title">Nossa Areia</h2><div style="max-width: 800px; margin: auto; background: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: left; line-height: 1.6;"><img src="quadra2.jpeg" alt="Areia de Alta Qualidade" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 25px; filter: brightness(0.8);"><p>A quadra de Beach Tennis utiliza areia de alta qualidade, cuidadosamente selecionada para garantir segurança, conforto e melhor desempenho desportivo.</p><br><p>Com granulometria ideal, essa areia proporciona o equilíbrio perfeito entre estabilidade do solo e absorção de impacto, favorecendo movimentos rápidos, precisos e seguros.</p><br><p style="text-align: center; font-weight: bold; color: var(--primary); font-size: 1.2rem; margin-top: 10px;">Aproveite o jogo com mais qualidade! 🎾</p></div></div>
     <div id="tela-local" class="secao-conteudo"><h2 class="section-title">Onde Estamos</h2><p style="font-size: 1.1rem; margin-bottom: 20px;">Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p><div class="map-responsive"><iframe src="https://maps.google.com/maps?q=Arena%20Vitale%20Russas%20Ceara&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="450" style="border:0; border-radius: 15px;" allowfullscreen="" loading="lazy"></iframe></div><br><br><a href="https://www.google.com/maps/search/?api=1&query=Arena+Vitale+Russas" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a></div>
     <div id="tela-placar" class="secao-conteudo"><h2 class="section-title">Marcar Placar ⚡</h2><div class="scoreboard-container"><div class="mode-switch"><button class="btn-duration active" onclick="mudarModo('beach')" id="btnBeach">Beach Tennis</button><button class="btn-duration" onclick="mudarModo('volei')" id="btnVolei">Vôlei / Fute</button></div><div class="score-box"><div class="team-score"><input type="text" value="Dupla A"><div class="points-display" id="scoreA" onclick="addPonto('A')">0</div><button class="btn-point" onclick="addPonto('A')">+</button><div class="games-display">Games: <span class="games-count" id="gameA">0</span></div></div><div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div><div class="team-score"><input type="text" value="Dupla B"><div class="points-display" id="scoreB" onclick="addPonto('B')">0</div><button class="btn-point" onclick="addPonto('B')">+</button><div class="games-display">Games: <span class="games-count" id="gameB">0</span></div></div></div><button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button></div><p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p></div>
     <div id="tela-parceiros" class="secao-conteudo"><h2 class="section-title">Nossos Parceiros</h2><div class="partners-container"><a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a><a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a><a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a><a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a></div></div>
-    <div id="tela-faq" class="secao-conteudo section-dark"><h2 class="section-title">Dúvidas Frequentes</h2><div style="max-width: 600px; margin: auto; text-align: left;"><details class="faq-item"><summary>Preciso levar minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details><details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details><details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details><details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details><details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017 e horários promocionais.</p></details></div></div>
+    <div id="tela-faq" class="secao-conteudo section-dark"><h2 class="section-title">Dúvidas Frequentes</h2><div style="max-width: 600px; margin: auto; text-align: left;"><details class="faq-item"><summary>Preciso de levar a minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details><details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details><details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details><details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details><details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017 e horários promocionais.</p></details></div></div>
 
     <footer id="footerPrincipal"><p>Desenvolvido por Edilson Renovato</p><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
     
@@ -396,10 +400,7 @@
         window.onload = function() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for (let registration of registrations) {
-                        registration.unregister();
-                        console.log('Service Worker antigo desinstalado.');
-                    }
+                    for (let registration of registrations) { registration.unregister(); }
                 });
             }
 
@@ -418,12 +419,12 @@
                 
                 document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
                 carregarDadosDoDia();
-                
                 carregarClima();
-                renderizarFidelidade();
+                
+                // Busca pontos reais na Base de Dados logo ao abrir o site
+                buscarPontosNoServidor(); 
                 
                 // SISTEMA DE RETORNO (SESSION STORAGE)
-                // Mantém na mesma aba se atualizar a página, mas volta ao inicio se fechar e abrir de novo.
                 const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
                 if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) {
                     navegarPara(telaSalvaSessao);
@@ -438,31 +439,41 @@
         // --- FUNÇÃO DO CLIMA TEMPO REAL (OPEN-METEO) ---
         async function carregarClima() {
             try {
-                // Coordenadas exatas de Russas-CE
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-4.9383&longitude=-37.9761&current_weather=true');
                 const data = await res.json();
                 const temp = data.current_weather.temperature;
                 const isDay = data.current_weather.is_day;
                 
                 document.getElementById('clima-temp').innerText = Math.round(temp) + '°C';
-                
                 if(!isDay) {
                     document.getElementById('weather-icon').className = 'fas fa-moon';
                     document.getElementById('weather-icon').style.color = '#fff';
                 }
-            } catch (error) {
-                console.log("Erro ao carregar clima", error);
-                document.getElementById('clima-temp').innerText = "28°C"; // Fallback caso dê erro
-            }
+            } catch (error) { document.getElementById('clima-temp').innerText = "28°C"; }
         }
 
-        // --- FUNÇÃO DE FIDELIDADE VIRTUAL ---
+        // --- SISTEMA DE FIDELIDADE (CONECTADO À FOLHA DE CÁLCULO) ---
+        function buscarPontosNoServidor() {
+            if(!usuarioLogado) return;
+            fetch(SCRIPT_URL, {
+                method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ acao: "buscar_pontos", telefone: usuarioLogado.phone })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.sucesso) {
+                    localStorage.setItem('pontosVitale', data.pontos);
+                    renderizarFidelidade();
+                }
+            }).catch(e => console.log("Erro ao buscar pontos: ", e));
+        }
+
         function renderizarFidelidade() {
             const grid = document.getElementById('stampGrid');
             if(!grid) return;
             grid.innerHTML = '';
             
-            // Recupera os pontos do cliente logado no celular dele
+            // Lê os pontos guardados localmente (atualizados pelo servidor)
             let pontosAtuais = parseInt(localStorage.getItem('pontosVitale')) || 0;
             
             for(let i = 1; i <= 10; i++) {
@@ -477,19 +488,52 @@
                 grid.appendChild(box);
             }
             
+            // Exibe o botão de resgate se chegar a 10
             if (pontosAtuais >= 10) {
-                alert("🎉 Parabéns! Você completou 10 jogos e ganhou 1 hora grátis! Apresente esta tela na recepção da Arena Vitale.");
+                document.getElementById('btnResgatar').style.display = 'block';
+            } else {
+                if(document.getElementById('btnResgatar')) document.getElementById('btnResgatar').style.display = 'none';
+            }
+        }
+
+        function resgatarPremio() {
+            let senhaAdmin = prompt("⚠️ APENAS PARA FUNCIONÁRIOS DA RECEÇÃO ⚠️\n\nDigite a palavra-passe para libertar o Coco:");
+            
+            if (senhaAdmin === "1234") { 
+                const btn = document.getElementById('btnResgatar');
+                btn.innerText = "A processar...";
+                btn.disabled = true;
+
+                // Tira os 10 pontos da folha de cálculo
+                fetch(SCRIPT_URL, {
+                    method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ acao: "resgatar_pontos", telefone: usuarioLogado.phone })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerText = "🌴 Resgatar Meu Coco";
+                    btn.disabled = false;
+                    
+                    if(data.sucesso) {
+                        alert("🥥 Resgate confirmado na Base de Dados! Pode entregar o coco geladinho ao cliente.");
+                        buscarPontosNoServidor(); // Atualiza a tela automaticamente para 0
+                    } else {
+                        alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes.");
+                    }
+                }).catch(e => {
+                    btn.innerText = "🌴 Resgatar Meu Coco"; btn.disabled = false;
+                    alert("Erro de ligação com a Base de Dados.");
+                });
+                
+            } else if (senhaAdmin !== null && senhaAdmin !== "") {
+                alert("❌ Palavra-passe incorreta! O resgate não foi realizado.");
             }
         }
 
         // --- FUNÇÕES DO CHATBOT ---
         function toggleChat() {
             const chatWindow = document.getElementById('chatbotWindow');
-            if (chatWindow.style.display === 'flex') {
-                chatWindow.style.display = 'none';
-            } else {
-                chatWindow.style.display = 'flex';
-            }
+            if (chatWindow.style.display === 'flex') { chatWindow.style.display = 'none'; } else { chatWindow.style.display = 'flex'; }
         }
 
         async function enviarMensagemChat() {
@@ -502,24 +546,19 @@
             document.getElementById('typingIndicator').style.display = 'block';
 
             try {
-                // A personalidade foca APENAS EM CURIOSIDADES SOBRE O ESPORTE
                 const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Sempre que fizer sentido na conversa, ou no final das suas respostas, conte uma curiosidade muito interessante e rápida sobre a história do Beach Tennis, regras do esporte, raquetes ou sobre jogar na areia! Não faça charadas, apenas curiosidades. Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
-                
                 const promptFinal = systemPrompt + "\n\nResponda à seguinte mensagem do cliente: " + userMessage;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptFinal }] }]
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: promptFinal }] }] })
                 });
 
                 const data = await response.json();
                 document.getElementById('typingIndicator').style.display = 'none';
 
                 if (data.error) {
-                    console.error("Erro da API:", data.error.message);
                     adicionarMensagemUI('bot', "⚠️ Ocorreu um erro na conexão com o Google: " + data.error.message);
                     return;
                 }
@@ -528,13 +567,12 @@
                     const aiResponse = data.candidates[0].content.parts[0].text;
                     adicionarMensagemUI('bot', aiResponse);
                 } else {
-                    adicionarMensagemUI('bot', "Poxa, me deu um branco agora. Pode repetir a pergunta? 😕");
+                    adicionarMensagemUI('bot', "Poxa, deu-me uma branca agora. Pode repetir a pergunta? 😕");
                 }
 
             } catch (error) {
-                console.error("Erro no Chatbot:", error);
                 document.getElementById('typingIndicator').style.display = 'none';
-                adicionarMensagemUI('bot', "Estou sem internet para pensar agora. Por favor, chame a gente no WhatsApp!");
+                adicionarMensagemUI('bot', "Estou sem internet para pensar agora. Por favor, chame-nos no WhatsApp!");
             }
         }
 
@@ -571,7 +609,7 @@
                         localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                         location.reload();
                     }
-                } catch(e) { alert("⚠️ Erro no servidor: " + text.substring(0, 100) + "..."); }
+                } catch(e) { alert("⚠️ Erro no servidor."); }
             }).catch(e => { btn.innerText = "ENTRAR"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
@@ -605,11 +643,10 @@
             document.getElementById('navLinks').classList.remove('active');
             window.scrollTo(0, 0);
             
-            // AGORA SALVA APENAS NA SESSÃO ATUAL (Reseta ao fechar aba)
             sessionStorage.setItem('ultimaTelaArena', idTela);
             
             if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
-            if(idTela === 'tela-fidelidade') renderizarFidelidade();
+            if(idTela === 'tela-fidelidade') buscarPontosNoServidor(); // Atualiza sempre que abrir a aba
         }
 
         function atualizarPagina() {
@@ -668,7 +705,7 @@
 
         async function carregarDadosDoDia() {
             const loading = document.getElementById('loading'); const select = document.getElementById('selectHora');
-            loading.style.display = 'block'; select.innerHTML = '<option value="">Carregando...</option>';
+            loading.style.display = 'block'; select.innerHTML = '<option value="">A carregar...</option>';
             document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
             try {
                 const response = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const data = await response.text();
@@ -683,7 +720,7 @@
                     }
                 });
                 atualizarMenuHorarios();
-            } catch (error) { console.error(error); horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
+            } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
         function atualizarMenuHorarios() {
@@ -703,7 +740,7 @@
                         let nl = nomeNoHorario.toLowerCase().trim();
                         if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado') { displayTexto = "INDISPONÍVEL"; } 
                         else if (nl.includes("confirmado") || nl.includes("aguardando") || nl.includes("pendente")) { displayTexto = nomeNoHorario; } 
-                        else { displayTexto = `${nomeNoHorario} (Aguardando Confirmação)`; }
+                        else { displayTexto = `${nomeNoHorario} (Aguardar Confirmação)`; }
                     }
                     texto = `${h}:00 - ⛔ ${displayTexto}`; 
                 }
@@ -725,22 +762,20 @@
 
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
-            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
+            const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
             .then(res => res.text()) 
             .then(txt => {
                 
-                // --- PONTUAÇÃO DO CARTÃO FIDELIDADE ---
-                let ptsAtual = parseInt(localStorage.getItem('pontosVitale')) || 0;
-                if(ptsAtual < 10) { localStorage.setItem('pontosVitale', ptsAtual + 1); }
-                // --------------------------------------
+                // Manda comando silencioso para o Servidor dar +1 ponto ao cliente
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
                 window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             })
-            .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
+            .catch(e => { alert("Erro de ligação."); btn.disabled = false; });
         }
 
         // --- MANUTENÇÃO PLACAR ---
