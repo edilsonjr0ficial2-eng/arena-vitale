@@ -330,12 +330,16 @@
             return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
         }
 
-        // --- FETCH ESTATÍSTICAS ---
+        // --- FETCH ESTATÍSTICAS (CORRIGIDO) ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex';
             document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
             
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) })
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ acao: "buscar_estatisticas" }) 
+            })
             .then(r => r.json())
             .then(data => {
                 if(data.sucesso) {
@@ -347,13 +351,14 @@
 
                     let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
 
+                    // Correção: Alterado de s.receitaTotal para s.recTotal, que é o valor que o Google envia.
                     let html = `
                         <div class="dash-grid">
                             <div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div>
                             <div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div>
                             <div class="dash-card" style="grid-column: 1 / -1;">
                                 <h4>Faturação Bruta (Semana Atual)</h4>
-                                <div class="value">R$ ${s.receitaTotal.toFixed(2).replace('.',',')}</div>
+                                <div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div>
                                 <div style="display:flex; justify-content: space-around; margin-top:10px;">
                                     <div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div>
                                     <div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div>
@@ -369,7 +374,8 @@
                 }
             })
             .catch(e => {
-                document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>';
+                console.error(e);
+                document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google. Certifique-se de que publicou a "Nova Versão" no Apps Script.</p>';
             });
         }
 
