@@ -396,7 +396,9 @@
 
         // --- 1. LÓGICA DE AUTENTICAÇÃO ---
         let usuarioLogado = null; 
-
+        
+// --- RASTREADOR DE ACESSOS ---
+        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "registrar_acesso" }) });
         window.onload = function() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
