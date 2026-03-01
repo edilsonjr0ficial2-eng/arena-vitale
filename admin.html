@@ -57,12 +57,19 @@
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
 
+        /* WIDGET ESTATÍSTICAS */
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .dash-card { background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--primary); }
+        .dash-card h4 { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
+        .dash-card .value { font-size: 1.8rem; font-weight: 900; color: white; }
+        .dash-card .sub { font-size: 0.85rem; color: var(--success); margin-top: 8px; }
+        .dash-card .sub.pending { color: var(--pending); }
+
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
         button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
 
-        /* TOAST DE NOTIFICAÇÃO */
         #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 15px 25px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         #toastNotification.show { bottom: 20px; }
 
@@ -93,6 +100,7 @@
         </div>
         
         <div class="toolbar">
+            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
@@ -107,7 +115,7 @@
 
     <div class="stats-bar">
         <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
-        <div class="stat-item">Faturamento do Dia (Agenda): <span id="statFaturamento">R$ 0,00</span></div>
+        <div class="stat-item">Faturação do Dia (Agenda): <span id="statFaturamento">R$ 0,00</span></div>
     </div>
 
     <div class="controls">
@@ -115,12 +123,25 @@
         <div class="date-display" id="dateDisplay">...</div>
         <button class="nav-btn" onclick="mudarDia(1)">❯</button>
         <button class="nav-btn" id="btnRecarregar" onclick="carregarAgenda()" style="margin-left:10px;">↻</button>
-        <span id="autoRefreshStatus" style="font-size: 0.8rem; color: var(--success); margin-left: 10px;">Monitorizando...</span>
+        <span id="autoRefreshStatus" style="font-size: 0.8rem; color: var(--success); margin-left: 10px;">A monitorizar...</span>
     </div>
 
     <div class="grid-container">
         <div class="column"><div class="col-header">🎾 Quadra Chicashoes</div><div id="listaQ1"></div></div>
         <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
+    </div>
+
+    <div id="modalEstatisticas" class="modal-bg">
+        <div class="modal-box" style="max-width: 600px; width: 95%;">
+            <h3 style="color:var(--primary); font-size: 1.8rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
+            <p style="color: #aaa; font-size: 0.9rem;">Dados atualizados em tempo real.</p>
+            
+            <div id="statsContent">
+                <p style="color: var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>
+            </div>
+            
+            <button class="close-btn" style="margin-top: 25px;" onclick="document.getElementById('modalEstatisticas').style.display='none'">Fechar Painel</button>
+        </div>
     </div>
 
     <div id="modalManual" class="modal-bg">
@@ -149,10 +170,9 @@
 
     <div id="modalGerenciarBlacklist" class="modal-bg">
         <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--danger)">Gerenciar Lista Negra</h3>
-            <div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">Carregando dados...</div>
-            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                </div>
+            <h3 style="color:var(--danger)">Gerir Lista Negra</h3>
+            <div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar dados...</div>
+            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div>
             <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
         </div>
     </div>
@@ -191,20 +211,15 @@
         let tempAgendamento = {};
         let faturamentoDia = 0; 
         
-        // --- VARIAVEIS DE NOTIFICAÇÃO ---
         let totalPendentesConhecidos = 0;
-        const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg'); // Som de bipe curto
+        const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 aplicarTemaSalvo();
                 carregarAgenda();
-                
-                // INICIA O MONITORAMENTO AUTOMÁTICO A CADA 60 SEGUNDOS
-                setInterval(() => {
-                    carregarAgenda(true); // true indica que foi atualização automática silenciosa
-                }, 60000); 
+                setInterval(() => { carregarAgenda(true); }, 60000); 
             }
         };
 
@@ -214,8 +229,6 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 aplicarTemaSalvo();
                 carregarAgenda();
-                
-                // INICIA O MONITORAMENTO APÓS O LOGIN
                 setInterval(() => { carregarAgenda(true); }, 60000); 
             } else alert("Senha incorreta!");
         }
@@ -225,8 +238,8 @@
         function aplicarTemaSalvo() { if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode'); }
         function mudarDia(delta) { 
             dataAtual.setDate(dataAtual.getDate() + delta); 
-            totalPendentesConhecidos = 0; // Reseta a contagem ao mudar de dia para não apitar atoa
-            document.title = "Painel Admin | Arena Vitale"; // Limpa o título
+            totalPendentesConhecidos = 0; 
+            document.title = "Painel Admin | Arena Vitale";
             carregarAgenda(); 
         }
         
@@ -237,28 +250,22 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
-        // --- AGENDA E NOTIFICAÇÕES ---
         async function carregarAgenda(isAuto = false) {
             const info = formatarData(dataAtual);
             document.getElementById('dateDisplay').innerText = info.texto;
             document.getElementById('printDate').innerText = info.texto;
-            
             if(!isAuto) document.getElementById('btnRecarregar').innerText = "↻";
 
             try { 
                 const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); 
                 const csv = await r.text(); 
                 processarCSV(csv, info.index); 
-            } catch (e) { 
-                console.error(e); 
-            }
+            } catch (e) { console.error(e); }
         }
 
         function processarCSV(csv, diaIndex) {
             const rows = csv.split('\n').map(r => r.split(',')); 
-            dadosAgenda = []; 
-            let ocupados = 0;
-            let pendentesAtuais = 0; // Contador desta leitura
+            dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0;
 
             rows.forEach((row, idx) => {
                 if(idx === 0) return; let h = parseInt(row[0]);
@@ -267,51 +274,35 @@
                     let nomeQ1 = row[colQ1] ? row[colQ1].replace(/[\r\n"]/g, '').trim() : "";
                     let nomeQ2 = row[colQ2] ? row[colQ2].replace(/[\r\n"]/g, '').trim() : "";
                     
-                    if(nomeQ1) ocupados++; 
-                    if(nomeQ2) ocupados++;
-                    
+                    if(nomeQ1) ocupados++; if(nomeQ2) ocupados++;
                     if(nomeQ1.includes("⏳")) pendentesAtuais++;
                     if(nomeQ2.includes("⏳")) pendentesAtuais++;
-
                     dadosAgenda.push({ hora: h, q1: nomeQ1, q2: nomeQ2 });
                 }
             });
             
-            let total = horas.length * 2; 
-            let porc = Math.round((ocupados / total) * 100);
+            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100);
             faturamentoDia = ocupados * 45; 
             document.getElementById('statOcupacao').innerText = porc + "%";
             document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ',');
-            
             renderizarGrid();
 
-            // --- LÓGICA DE ALERTA DE NOVA SOLICITAÇÃO ---
             if (pendentesAtuais > totalPendentesConhecidos) {
-                let novos = pendentesAtuais - totalPendentesConhecidos;
-                dispararNotificacao(novos);
+                dispararNotificacao(pendentesAtuais - totalPendentesConhecidos);
             }
-            
-            // Se os pendentes foram resolvidos, limpa o título do navegador
-            if (pendentesAtuais === 0) {
-                document.title = "Painel Admin | Arena Vitale";
-            }
-            
-            totalPendentesConhecidos = pendentesAtuais; // Atualiza a "memória"
+            if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale";
+            totalPendentesConhecidos = pendentesAtuais; 
         }
 
-        // Toca o som, muda o título da aba e exibe o Toast verde
         function dispararNotificacao(qtdNovos) {
             alertaSom.play().catch(e => console.log("O navegador bloqueou o áudio automático."));
             document.title = `(${qtdNovos}) Nova Solicitação! - Admin`;
             document.getElementById('toastNotification').classList.add('show');
-            
-            // Oculta o toast sozinho após 8 segundos
             setTimeout(fecharToast, 8000);
         }
-
         function fecharToast() {
             document.getElementById('toastNotification').classList.remove('show');
-            document.title = "Painel Admin | Arena Vitale"; // Limpa o título da aba ao clicar
+            document.title = "Painel Admin | Arena Vitale"; 
         }
         
         function renderizarGrid() {
@@ -339,15 +330,56 @@
             return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
         }
 
+        // --- FETCH ESTATÍSTICAS ---
+        function abrirEstatisticas() {
+            document.getElementById('modalEstatisticas').style.display = 'flex';
+            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
+            
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) })
+            .then(r => r.json())
+            .then(data => {
+                if(data.sucesso) {
+                    let s = data.stats;
+                    
+                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]}));
+                    arrayHoras.sort((a,b) => b.qtd - a.qtd);
+                    let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join(' &nbsp;|&nbsp; ');
+
+                    let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
+
+                    let html = `
+                        <div class="dash-grid">
+                            <div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div>
+                            <div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div>
+                            <div class="dash-card" style="grid-column: 1 / -1;">
+                                <h4>Faturação Bruta (Semana Atual)</h4>
+                                <div class="value">R$ ${s.receitaTotal.toFixed(2).replace('.',',')}</div>
+                                <div style="display:flex; justify-content: space-around; margin-top:10px;">
+                                    <div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div>
+                                    <div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div>
+                                </div>
+                            </div>
+                            <div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div>
+                            <div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados de agendamento"}</div></div>
+                        </div>
+                    `;
+                    document.getElementById('statsContent').innerHTML = html;
+                } else {
+                    document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>';
+                }
+            })
+            .catch(e => {
+                document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>';
+            });
+        }
+
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
-        
         function adicionarBloqueio() {
             const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value;
-            if(!n) return alert("Nome?");
+            if(!n) return alert("Indique um nome.");
             if(confirm(`Bloquear ${n}?`)) { enviarFetch({ acao: "bloquear", nome: n, telefone: t }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; }
         }
 
-        // --- GERENCIAR LISTA NEGRA (VER E REMOVER) ---
         function abrirGerenciarBlacklist() {
             document.getElementById('modalGerenciarBlacklist').style.display = 'flex';
             document.getElementById('loadingBlacklist').style.display = 'block';
@@ -356,58 +388,36 @@
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) })
             .then(r => r.json())
             .then(data => {
-                document.getElementById('loadingBlacklist').style.display = 'none';
-                let html = "";
-                
+                document.getElementById('loadingBlacklist').style.display = 'none'; let html = "";
                 if(data.lista && data.lista.length > 0) {
                     let isHeader = true;
                     data.lista.forEach((r, idx) => {
-                        // Ignora o cabeçalho se existir
                         if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return;
-                        
-                        let nome = r[0];
-                        let tel = r[1] || "Sem telefone";
-                        html += `
-                            <div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;">
-                                <span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span>
-                                <button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')" title="Remover da lista negra">🗑️</button>
-                            </div>
-                        `;
+                        let nome = r[0]; let tel = r[1] || "Sem telefone";
+                        html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')" title="Remover da lista negra">🗑️</button></div>`;
                     });
                 }
-                
                 if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>";
                 document.getElementById('listaBlacklistConteudo').innerHTML = html;
-            })
-            .catch(e => {
-                document.getElementById('loadingBlacklist').style.display = 'none';
-                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>";
-            });
+            }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
         }
 
         function removerDaBlacklist(nome) {
             if(confirm(`Tem certeza que deseja remover "${nome}" da Lista Negra?`)) {
                 document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>A remover...</p>";
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ acao: "remover_blacklist", nome: nome })
-                })
-                .then(() => abrirGerenciarBlacklist()) // Recarrega a lista após remover
-                .catch(() => { alert("Erro ao tentar remover."); abrirGerenciarBlacklist(); });
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) })
+                .then(() => abrirGerenciarBlacklist()).catch(() => { alert("Erro ao tentar remover."); abrirGerenciarBlacklist(); });
             }
         }
 
-        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).catch(e => alert("Erro ao enviar dados para a planilha.")); }
-
-        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, confirmando o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
-        
+        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).catch(e => alert("Erro ao enviar os dados para a folha de cálculo.")); }
+        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
         
         function confirmarAgendamento(h, q, n) { 
-            if(confirm(`Confirmar agendamento de ${n}?`)) {
+            if(confirm(`Confirmar o agendamento de ${n}?`)) {
                 let nomeLimpo = n.replace("⏳", "").trim();
                 enviarComando("agendar", h, q, nomeLimpo + " (Confirmado)"); 
-                // Deduz dos pendentes conhecidos para não apitar outra vez ao recarregar a tela
                 if(totalPendentesConhecidos > 0) totalPendentesConhecidos--;
                 fecharToast();
             }
@@ -415,27 +425,23 @@
 
         function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Quadra ${q === 1 ? 'Chicashoes' : 'Padaria do Helder'}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
-        
         function salvarManual() {
             let n = document.getElementById('manualNome').value; if(!n) return alert("Indique o Nome.");
             if(document.getElementById('checkMensalista').checked) n += " (M)";
             enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n); fecharModal();
         }
-        
         function cancelar(h, q, n) { if(confirm(`Apagar o horário de ${n}?`)) enviarComando("cancelar", h, q, ""); }
-        
         function enviarComando(a, h, q, n) {
             let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
             if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : "");
             renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true });
         }
-        
         function copiarAgenda() {
             let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`;
             horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
             t += `\n*Quadra Padaria do Helder:*\n`;
             horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
-            navigator.clipboard.writeText(t).then(() => alert("Agenda copiada para a área de transferência!"));
+            navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
         }
         
         function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
@@ -445,7 +451,7 @@
         function gerarRelatorio(tipo) { 
             let win = window.open("", "_blank"); win.document.write("A carregar base de dados..."); 
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
-                let html = `<html><head><title>Relatório de Clientes</title><style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px; text-align:left;}</style></head><body><h1>Base de Dados: Clientes Arena Vitale</h1><table><tbody>`;
+                let html = `<html><head><title>Relatório</title><style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px;text-align:left;}</style></head><body><h1>Base de Dados de Clientes</h1><table><tbody>`;
                 data.lista.forEach(r => { html += `<tr><td>${r.join('</td><td>')}</td></tr>`; });
                 html += `</tbody></table></body></html>`;
                 win.document.body.innerHTML = html;
