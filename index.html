@@ -297,16 +297,16 @@
         <h2 class="section-title">Programa de Fidelidade ⭐</h2>
         <div class="fidelidade-box">
             <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
-            <p>Jogue connosco, acumule carimbos e ganhe prémios!</p>
-            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">um coco 🥥</span>!</strong>
+            <p>Jogue conosco, acumule carimbos virtuais e ganhe prêmios!</p>
+            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
             
             <div class="stamp-grid" id="stampGrid">
                 </div>
             
-            <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🌴 Resgatar Meu Coco</button>
+            <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar 1 Hora Grátis</button>
 
             <div class="fidelidade-nota">
-                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar o seu coco.
+                * Você ganha 1 carimbo automático no seu celular a cada reserva de quadra finalizada pelo site. Apresente esta tela na recepção para resgatar sua hora grátis.
             </div>
         </div>
     </div>
@@ -502,7 +502,7 @@
         }
 
         function resgatarPremio() {
-            let senhaAdmin = prompt("⚠️ APENAS PARA FUNCIONÁRIOS DA RECEÇÃO ⚠️\n\nDigite a palavra-passe para libertar o Coco:");
+            let senhaAdmin = prompt("⚠️ APENAS PARA FUNCIONÁRIOS DA RECEPÇÃO ⚠️\n\nDigite a senha para liberar 1 Hora Grátis:");
             
             if (senhaAdmin === "1234") { 
                 const btn = document.getElementById('btnResgatar');
@@ -515,22 +515,22 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    btn.innerText = "🌴 Resgatar Meu Coco";
+                    btn.innerText = "🎁 Resgatar 1 Hora Grátis";
                     btn.disabled = false;
                     
                     if(data.sucesso) {
-                        alert("🥥 Resgate confirmado na Base de Dados! Pode entregar o coco geladinho ao cliente.");
+                        alert("🎉 Resgate confirmado na Base de Dados! 1 Hora Grátis liberada para o cliente.");
                         buscarPontosNoServidor(); 
                     } else {
                         alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes.");
                     }
                 }).catch(e => {
-                    btn.innerText = "🌴 Resgatar Meu Coco"; btn.disabled = false;
+                    btn.innerText = "🎁 Resgatar 1 Hora Grátis"; btn.disabled = false;
                     alert("Erro de ligação com a Base de Dados.");
                 });
                 
             } else if (senhaAdmin !== null && senhaAdmin !== "") {
-                alert("❌ Palavra-passe incorreta! O resgate não foi realizado.");
+                alert("❌ Senha incorreta! O resgate não foi realizado.");
             }
         }
 
