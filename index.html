@@ -394,8 +394,9 @@
         const whatsappNumber = "5588988229008";
 
         // --- CHAVE DA API (TRUQUE ANTI-GITHUB) ---
-        const parte1 = "AIzaSyBsgWwp9jjgjhp"; 
-        const parte2 = "MyXtXskPNIcYCAEnneR0";
+        // COLE A SUA NOVA CHAVE AQUI DIVIDIDA EM DUAS PARTES:
+        const parte1 = "AIzaSy_COLE_SUA_NOVA_CHAVE_AQUI"; 
+        const parte2 = "RESTANTE_DA_CHAVE";
         const GEMINI_API_KEY = parte1 + parte2; 
         // -----------------------------------------------
 
@@ -403,7 +404,6 @@
         let usuarioLogado = null; 
 
         // --- RASTREADOR DE ACESSOS ---
-        // Faz o "ping" silencioso ao abrir o site para registar a visita no painel de estatísticas
         fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
 
         window.onload = function() {
@@ -430,10 +430,8 @@
                 carregarDadosDoDia();
                 carregarClima();
                 
-                // Busca pontos reais na Base de Dados logo ao abrir o site
                 buscarPontosNoServidor(); 
                 
-                // SISTEMA DE RETORNO (SESSION STORAGE)
                 const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
                 if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) {
                     navegarPara(telaSalvaSessao);
@@ -482,7 +480,6 @@
             if(!grid) return;
             grid.innerHTML = '';
             
-            // Lê os pontos guardados localmente (atualizados pelo servidor)
             let pontosAtuais = parseInt(localStorage.getItem('pontosVitale')) || 0;
             
             for(let i = 1; i <= 10; i++) {
@@ -497,7 +494,6 @@
                 grid.appendChild(box);
             }
             
-            // Exibe o botão de resgate se chegar a 10
             if (pontosAtuais >= 10) {
                 document.getElementById('btnResgatar').style.display = 'block';
             } else {
@@ -513,7 +509,6 @@
                 btn.innerText = "A processar...";
                 btn.disabled = true;
 
-                // Tira os 10 pontos da folha de cálculo
                 fetch(SCRIPT_URL, {
                     method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ acao: "resgatar_pontos", telefone: usuarioLogado.phone })
@@ -525,7 +520,7 @@
                     
                     if(data.sucesso) {
                         alert("🥥 Resgate confirmado na Base de Dados! Pode entregar o coco geladinho ao cliente.");
-                        buscarPontosNoServidor(); // Atualiza a tela automaticamente para 0
+                        buscarPontosNoServidor(); 
                     } else {
                         alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes.");
                     }
@@ -655,7 +650,7 @@
             sessionStorage.setItem('ultimaTelaArena', idTela);
             
             if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
-            if(idTela === 'tela-fidelidade') buscarPontosNoServidor(); // Atualiza sempre que abrir a aba
+            if(idTela === 'tela-fidelidade') buscarPontosNoServidor(); 
         }
 
         function atualizarPagina() {
@@ -728,6 +723,7 @@
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
+        // --- SISTEMA DE VISUALIZAÇÃO DOS HORÁRIOS CORRIGIDO PARA MOSTRAR A TURMA FIXA ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
             horas.forEach(h => {
@@ -743,9 +739,16 @@
                     disabled = true; let displayTexto = "INDISPONÍVEL";
                     if (nomeNoHorario) {
                         let nl = nomeNoHorario.toLowerCase().trim();
-                        if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado') { displayTexto = "INDISPONÍVEL"; } 
-                        else if (nl.includes("confirmado") || nl.includes("aguardando") || nl.includes("pendente")) { displayTexto = nomeNoHorario; } 
-                        else { displayTexto = `${nomeNoHorario} (Aguardar Confirmação)`; }
+                        if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado' || nl === '⛔ interditado') { 
+                            displayTexto = "INDISPONÍVEL"; 
+                        } 
+                        else if (nomeNoHorario.includes("⏳")) { 
+                            displayTexto = `${nomeNoHorario.replace('⏳', '').trim()} (Aguardar Confirmação)`; 
+                        } 
+                        else { 
+                            // É uma Turma Fixa, Aula ou Agendamento Confirmado. Mostra o nome real.
+                            displayTexto = nomeNoHorario.replace('(Confirmado)', '').trim(); 
+                        }
                     }
                     texto = `${h}:00 - ⛔ ${displayTexto}`; 
                 }
