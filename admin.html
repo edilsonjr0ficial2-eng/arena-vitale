@@ -20,6 +20,11 @@
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
         .tool-btn { padding: 8px 12px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
+        
+        /* Botão Destaque para Grade Fixa */
+        .btn-modo-fixo { background: transparent; border-color: var(--primary); color: var(--primary); }
+        .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        
         .btn-logout { background: var(--danger); border: none; color: white; }
 
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
@@ -39,6 +44,10 @@
         .slot-content.booked { color: var(--primary); font-weight: bold; }
         .slot-content.pending { color: var(--pending); font-style: italic; }
         
+        /* Estilo especial para quando estiver a editar a Grade Fixa */
+        .slot.slot-fixo { background: rgba(255, 215, 0, 0.05); }
+        .slot-content.fixo-booked { color: var(--primary); }
+
         .actions { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
@@ -57,7 +66,6 @@
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
 
-        /* WIDGET ESTATÍSTICAS */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .dash-card { background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--primary); }
         .dash-card h4 { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
@@ -100,6 +108,7 @@
         </div>
         
         <div class="toolbar">
+            <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
@@ -108,7 +117,6 @@
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
             <button class="tool-btn" onclick="abrirModalAddBloqueio()">➕ Add Bloqueio</button>
-            <button class="tool-btn" onclick="alternarModo()">🌗 Sol/Sombra</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
@@ -135,21 +143,19 @@
         <div class="modal-box" style="max-width: 600px; width: 95%;">
             <h3 style="color:var(--primary); font-size: 1.8rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
             <p style="color: #aaa; font-size: 0.9rem;">Dados atualizados em tempo real.</p>
-            
             <div id="statsContent">
                 <p style="color: var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>
             </div>
-            
             <button class="close-btn" style="margin-top: 25px;" onclick="document.getElementById('modalEstatisticas').style.display='none'">Fechar Painel</button>
         </div>
     </div>
 
     <div id="modalManual" class="modal-bg">
         <div class="modal-box">
-            <h3 style="color:var(--primary)">Novo Agendamento</h3>
+            <h3 style="color:var(--primary)" id="tituloModalAgenda">Novo Agendamento</h3>
             <p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
-            <input type="text" id="manualNome" placeholder="Nome do Jogador / Bloqueio">
-            <div class="checkbox-wrapper">
+            <input type="text" id="manualNome" placeholder="Nome do Jogador / Turma">
+            <div class="checkbox-wrapper" id="divMensalista">
                 <input type="checkbox" id="checkMensalista" style="width:auto;">
                 <label>Marcar como Mensalista (M)</label>
             </div>
@@ -213,13 +219,18 @@
         
         let totalPendentesConhecidos = 0;
         const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        
+        // --- VARIÁVEIS DA GRADE FIXA ---
+        let modoGradeFixa = false;
+        let cachedPadrao = []; // Guarda os dados do servidor para evitar chamadas contínuas
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
-                aplicarTemaSalvo();
                 carregarAgenda();
-                setInterval(() => { carregarAgenda(true); }, 60000); 
+                setInterval(() => { 
+                    if(!modoGradeFixa) carregarAgenda(true); 
+                }, 60000); 
             }
         };
 
@@ -227,20 +238,23 @@
             if(document.getElementById('passInput').value === SENHA_ADMIN) {
                 localStorage.setItem('adminAuth', SENHA_ADMIN);
                 document.getElementById('loginOverlay').style.display = 'none';
-                aplicarTemaSalvo();
                 carregarAgenda();
-                setInterval(() => { carregarAgenda(true); }, 60000); 
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             } else alert("Senha incorreta!");
         }
 
         function fazerLogout() { localStorage.removeItem('adminAuth'); location.reload(); }
-        function alternarModo() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
-        function aplicarTemaSalvo() { if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode'); }
+        
         function mudarDia(delta) { 
             dataAtual.setDate(dataAtual.getDate() + delta); 
             totalPendentesConhecidos = 0; 
             document.title = "Painel Admin | Arena Vitale";
-            carregarAgenda(); 
+            
+            if(modoGradeFixa) {
+                atualizarTelaGradeFixa(); 
+            } else {
+                carregarAgenda(); 
+            }
         }
         
         function formatarData(date) {
@@ -250,7 +264,103 @@
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
 
+        // ==========================================
+        // --- SISTEMA DE MODO GRADE FIXA (MOLDE) ---
+        // ==========================================
+        function alternarModoGradeFixa() {
+            modoGradeFixa = !modoGradeFixa;
+            const btn = document.getElementById('btnToggleModo');
+            
+            if(modoGradeFixa) {
+                btn.classList.add('ativo');
+                btn.innerText = "🔙 Voltar para Agenda Normal";
+                document.getElementById('autoRefreshStatus').innerText = "Modo de Edição Fixo";
+                document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
+                
+                document.getElementById('listaQ1').innerHTML = "A carregar molde do servidor...";
+                document.getElementById('listaQ2').innerHTML = "A carregar molde do servidor...";
+                
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.sucesso) {
+                        cachedPadrao = data.lista;
+                        atualizarTelaGradeFixa();
+                    } else {
+                        alert("Erro ao carregar Grade Fixa.");
+                        alternarModoGradeFixa(); // Falha e volta ao normal
+                    }
+                }).catch(e => { alert("Erro de comunicação."); alternarModoGradeFixa(); });
+                
+            } else {
+                btn.classList.remove('ativo');
+                btn.innerText = "📌 Grade Fixa (Molde)";
+                document.getElementById('autoRefreshStatus').innerText = "A monitorizar...";
+                document.getElementById('autoRefreshStatus').style.color = "var(--success)";
+                carregarAgenda(); 
+            }
+        }
+
+        function atualizarTelaGradeFixa() {
+            const info = formatarData(dataAtual);
+            document.getElementById('dateDisplay').innerHTML = `<span style='color:var(--primary)'>MOLDE FIXO: ${diasSemana[info.index]}</span>`;
+            document.getElementById('printDate').innerText = "MOLDE: " + diasSemana[info.index];
+            
+            dadosAgenda = [];
+            cachedPadrao.forEach((row, idx) => {
+                if(idx === 0) return; let h = parseInt(row[0]);
+                if(!isNaN(h)) {
+                    let colQ1 = 1 + info.index; let colQ2 = 9 + info.index;
+                    let nomeQ1 = row[colQ1] ? row[colQ1].toString().trim() : "";
+                    let nomeQ2 = row[colQ2] ? row[colQ2].toString().trim() : "";
+                    dadosAgenda.push({ hora: h, q1: nomeQ1, q2: nomeQ2 });
+                }
+            });
+            renderizarGridFixa();
+        }
+
+        function renderizarGridFixa() {
+            let hQ1 = ""; let hQ2 = "";
+            horas.forEach(h => {
+                let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" };
+                hQ1 += criarSlotFixoHTML(h, 1, slot.q1); hQ2 += criarSlotFixoHTML(h, 2, slot.q2);
+            });
+            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
+        }
+
+        function criarSlotFixoHTML(h, q, n) {
+            let ocupado = n.length > 0;
+            let botoes = ocupado ? 
+                `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${n}')" title="Remover da Grade Fixa">🗑️</button>` 
+                : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`;
+            
+            let classe = ocupado ? "fixo-booked" : "";
+            return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
+        }
+
+        function apagarFixo(h, q, n) {
+             if(confirm(`Remover "${n}" do Molde Permanente de ${diasSemana[formatarData(dataAtual).index]}?`)) {
+                let i = dadosAgenda.findIndex(d => d.hora === h);
+                if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; }
+                renderizarGridFixa();
+                
+                // Grava no servidor e atualiza o cache
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) 
+                }).then(() => {
+                    // Refetch the data quietly to keep cache synced
+                    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) })
+                    .then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; });
+                });
+             }
+        }
+
+        // ==========================================
+        // --- AGENDA NORMAL ---
+        // ==========================================
         async function carregarAgenda(isAuto = false) {
+            if(modoGradeFixa) return; // Segurança
             const info = formatarData(dataAtual);
             document.getElementById('dateDisplay').innerText = info.texto;
             document.getElementById('printDate').innerText = info.texto;
@@ -287,23 +397,18 @@
             document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ',');
             renderizarGrid();
 
-            if (pendentesAtuais > totalPendentesConhecidos) {
-                dispararNotificacao(pendentesAtuais - totalPendentesConhecidos);
-            }
+            if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos);
             if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale";
             totalPendentesConhecidos = pendentesAtuais; 
         }
 
         function dispararNotificacao(qtdNovos) {
-            alertaSom.play().catch(e => console.log("O navegador bloqueou o áudio automático."));
+            alertaSom.play().catch(e => console.log("O navegador bloqueou o áudio."));
             document.title = `(${qtdNovos}) Nova Solicitação! - Admin`;
             document.getElementById('toastNotification').classList.add('show');
             setTimeout(fecharToast, 8000);
         }
-        function fecharToast() {
-            document.getElementById('toastNotification').classList.remove('show');
-            document.title = "Painel Admin | Arena Vitale"; 
-        }
+        function fecharToast() { document.getElementById('toastNotification').classList.remove('show'); document.title = "Painel Admin | Arena Vitale"; }
         
         function renderizarGrid() {
             let hQ1 = ""; let hQ2 = "";
@@ -330,28 +435,20 @@
             return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
         }
 
-        // --- FETCH ESTATÍSTICAS (CORRIGIDO) ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex';
             document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
             
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ acao: "buscar_estatisticas" }) 
-            })
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_estatisticas" }) })
             .then(r => r.json())
             .then(data => {
                 if(data.sucesso) {
                     let s = data.stats;
-                    
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]}));
                     arrayHoras.sort((a,b) => b.qtd - a.qtd);
                     let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join(' &nbsp;|&nbsp; ');
-
                     let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
 
-                    // Correção: Alterado de s.receitaTotal para s.recTotal, que é o valor que o Google envia.
                     let html = `
                         <div class="dash-grid">
                             <div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div>
@@ -369,16 +466,83 @@
                         </div>
                     `;
                     document.getElementById('statsContent').innerHTML = html;
-                } else {
-                    document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>';
-                }
-            })
-            .catch(e => {
-                console.error(e);
-                document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google. Certifique-se de que publicou a "Nova Versão" no Apps Script.</p>';
-            });
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
+            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
         }
 
+        // --- SISTEMA MANUAL UNIFICADO (Serve para Normal e Molde) ---
+        function abrirManual(h, q) { 
+            tempAgendamento = { hora: h, quadra: q }; 
+            let ds = diasSemana[formatarData(dataAtual).index];
+            if(modoGradeFixa) {
+                document.getElementById('tituloModalAgenda').innerText = "Adicionar Horário Fixo";
+                document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`;
+                document.getElementById('divMensalista').style.display = 'none'; // No molde não precisa dizer (M)
+            } else {
+                document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento";
+                document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`;
+                document.getElementById('divMensalista').style.display = 'flex';
+                document.getElementById('checkMensalista').checked = false;
+            }
+            document.getElementById('manualNome').value = ""; 
+            document.getElementById('modalManual').style.display = 'flex'; 
+            document.getElementById('manualNome').focus(); 
+        }
+        
+        function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
+        
+        function salvarManual() {
+            let n = document.getElementById('manualNome').value; if(!n) return alert("Indique o Nome.");
+            if(!modoGradeFixa && document.getElementById('checkMensalista').checked) n += " (M)";
+            
+            fecharModal();
+            
+            if(modoGradeFixa) {
+                let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora);
+                if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; }
+                renderizarGridFixa();
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) 
+                }).then(() => {
+                    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; });
+                });
+            } else {
+                enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
+            }
+        }
+        
+        function cancelar(h, q, n) { if(confirm(`Apagar o horário de ${n}?`)) enviarComando("cancelar", h, q, ""); }
+        
+        function enviarComando(a, h, q, n) {
+            let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
+            if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : "");
+            renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true });
+        }
+        
+        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).catch(e => alert("Erro ao enviar os dados para a folha de cálculo.")); }
+
+        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
+        function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
+        
+        function confirmarAgendamento(h, q, n) { 
+            if(confirm(`Confirmar o agendamento de ${n}?`)) {
+                let nomeLimpo = n.replace("⏳", "").trim();
+                enviarComando("agendar", h, q, nomeLimpo + " (Confirmado)"); 
+                if(totalPendentesConhecidos > 0) totalPendentesConhecidos--;
+                fecharToast();
+            }
+        }
+
+        function copiarAgenda() {
+            let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`;
+            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            t += `\n*Quadra Padaria do Helder:*\n`;
+            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
+        }
+
+        // --- SISTEMA DE BLACKLIST / BLOQUEIOS ---
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
         function adicionarBloqueio() {
             const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value;
@@ -416,40 +580,6 @@
             }
         }
 
-        function enviarFetch(d) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) }).catch(e => alert("Erro ao enviar os dados para a folha de cálculo.")); }
-        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
-        function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
-        
-        function confirmarAgendamento(h, q, n) { 
-            if(confirm(`Confirmar o agendamento de ${n}?`)) {
-                let nomeLimpo = n.replace("⏳", "").trim();
-                enviarComando("agendar", h, q, nomeLimpo + " (Confirmado)"); 
-                if(totalPendentesConhecidos > 0) totalPendentesConhecidos--;
-                fecharToast();
-            }
-        }
-
-        function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; document.getElementById('modalInfo').innerText = `${h}:00 - Quadra ${q === 1 ? 'Chicashoes' : 'Padaria do Helder'}`; document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
-        function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
-        function salvarManual() {
-            let n = document.getElementById('manualNome').value; if(!n) return alert("Indique o Nome.");
-            if(document.getElementById('checkMensalista').checked) n += " (M)";
-            enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n); fecharModal();
-        }
-        function cancelar(h, q, n) { if(confirm(`Apagar o horário de ${n}?`)) enviarComando("cancelar", h, q, ""); }
-        function enviarComando(a, h, q, n) {
-            let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
-            if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : "");
-            renderizarGrid(); enviarFetch({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true });
-        }
-        function copiarAgenda() {
-            let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`;
-            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
-            t += `\n*Quadra Padaria do Helder:*\n`;
-            horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
-            navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
-        }
-        
         function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
         function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
         function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
