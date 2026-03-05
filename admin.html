@@ -109,7 +109,9 @@
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="gerarRelatorio('clientes')">👥 Clientes</button>
+            
+            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Gestão de Clientes</button>
+            
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
@@ -135,6 +137,37 @@
     <div class="grid-container">
         <div class="column"><div class="col-header">🎾 Quadra Chicashoes</div><div id="listaQ1"></div></div>
         <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
+    </div>
+
+    <div id="modalGerenciarClientes" class="modal-bg">
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <h3 style="color:var(--primary)">Gestão de Clientes & Fidelidade</h3>
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; justify-content:center; flex-wrap:wrap;">
+                <label style="color:#ccc;">Sem jogar há mais de:</label>
+                <input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;">
+                <label style="color:#ccc;">dias</label>
+                <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">🔍 Filtrar</button>
+                <button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; renderizarTabelaClientes()">Limpar</button>
+            </div>
+            
+            <div style="max-height: 400px; overflow-y: auto; background: #111; border-radius: 5px; padding: 10px; border: 1px solid #333;">
+                <div id="loadingClientes" style="color:var(--primary);">A carregar base de dados...</div>
+                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary); color:var(--primary);">
+                            <th style="padding: 8px;">Nome & Contato</th>
+                            <th style="padding: 8px;">Último Jogo</th>
+                            <th style="padding: 8px; text-align:center;">Raquetes (Pontos)</th>
+                            <th style="padding: 8px;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaClientesBody">
+                        </tbody>
+                </table>
+            </div>
+            <button class="close-btn" style="margin-top: 15px;" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar Gestão</button>
+        </div>
     </div>
 
     <div id="modalEstatisticas" class="modal-bg">
@@ -218,17 +251,17 @@
         let totalPendentesConhecidos = 0;
         const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         
-        // --- VARIÁVEIS DA GRADE FIXA ---
         let modoGradeFixa = false;
         let cachedPadrao = []; 
+
+        // Variável Global para os Clientes
+        let clientesCadastrados = [];
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 carregarAgenda();
-                setInterval(() => { 
-                    if(!modoGradeFixa) carregarAgenda(true); 
-                }, 60000); 
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             }
         };
 
@@ -247,12 +280,7 @@
             dataAtual.setDate(dataAtual.getDate() + delta); 
             totalPendentesConhecidos = 0; 
             document.title = "Painel Admin | Arena Vitale";
-            
-            if(modoGradeFixa) {
-                atualizarTelaGradeFixa(); 
-            } else {
-                carregarAgenda(); 
-            }
+            if(modoGradeFixa) { atualizarTelaGradeFixa(); } else { carregarAgenda(); }
         }
         
         function formatarData(date) {
@@ -261,6 +289,120 @@
             let mes = String(date.getMonth() + 1).padStart(2, '0');
             return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex };
         }
+
+        // ==========================================
+        // --- GESTÃO DE CLIENTES (FILTRO E PONTOS) ---
+        // ==========================================
+        function abrirGerenciadorClientes() {
+            document.getElementById('modalGerenciarClientes').style.display = 'flex';
+            document.getElementById('loadingClientes').style.display = 'block';
+            document.getElementById('tabelaClientes').style.display = 'none';
+
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_clientes" }) })
+            .then(r => r.json())
+            .then(data => {
+                if(data.sucesso) {
+                    clientesCadastrados = data.lista; // Guarda a lista em memória
+                    renderizarTabelaClientes();
+                }
+            }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
+        }
+
+        function renderizarTabelaClientes() {
+            document.getElementById('loadingClientes').style.display = 'none';
+            document.getElementById('tabelaClientes').style.display = 'table';
+            const tbody = document.getElementById('listaClientesBody');
+            tbody.innerHTML = '';
+
+            let diasFiltro = parseInt(document.getElementById('filtroDias').value);
+            let hoje = new Date();
+            hoje.setHours(0,0,0,0);
+
+            for(let i = 1; i < clientesCadastrados.length; i++) { // Salta o cabeçalho [0]
+                let row = clientesCadastrados[i];
+                let nome = row[1];
+                let telefone = row[2];
+                let ultimoAgendamentoStr = row[5] || ""; 
+                let pontos = parseInt(row[6]) || 0;     
+
+                // Lógica do Filtro de Inatividade
+                if(!isNaN(diasFiltro) && diasFiltro > 0) {
+                    if(ultimoAgendamentoStr) {
+                        let dataUltimo = parseDataBR(ultimoAgendamentoStr);
+                        if(dataUltimo) {
+                            let diffTime = hoje.getTime() - dataUltimo.getTime();
+                            let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                            if(diffDays <= diasFiltro) continue; // Jogou recentemente, então OCULTA
+                        }
+                    }
+                }
+
+                let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!', '_blank')" title="Chamar no WhatsApp">📞</button>`;
+
+                let tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #333";
+                tr.innerHTML = `
+                    <td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td>
+                    <td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td>
+                    <td style="padding: 10px 8px; text-align:center;">
+                        <input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);">
+                    </td>
+                    <td style="padding: 10px 8px; white-space: nowrap;">
+                        ${btnWa}
+                        <button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            if(tbody.innerHTML === '') {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado com este filtro.</td></tr>';
+            }
+        }
+
+        // Função para converter "DD/MM/YYYY, HH:MM" em formato de Data do Javascript
+        function parseDataBR(dataStr) {
+            if (!dataStr) return null;
+            let soData = dataStr.split(',')[0].split(' ')[0].trim(); // Pega apenas o dia
+            let partes = soData.split('/');
+            if(partes.length === 3) {
+                return new Date(partes[2], partes[1] - 1, partes[0]);
+            }
+            return null;
+        }
+
+        // Envia a ordem de alterar os pontos para o Google
+        function salvarPontosAdmin(event, telefone) {
+            let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value);
+            if(isNaN(novosPontos)) return alert("Valor inválido.");
+
+            let btn = event.target;
+            let txtOriginal = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.sucesso) {
+                    btn.innerText = "Salvo!";
+                    btn.style.background = "var(--success)";
+                    setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000);
+                    
+                    // Atualiza a memória local para não perder o valor ao filtrar
+                    let cliente = clientesCadastrados.find(c => c[2] == telefone);
+                    if(cliente) cliente[6] = novosPontos;
+                } else {
+                    alert("Erro ao salvar.");
+                    btn.innerText = txtOriginal; btn.disabled = false;
+                }
+            }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
+        }
+
 
         // ==========================================
         // --- SISTEMA DE MODO GRADE FIXA (MOLDE) ---
@@ -580,16 +722,6 @@
         function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
         function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
         function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { enviarFetch({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
-
-        function gerarRelatorio(tipo) { 
-            let win = window.open("", "_blank"); win.document.write("A carregar base de dados..."); 
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
-                let html = `<html><head><title>Relatório</title><style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:8px;text-align:left;}</style></head><body><h1>Base de Dados de Clientes</h1><table><tbody>`;
-                data.lista.forEach(r => { html += `<tr><td>${r.join('</td><td>')}</td></tr>`; });
-                html += `</tbody></table></body></html>`;
-                win.document.body.innerHTML = html;
-            }); 
-        }
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() {
