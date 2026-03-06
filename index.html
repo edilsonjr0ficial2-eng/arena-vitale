@@ -406,8 +406,9 @@
 
         let usuarioLogado = null; 
         let promocaoAtual = null;
+        let usouPromoFlag = false;
 
-        // --- RASTREADOR DE ACESSOS CORRIGIDO ---
+        // --- RASTREADOR DE ACESSOS ---
         fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
 
         window.onload = function() {
@@ -467,7 +468,7 @@
             } catch (error) { document.getElementById('clima-temp').innerText = "28°C"; }
         }
 
-        // --- SISTEMA DE FIDELIDADE ---
+        // --- SISTEMA DE FIDELIDADE (CONECTADO À FOLHA DE CÁLCULO) ---
         function buscarPontosNoServidor() {
             if(!usuarioLogado) return;
             fetch(SCRIPT_URL, {
@@ -487,6 +488,7 @@
             const grid = document.getElementById('stampGrid');
             if(!grid) return;
             grid.innerHTML = '';
+            
             let pontosAtuais = parseInt(localStorage.getItem('pontosVitale')) || 0;
             
             for(let i = 1; i <= 10; i++) {
@@ -500,16 +502,22 @@
                 }
                 grid.appendChild(box);
             }
-            if (pontosAtuais >= 10) { document.getElementById('btnResgatar').style.display = 'block'; } 
-            else { if(document.getElementById('btnResgatar')) document.getElementById('btnResgatar').style.display = 'none'; }
+            
+            if (pontosAtuais >= 10) {
+                document.getElementById('btnResgatar').style.display = 'block';
+            } else {
+                if(document.getElementById('btnResgatar')) document.getElementById('btnResgatar').style.display = 'none';
+            }
         }
 
         function resgatarPremio() {
             let senhaAdmin = prompt("⚠️ APENAS PARA FUNCIONÁRIOS DA RECEPÇÃO ⚠️\n\nDigite a senha para liberar 1 Hora Grátis:");
+            
             if (senhaAdmin === "1234") { 
                 const btn = document.getElementById('btnResgatar');
                 btn.innerText = "A processar...";
                 btn.disabled = true;
+
                 fetch(SCRIPT_URL, {
                     method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ acao: "resgatar_pontos", telefone: usuarioLogado.phone })
@@ -518,15 +526,21 @@
                 .then(data => {
                     btn.innerText = "🎁 Resgatar 1 Hora Grátis";
                     btn.disabled = false;
+                    
                     if(data.sucesso) {
                         alert("🎉 Resgate confirmado na Base de Dados! 1 Hora Grátis liberada para o cliente.");
                         buscarPontosNoServidor(); 
-                    } else { alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes."); }
+                    } else {
+                        alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes.");
+                    }
                 }).catch(e => {
                     btn.innerText = "🎁 Resgatar 1 Hora Grátis"; btn.disabled = false;
                     alert("Erro de ligação com a Base de Dados.");
                 });
-            } else if (senhaAdmin !== null && senhaAdmin !== "") { alert("❌ Senha incorreta! O resgate não foi realizado."); }
+                
+            } else if (senhaAdmin !== null && senhaAdmin !== "") {
+                alert("❌ Senha incorreta! O resgate não foi realizado.");
+            }
         }
 
         // --- FUNÇÕES DO CHATBOT ---
@@ -545,7 +559,7 @@
             document.getElementById('typingIndicator').style.display = 'block';
 
             try {
-                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
+                const systemPrompt = "Aja como Areninha Vitalezinha, a assistente virtual fofa, divertida e educada da Arena Vitale (Beach Tennis, Vôlei e Futevôlei em Russas, CE). Use emojis e dê respostas curtas e diretas. Nossas regras: 1. Quadras: Chicashoes e Padaria do Helder. 2. Raquetes: Grátis. 3. Cancelamento: Grátis até 3h antes. 4. Pagamento: Espécie, Pix e Cartão. 5. Funcionamento: 7h às 22h. 6. Areia: Tratada de alta qualidade. INSTRUÇÃO ESPECIAL: Sempre que fizer sentido na conversa, ou no final das suas respostas, conte uma curiosidade muito interessante e rápida sobre a história do Beach Tennis, regras do esporte, raquetes ou sobre jogar na areia! Não faça charadas, apenas curiosidades. Se não souber responder algo sobre a arena, peça para o cliente chamar no WhatsApp.";
                 const promptFinal = systemPrompt + "\n\nResponda à seguinte mensagem do cliente: " + userMessage;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -672,7 +686,8 @@
             let valorPromo = 0;
             let horasPromo = [];
             
-            // Verifica se tem promoção e se o dia que o utilizador escolheu no calendário está no intervalo
+            usouPromoFlag = false; // Reseta a flag global
+
             if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
                 let dataEscolhida = new Date(dataVisualizada);
                 dataEscolhida.setHours(0,0,0,0);
@@ -696,10 +711,9 @@
 
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                
-                // Se a promoção estiver ativa E o horário escolhido estiver na lista da promoção
                 if (promoAtivaNesteDia && horasPromo.includes(hAtual)) {
                     total += valorPromo;
+                    usouPromoFlag = true; // Confirma que usou
                 } else if (hAtual >= 7 && hAtual <= 16) { 
                     total += 35; 
                 } else { 
@@ -750,7 +764,7 @@
                     }
                 });
                 atualizarMenuHorarios();
-                atualizarPrecoDisplay(); // Força a verificar se há promoção a piscar neste dia
+                atualizarPrecoDisplay();
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
@@ -796,7 +810,12 @@
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente' }) })
+            
+            // Envia também o sinal usouPromo para o Google incrementar se for o caso
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
+            })
             .then(res => res.text()) 
             .then(txt => {
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
