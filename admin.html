@@ -85,7 +85,7 @@
         </div>
         
         <div class="toolbar">
-            <button class="tool-btn" id="btnTravaAgenda" onclick="toggleTravaAgenda()" style="border-color: #555;">Carregando...</button>
+            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
             <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
             
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
@@ -97,6 +97,7 @@
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
+            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
@@ -116,6 +117,26 @@
     <div class="grid-container">
         <div class="column"><div class="col-header">🎾 Quadra Chicashoes</div><div id="listaQ1"></div></div>
         <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
+    </div>
+
+    <div id="modalCadeado" class="modal-bg">
+        <div class="modal-box" style="max-width: 400px;">
+            <h3 style="color:var(--primary)">Controle da Agenda 🔒</h3>
+            <div style="margin-top: 15px; text-align: left;">
+                <label style="color:#aaa; font-size:0.9rem;">Status Geral (Para o Público):</label>
+                <select id="cadStatus">
+                    <option value="SIM">🔓 Liberada para Agendamentos</option>
+                    <option value="NAO">🔒 Bloqueada (Ninguém agenda)</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar a partir de:</label><input type="date" id="cadInicio" style="margin-top: 5px;"></div>
+                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar até (limite):</label><input type="date" id="cadFim" style="margin-top: 5px;"></div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que você quer focar.</p>
+            <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
+            <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
+        </div>
     </div>
 
     <div id="modalPromocao" class="modal-bg">
@@ -201,16 +222,14 @@
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda();
-                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             }
         };
 
         function tentarLogin() {
             if(document.getElementById('passInput').value === SENHA_ADMIN) {
                 localStorage.setItem('adminAuth', SENHA_ADMIN); document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda();
-                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             } else alert("Senha incorreta!");
         }
 
@@ -218,26 +237,41 @@
         function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); totalPendentesConhecidos = 0; document.title = "Painel Admin | Arena Vitale"; if(modoGradeFixa) atualizarTelaGradeFixa(); else carregarAgenda(); }
         function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
 
-        // --- TRAVAS E LIMPEZA (CONFIGURAÇÕES ADMIN) ---
+        // --- TRAVAS E LIMPEZA (CADEADO) ---
         function carregarConfigAdmin() {
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_config_admin" }) })
-            .then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.autoLimpeza); });
+            .then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.autoLimpeza, data.dataInicio, data.dataFim); });
         }
 
-        function atualizarBotoesConfig(liberada, autoLimpeza) {
+        function atualizarBotoesConfig(liberada, autoLimpeza, dIni, dFim) {
             let btnT = document.getElementById('btnTravaAgenda');
-            if (liberada) { btnT.innerHTML = "🔓 Agenda: Liberada"; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; } 
-            else { btnT.innerHTML = "🔒 Agenda: Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
+            if (liberada) { 
+                let txt = "🔓 Agenda Liberada";
+                if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; }
+                btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
+            } else { btnT.innerHTML = "🔒 Agenda Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
             
             let btnL = document.getElementById('btnAutoLimpeza');
             if (autoLimpeza) { btnL.innerHTML = "♻️ Limpeza Semanal: ON"; btnL.style.color = "var(--success)"; btnL.style.borderColor = "var(--success)"; } 
             else { btnL.innerHTML = "♻️ Limpeza Semanal: OFF"; btnL.style.color = "var(--danger)"; btnL.style.borderColor = "var(--danger)"; }
         }
 
-        function toggleTravaAgenda() {
+        function abrirModalCadeado() {
+            document.getElementById('modalCadeado').style.display = 'flex';
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_config_admin" }) })
+            .then(r => r.json()).then(data => { 
+                if(data.sucesso) {
+                    document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO";
+                    document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || "";
+                } 
+            });
+        }
+
+        function salvarCadeado() {
+            let status = document.getElementById('cadStatus').value; let inicio = document.getElementById('cadInicio').value; let fim = document.getElementById('cadFim').value;
             document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "toggle_trava_agenda" }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); alert(data.liberada ? "✅ Agenda LIBERADA!" : "🔒 Agenda BLOQUEADA!"); } });
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_trava_agenda", status: status, inicio: inicio, fim: fim }) })
+            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; alert("Configurações da agenda atualizadas no site!"); } });
         }
 
         function toggleAutoLimpeza() {
@@ -306,7 +340,8 @@
             if(modoGradeFixa) {
                 btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo de Edição Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
                 document.getElementById('listaQ1').innerHTML = "A carregar molde do servidor..."; document.getElementById('listaQ2').innerHTML = "A carregar molde do servidor...";
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro ao carregar Grade Fixa."); alternarModoGradeFixa(); } }).catch(e => { alert("Erro de comunicação com o Google."); alternarModoGradeFixa(); });
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json())
+                .then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro ao carregar Grade Fixa."); alternarModoGradeFixa(); } }).catch(e => { alert("Erro de comunicação com o Google."); alternarModoGradeFixa(); });
             } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "A monitorizar..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
         }
 
@@ -328,7 +363,8 @@
         function apagarFixo(h, q, n) {
              if(confirm(`Remover "${n}" do Molde Permanente de ${diasSemana[formatarData(dataAtual).index]}?`)) {
                 let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) })
+                .then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
              }
         }
 
@@ -414,6 +450,24 @@
             t += `\n*Quadra Padaria do Helder:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
             navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
         }
+
+        function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
+        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; } }
+
+        function abrirGerenciarBlacklist() {
+            document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
+                document.getElementById('loadingBlacklist').style.display = 'none'; let html = "";
+                if(data.lista && data.lista.length > 0) { let isHeader = true; data.lista.forEach((r, idx) => { if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return; let nome = r[0]; let tel = r[1] || "Sem telefone"; html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')" title="Remover da lista negra">🗑️</button></div>`; }); }
+                if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
+            }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
+        }
+
+        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover "${nome}" da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>A remover...</p>"; fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()).catch(() => { alert("Erro ao tentar remover."); abrirGerenciarBlacklist(); }); } }
+
+        function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
+        function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
+        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
     </script>
 </body>
 </html>
