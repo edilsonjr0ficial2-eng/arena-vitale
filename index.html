@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* --- PALETA DE CORES --- */
         :root { --bg-color: #000; --card-color: #111; --primary: #FFD700; --text-color: #fff; --hover: #E6C300; --instagram: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
@@ -252,8 +253,12 @@
             <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
             
             <div class="stamp-grid" id="stampGrid"></div>
+            
             <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar 1 Hora Grátis</button>
-            <div class="fidelidade-nota">* Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.</div>
+
+            <div class="fidelidade-nota">
+                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.
+            </div>
         </div>
     </div>
 
@@ -488,12 +493,11 @@
         function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
-        // --- FUNÇÃO DE MUDAR DIA CORRIGIDA (CADEADO POR DATA) ---
         function mudarDia(delta) { 
             let dataAlvo = new Date(dataVisualizada); dataAlvo.setDate(dataAlvo.getDate() + delta); dataAlvo.setHours(0,0,0,0);
             let hojeStr = new Date(); hojeStr.setHours(0,0,0,0);
             
-            if (dataAlvo < hojeStr) return; // Nunca recua para dias passados
+            if (dataAlvo < hojeStr) return; 
             
             if (agendaStatusGeral === "NAO") return alert("🔒 A agenda está temporariamente bloqueada pela administração.");
 
@@ -561,16 +565,28 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
+        // --- CORREÇÃO DO REDIRECIONAMENTO WHATSAPP ---
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) })
-            .then(res => res.text()).then(txt => {
+            
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
+            })
+            .then(res => res.text())
+            .then(txt => {
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
+                
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
-                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`, '_blank'); location.reload();
-            }).catch(e => { alert("Erro de ligação."); btn.disabled = false; });
+                
+                // Força a abertura do WhatsApp na mesma aba para não ser bloqueado pelos telemóveis
+                window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+                
+                setTimeout(() => { location.reload(); }, 1500);
+            })
+            .catch(e => { alert("Erro de ligação."); btn.disabled = false; });
         }
 
         let pA = 0, pB = 0; let gA = 0, gB = 0; const beachPoints = [0, 15, 30, 40]; let modoJogo = 'beach';
