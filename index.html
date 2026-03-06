@@ -6,6 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+
     <title>Arena Vitale | Beach Tennis</title>
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
@@ -249,14 +250,9 @@
             <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
             <p>Jogue connosco, acumule carimbos e ganhe prémios!</p>
             <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
-            
             <div class="stamp-grid" id="stampGrid"></div>
-            
             <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar 1 Hora Grátis</button>
-
-            <div class="fidelidade-nota">
-                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.
-            </div>
+            <div class="fidelidade-nota">* Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.</div>
         </div>
     </div>
 
@@ -295,9 +291,7 @@
             </div>
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
-                
                 <div id="avisoPromocao" class="promo-alert">🏷️ Promoção Ativa Neste Dia!</div>
-                
                 <div id="loading" class="loading-msg">A carregar disponibilidade...</div>
                 <select id="selectHora" class="time-select" onchange="liberarBotao()">
                     <option value="">Aguarde, a carregar agenda...</option>
@@ -316,7 +310,7 @@
             <div class="terms-box">
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
-                • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>. (Ex: Se marcou 2h no cartão e cancelou com menos de 3 horas, o valor a ser pago será de R$ 50,00. A mesma lógica aplica-se caso o pagamento selecionado tenha sido espécie/pix).<br><br>
+                • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>.<br><br>
                 • <strong>O utilizador que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
                 • O não comparecimento sem aviso prévio resultará em <strong>bloqueio para novos agendamentos</strong>.
             </div>
@@ -346,6 +340,8 @@
         let usuarioLogado = null; 
         let promocaoAtual = null;
         let usouPromoFlag = false;
+        
+        let agendaProximaSemanaLiberada = false; // VARIAVEL DA TRAVA DA AGENDA
 
         fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
 
@@ -355,7 +351,12 @@
             }
 
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) })
-            .then(r => r.json()).then(data => { if(data.sucesso && data.promo && data.promo.inicio) promocaoAtual = data.promo; });
+            .then(r => r.json()).then(data => { 
+                if(data.sucesso) {
+                    if (data.promo && data.promo.inicio) promocaoAtual = data.promo; 
+                    agendaProximaSemanaLiberada = data.agendaLiberada; // RECEBE O STATUS DO CADEADO AQUI
+                }
+            });
 
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
@@ -528,7 +529,15 @@
             let hoje = new Date(); let diaHoje = hoje.getDay(); let diasAteDomingo = (7 - diaHoje) % 7; if (diaHoje === 0) diasAteDomingo = 0; 
             let dataLimiteDomingo = new Date(hoje); dataLimiteDomingo.setDate(hoje.getDate() + diasAteDomingo); dataLimiteDomingo.setHours(23, 59, 59, 999);
             const novaDataTentativa = new Date(dataVisualizada); novaDataTentativa.setDate(novaDataTentativa.getDate() + delta); novaDataTentativa.setHours(12, 0, 0, 0);
-            if (novaDataTentativa > dataLimiteDomingo) return alert("🔒 A agenda da próxima semana abre apenas na Segunda-feira!");
+            
+            // --- VERIFICAÇÃO DO CADEADO DA AGENDA (TRAVA) ---
+            if (novaDataTentativa > dataLimiteDomingo) {
+                if (!agendaProximaSemanaLiberada) {
+                    alert("🔒 A agenda da próxima semana está temporariamente bloqueada. Aguarde a liberação!");
+                    return; 
+                }
+            }
+
             hoje.setHours(0,0,0,0); const novaDataZerada = new Date(novaDataTentativa); novaDataZerada.setHours(0,0,0,0);
             if (novaDataZerada < hoje) return; dataVisualizada = novaDataTentativa; document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia();
         }
