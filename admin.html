@@ -108,15 +108,13 @@
         <div class="toolbar">
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
+            <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            
             <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Gestão de Clientes</button>
-            
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
-            <button class="tool-btn" onclick="abrirModalAddBloqueio()">➕ Add Bloqueio</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
@@ -139,10 +137,46 @@
         <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
     </div>
 
+    <div id="modalPromocao" class="modal-bg">
+        <div class="modal-box" style="max-width: 500px;">
+            <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <div style="flex: 1; text-align: left;">
+                    <label style="font-size: 0.8rem; color: #aaa;">Data Início:</label>
+                    <input type="date" id="promoInicio" style="margin-top: 5px;">
+                </div>
+                <div style="flex: 1; text-align: left;">
+                    <label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label>
+                    <input type="date" id="promoFim" style="margin-top: 5px;">
+                </div>
+            </div>
+
+            <div style="text-align: left; margin-top: 10px;">
+                <label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label>
+                <input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;">
+            </div>
+
+            <div style="text-align: left; margin-top: 15px;">
+                <label style="font-size: 0.8rem; color: #aaa;">Horários Participantes:</label>
+                <div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;">
+                    </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top: 15px;">
+               <button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = true)">Marcar Todos</button>
+               <button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = false)">Desmarcar</button>
+            </div>
+
+            <button class="primary-btn" style="margin-top:20px;" onclick="salvarPromocao()">💾 SALVAR PROMOÇÃO</button>
+            <button class="primary-btn" style="background: var(--danger); margin-top: 10px;" onclick="desativarPromocao()">❌ DESATIVAR PROMOÇÃO</button>
+            <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
     <div id="modalGerenciarClientes" class="modal-bg">
         <div class="modal-box" style="max-width: 800px; width: 95%;">
             <h3 style="color:var(--primary)">Gestão de Clientes & Fidelidade</h3>
-            
             <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; justify-content:center; flex-wrap:wrap;">
                 <label style="color:#ccc;">Sem jogar há mais de:</label>
                 <input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;">
@@ -150,7 +184,6 @@
                 <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">🔍 Filtrar</button>
                 <button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; renderizarTabelaClientes()">Limpar</button>
             </div>
-            
             <div style="max-height: 400px; overflow-y: auto; background: #111; border-radius: 5px; padding: 10px; border: 1px solid #333;">
                 <div id="loadingClientes" style="color:var(--primary);">A carregar base de dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
@@ -162,8 +195,7 @@
                             <th style="padding: 8px;">Ação</th>
                         </tr>
                     </thead>
-                    <tbody id="listaClientesBody">
-                        </tbody>
+                    <tbody id="listaClientesBody"></tbody>
                 </table>
             </div>
             <button class="close-btn" style="margin-top: 15px;" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar Gestão</button>
@@ -253,8 +285,6 @@
         
         let modoGradeFixa = false;
         let cachedPadrao = []; 
-
-        // Variável Global para os Clientes
         let clientesCadastrados = [];
 
         window.onload = function() {
@@ -291,6 +321,71 @@
         }
 
         // ==========================================
+        // --- SISTEMA DE PROMOÇÕES (NOVO) ---
+        // ==========================================
+        function abrirModalPromocao() {
+            document.getElementById('modalPromocao').style.display = 'flex';
+            let html = "";
+            horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; });
+            document.getElementById('promoHorariosGrid').innerHTML = html;
+
+            // Busca as configurações atuais
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) })
+            .then(r => r.json())
+            .then(data => {
+                if(data.sucesso && data.promo) {
+                    document.getElementById('promoInicio').value = data.promo.inicio;
+                    document.getElementById('promoFim').value = data.promo.fim;
+                    document.getElementById('promoValor').value = data.promo.valor;
+                    let hrs = data.promo.horarios.toString().split(',');
+                    document.querySelectorAll('.chk-promo').forEach(chk => {
+                        if(hrs.includes(chk.value)) chk.checked = true;
+                    });
+                }
+            });
+        }
+
+        function salvarPromocao() {
+            let inicio = document.getElementById('promoInicio').value;
+            let fim = document.getElementById('promoFim').value;
+            let valor = document.getElementById('promoValor').value;
+            let selecionados = [];
+            document.querySelectorAll('.chk-promo:checked').forEach(chk => selecionados.push(chk.value));
+
+            if(!inicio || !fim || !valor || selecionados.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
+
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                body: JSON.stringify({ acao: "salvar_promocao", inicio: inicio, fim: fim, valor: valor, horarios: selecionados.join(',') }) 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.sucesso) {
+                    alert("Promoção ativada com sucesso no site!");
+                    document.getElementById('modalPromocao').style.display = 'none';
+                }
+            });
+        }
+
+        function desativarPromocao() {
+            if(confirm("Tem certeza que deseja desativar a promoção no site?")) {
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "" }) 
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.sucesso) {
+                        alert("Promoção desativada!");
+                        document.getElementById('modalPromocao').style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // ==========================================
         // --- GESTÃO DE CLIENTES (FILTRO E PONTOS) ---
         // ==========================================
         function abrirGerenciadorClientes() {
@@ -302,7 +397,7 @@
             .then(r => r.json())
             .then(data => {
                 if(data.sucesso) {
-                    clientesCadastrados = data.lista; // Guarda a lista em memória
+                    clientesCadastrados = data.lista; 
                     renderizarTabelaClientes();
                 }
             }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
@@ -318,26 +413,25 @@
             let hoje = new Date();
             hoje.setHours(0,0,0,0);
 
-            for(let i = 1; i < clientesCadastrados.length; i++) { // Salta o cabeçalho [0]
+            for(let i = 1; i < clientesCadastrados.length; i++) { 
                 let row = clientesCadastrados[i];
                 let nome = row[1];
                 let telefone = row[2];
                 let ultimoAgendamentoStr = row[5] || ""; 
                 let pontos = parseInt(row[6]) || 0;     
 
-                // Lógica do Filtro de Inatividade
                 if(!isNaN(diasFiltro) && diasFiltro > 0) {
                     if(ultimoAgendamentoStr) {
                         let dataUltimo = parseDataBR(ultimoAgendamentoStr);
                         if(dataUltimo) {
                             let diffTime = hoje.getTime() - dataUltimo.getTime();
                             let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                            if(diffDays <= diasFiltro) continue; // Jogou recentemente, então OCULTA
+                            if(diffDays <= diasFiltro) continue; 
                         }
                     }
                 }
 
-                let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!', '_blank')" title="Chamar no WhatsApp">📞</button>`;
+                let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')" title="Chamar no WhatsApp">📞</button>`;
 
                 let tr = document.createElement('tr');
                 tr.style.borderBottom = "1px solid #333";
@@ -354,32 +448,23 @@
                 `;
                 tbody.appendChild(tr);
             }
-
-            if(tbody.innerHTML === '') {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado com este filtro.</td></tr>';
-            }
+            if(tbody.innerHTML === '') { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado com este filtro.</td></tr>'; }
         }
 
-        // Função para converter "DD/MM/YYYY, HH:MM" em formato de Data do Javascript
         function parseDataBR(dataStr) {
             if (!dataStr) return null;
-            let soData = dataStr.split(',')[0].split(' ')[0].trim(); // Pega apenas o dia
+            let soData = dataStr.split(',')[0].split(' ')[0].trim(); 
             let partes = soData.split('/');
-            if(partes.length === 3) {
-                return new Date(partes[2], partes[1] - 1, partes[0]);
-            }
+            if(partes.length === 3) return new Date(partes[2], partes[1] - 1, partes[0]);
             return null;
         }
 
-        // Envia a ordem de alterar os pontos para o Google
         function salvarPontosAdmin(event, telefone) {
             let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value);
             if(isNaN(novosPontos)) return alert("Valor inválido.");
 
-            let btn = event.target;
-            let txtOriginal = btn.innerText;
-            btn.innerText = "...";
-            btn.disabled = true;
+            let btn = event.target; let txtOriginal = btn.innerText;
+            btn.innerText = "..."; btn.disabled = true;
 
             fetch(SCRIPT_URL, { 
                 method: "POST", 
@@ -389,17 +474,11 @@
             .then(r => r.json())
             .then(data => {
                 if(data.sucesso) {
-                    btn.innerText = "Salvo!";
-                    btn.style.background = "var(--success)";
+                    btn.innerText = "Salvo!"; btn.style.background = "var(--success)";
                     setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000);
-                    
-                    // Atualiza a memória local para não perder o valor ao filtrar
                     let cliente = clientesCadastrados.find(c => c[2] == telefone);
                     if(cliente) cliente[6] = novosPontos;
-                } else {
-                    alert("Erro ao salvar.");
-                    btn.innerText = txtOriginal; btn.disabled = false;
-                }
+                } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
@@ -416,22 +495,15 @@
                 btn.innerText = "🔙 Voltar para Agenda Normal";
                 document.getElementById('autoRefreshStatus').innerText = "Modo de Edição Fixo";
                 document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
-                
                 document.getElementById('listaQ1').innerHTML = "A carregar molde do servidor...";
                 document.getElementById('listaQ2').innerHTML = "A carregar molde do servidor...";
                 
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) })
                 .then(r => r.json())
                 .then(data => {
-                    if(data.sucesso) {
-                        cachedPadrao = data.lista;
-                        atualizarTelaGradeFixa();
-                    } else {
-                        alert("Erro ao carregar Grade Fixa.");
-                        alternarModoGradeFixa(); 
-                    }
+                    if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } 
+                    else { alert("Erro ao carregar Grade Fixa."); alternarModoGradeFixa(); }
                 }).catch(e => { alert("Erro de comunicação com o Google."); alternarModoGradeFixa(); });
-                
             } else {
                 btn.classList.remove('ativo');
                 btn.innerText = "📌 Grade Fixa (Molde)";
@@ -470,10 +542,7 @@
 
         function criarSlotFixoHTML(h, q, n) {
             let ocupado = n.length > 0;
-            let botoes = ocupado ? 
-                `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${n}')" title="Remover da Grade Fixa">🗑️</button>` 
-                : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`;
-            
+            let botoes = ocupado ? `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${n}')" title="Remover da Grade Fixa">🗑️</button>` : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`;
             let classe = ocupado ? "fixo-booked" : "";
             return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
         }
@@ -485,8 +554,7 @@
                 renderizarGridFixa();
                 
                 fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) 
                 }).then(() => {
                     fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) })
@@ -496,7 +564,7 @@
         }
 
         // ==========================================
-        // --- AGENDA NORMAL ---
+        // --- AGENDA NORMAL E OUTROS ---
         // ==========================================
         async function carregarAgenda(isAuto = false) {
             if(modoGradeFixa) return; 
@@ -606,10 +674,9 @@
                     `;
                     document.getElementById('statsContent').innerHTML = html;
                 } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
-            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
+            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google. Certifique-se de que publicou a "Nova Versão" no Apps Script.</p>'; });
         }
 
-        // --- SISTEMA MANUAL UNIFICADO (Serve para Normal e Molde) ---
         function abrirManual(h, q) { 
             tempAgendamento = { hora: h, quadra: q }; 
             let ds = diasSemana[formatarData(dataAtual).index];
@@ -641,8 +708,7 @@
                 if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; }
                 renderizarGridFixa();
                 fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) 
                 }).then(() => {
                     fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; });
