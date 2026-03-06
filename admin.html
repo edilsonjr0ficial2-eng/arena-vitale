@@ -152,15 +152,24 @@
                 </div>
             </div>
 
-            <div style="text-align: left; margin-top: 10px;">
-                <label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label>
-                <input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="flex: 1; text-align: left;">
+                    <label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label>
+                    <input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;">
+                </div>
+                <div style="flex: 1; text-align: left;">
+                    <label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas (Opcional):</label>
+                    <input type="number" id="promoLimite" placeholder="Ex: 10 (Vazio = Ilimitado)" style="margin-top: 5px;">
+                </div>
+            </div>
+            
+            <div id="promoUsosDisplay" style="text-align: left; margin-top: 5px; font-size: 0.85rem; color: var(--success); display: none; font-weight:bold;">
+                ✅ Promoção usada <span id="promoUsosCount"></span> vezes.
             </div>
 
             <div style="text-align: left; margin-top: 15px;">
                 <label style="font-size: 0.8rem; color: #aaa;">Horários Participantes:</label>
-                <div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;">
-                    </div>
+                <div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;"></div>
             </div>
 
             <div style="display:flex; gap:10px; margin-top: 15px;">
@@ -321,7 +330,7 @@
         }
 
         // ==========================================
-        // --- SISTEMA DE PROMOÇÕES (NOVO) ---
+        // --- SISTEMA DE PROMOÇÕES COM LIMITE ---
         // ==========================================
         function abrirModalPromocao() {
             document.getElementById('modalPromocao').style.display = 'flex';
@@ -329,7 +338,6 @@
             horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; });
             document.getElementById('promoHorariosGrid').innerHTML = html;
 
-            // Busca as configurações atuais
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) })
             .then(r => r.json())
             .then(data => {
@@ -337,10 +345,17 @@
                     document.getElementById('promoInicio').value = data.promo.inicio;
                     document.getElementById('promoFim').value = data.promo.fim;
                     document.getElementById('promoValor').value = data.promo.valor;
+                    document.getElementById('promoLimite').value = data.promo.limite || "";
+                    
+                    if (data.promo.limite) {
+                        document.getElementById('promoUsosDisplay').style.display = 'block';
+                        document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`;
+                    } else {
+                        document.getElementById('promoUsosDisplay').style.display = 'none';
+                    }
+
                     let hrs = data.promo.horarios.toString().split(',');
-                    document.querySelectorAll('.chk-promo').forEach(chk => {
-                        if(hrs.includes(chk.value)) chk.checked = true;
-                    });
+                    document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
                 }
             });
         }
@@ -349,18 +364,17 @@
             let inicio = document.getElementById('promoInicio').value;
             let fim = document.getElementById('promoFim').value;
             let valor = document.getElementById('promoValor').value;
+            let limite = document.getElementById('promoLimite').value;
             let selecionados = [];
             document.querySelectorAll('.chk-promo:checked').forEach(chk => selecionados.push(chk.value));
 
             if(!inicio || !fim || !valor || selecionados.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
 
             fetch(SCRIPT_URL, { 
-                method: "POST", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                body: JSON.stringify({ acao: "salvar_promocao", inicio: inicio, fim: fim, valor: valor, horarios: selecionados.join(',') }) 
+                method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                body: JSON.stringify({ acao: "salvar_promocao", inicio: inicio, fim: fim, valor: valor, horarios: selecionados.join(','), limite: limite }) 
             })
-            .then(r => r.json())
-            .then(data => {
+            .then(r => r.json()).then(data => {
                 if(data.sucesso) {
                     alert("Promoção ativada com sucesso no site!");
                     document.getElementById('modalPromocao').style.display = 'none';
@@ -371,12 +385,10 @@
         function desativarPromocao() {
             if(confirm("Tem certeza que deseja desativar a promoção no site?")) {
                 fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                    body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "" }) 
+                    method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) 
                 })
-                .then(r => r.json())
-                .then(data => {
+                .then(r => r.json()).then(data => {
                     if(data.sucesso) {
                         alert("Promoção desativada!");
                         document.getElementById('modalPromocao').style.display = 'none';
@@ -386,7 +398,7 @@
         }
 
         // ==========================================
-        // --- GESTÃO DE CLIENTES (FILTRO E PONTOS) ---
+        // --- GESTÃO DE CLIENTES ---
         // ==========================================
         function abrirGerenciadorClientes() {
             document.getElementById('modalGerenciarClientes').style.display = 'flex';
@@ -467,8 +479,7 @@
             btn.innerText = "..."; btn.disabled = true;
 
             fetch(SCRIPT_URL, { 
-                method: "POST", 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) 
             })
             .then(r => r.json())
@@ -653,7 +664,7 @@
                     let s = data.stats;
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]}));
                     arrayHoras.sort((a,b) => b.qtd - a.qtd);
-                    let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join(' &nbsp;|&nbsp; ');
+                    let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join('  |  ');
                     let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
 
                     let html = `
