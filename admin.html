@@ -85,9 +85,8 @@
         </div>
         
         <div class="toolbar">
-            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
-            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
-            
+            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">A carregar...</button>
+            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">A carregar...</button>
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
@@ -121,7 +120,7 @@
 
     <div id="modalCadeado" class="modal-bg">
         <div class="modal-box" style="max-width: 400px;">
-            <h3 style="color:var(--primary)">Controle da Agenda 🔒</h3>
+            <h3 style="color:var(--primary)">Controlo da Agenda 🔒</h3>
             <div style="margin-top: 15px; text-align: left;">
                 <label style="color:#aaa; font-size:0.9rem;">Status Geral (Para o Público):</label>
                 <select id="cadStatus">
@@ -133,7 +132,7 @@
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar a partir de:</label><input type="date" id="cadInicio" style="margin-top: 5px;"></div>
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar até (limite):</label><input type="date" id="cadFim" style="margin-top: 5px;"></div>
             </div>
-            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que você quer focar.</p>
+            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que pretende focar.</p>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
             <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
         </div>
@@ -144,7 +143,12 @@
             <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
             <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim" style="margin-top: 5px;"></div></div>
             <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label><input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas (Opcional):</label><input type="number" id="promoLimite" placeholder="Ex: 10" style="margin-top: 5px;"></div></div>
-            <div id="promoUsosDisplay" style="text-align: left; margin-top: 5px; font-size: 0.85rem; color: var(--success); display: none; font-weight:bold;">✅ Promoção usada <span id="promoUsosCount"></span> vezes.</div>
+            
+            <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; font-weight:bold; background: #1a1a1a; padding: 10px; border-radius: 5px; border: 1px solid #333;">
+                ✅ Promoção usada <span id="promoUsosCount"></span> vezes.<br>
+                <div style="margin-top: 5px; color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all;" id="promoListaTelefones"></div>
+            </div>
+
             <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários Participantes:</label><div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;"></div></div>
             <div style="display:flex; gap:10px; margin-top: 15px;"><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = true)">Marcar Todos</button><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = false)">Desmarcar</button></div>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarPromocao()">💾 SALVAR PROMOÇÃO</button><button class="primary-btn" style="background: var(--danger); margin-top: 10px;" onclick="desativarPromocao()">❌ DESATIVAR PROMOÇÃO</button><button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
@@ -222,14 +226,16 @@
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda();
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             }
         };
 
         function tentarLogin() {
             if(document.getElementById('passInput').value === SENHA_ADMIN) {
                 localStorage.setItem('adminAuth', SENHA_ADMIN); document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda();
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             } else alert("Senha incorreta!");
         }
 
@@ -285,11 +291,26 @@
             document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
             horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; });
             document.getElementById('promoHorariosGrid').innerHTML = html;
+            
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json())
             .then(data => {
                 if(data.sucesso && data.promo) {
                     document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
-                    if (data.promo.limite) { document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; } else document.getElementById('promoUsosDisplay').style.display = 'none';
+                    
+                    if (data.promo.limite) { 
+                        document.getElementById('promoUsosDisplay').style.display = 'block'; 
+                        document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; 
+                        
+                        // NOVIDADE: MOSTRA QUEM USOU A PROMOÇÃO!
+                        if(data.promo.telefones) {
+                            document.getElementById('promoListaTelefones').innerText = "Telefones que usaram: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', ');
+                        } else {
+                            document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado ainda.";
+                        }
+                    } else {
+                        document.getElementById('promoUsosDisplay').style.display = 'none';
+                    }
+
                     let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
                 }
             });
