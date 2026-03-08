@@ -214,7 +214,6 @@
     </header>
 
     <div id="relogioFlutuante" class="floating-clock">--:--:--</div>
-    
     <div class="btn-refresh-float" onclick="atualizarPagina()" title="Atualizar Dados">🔄</div>
 
     <div id="tela-inicial">
@@ -231,10 +230,7 @@
     <button class="chat-float-btn" onclick="toggleChat()" title="Falar com a IA">🤖</button>
     
     <div class="chatbot-window" id="chatbotWindow">
-        <div class="chat-header">
-            Areninha Vitalezinha 🎾
-            <span onclick="toggleChat()">✖</span>
-        </div>
+        <div class="chat-header">Areninha Vitalezinha 🎾<span onclick="toggleChat()">✖</span></div>
         <div class="chat-messages" id="chatMessages">
             <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena e no final das nossas conversas sempre te conto uma curiosidade incrível sobre o Beach Tennis! Como posso ajudar hoje? 😊</div>
         </div>
@@ -251,14 +247,9 @@
             <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
             <p>Jogue connosco, acumule carimbos e ganhe prémios!</p>
             <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
-            
             <div class="stamp-grid" id="stampGrid"></div>
-            
             <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar 1 Hora Grátis</button>
-
-            <div class="fidelidade-nota">
-                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.
-            </div>
+            <div class="fidelidade-nota">* Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.</div>
         </div>
     </div>
 
@@ -297,9 +288,7 @@
             </div>
             <div class="time-selector-container">
                 <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
-                
                 <div id="avisoPromocao" class="promo-alert">🏷️ Promoção Ativa Neste Dia!</div>
-                
                 <div id="loading" class="loading-msg">A carregar disponibilidade...</div>
                 <select id="selectHora" class="time-select" onchange="liberarBotao()">
                     <option value="">Aguarde, a carregar agenda...</option>
@@ -346,7 +335,6 @@
         const whatsappNumber = "5588988229008";
 
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
-        
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
         fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
@@ -466,15 +454,30 @@
 
         function calcularValorTotal(horaInicio, duracao, pagamento) {
             if (isNaN(horaInicio)) return 0; let total = 0; let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = []; usouPromoFlag = false; 
+            
+            let avisoPromo = document.getElementById('avisoPromocao');
+            avisoPromo.style.display = 'none';
+
             if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
                 let dataEscolhida = new Date(dataVisualizada); dataEscolhida.setHours(0,0,0,0);
                 let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]);
                 let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
+                
                 if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
-                    promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor); horasPromo = promocaoAtual.horarios.toString().split(',').map(Number);
-                    document.getElementById('avisoPromocao').style.display = 'block';
-                } else document.getElementById('avisoPromocao').style.display = 'none';
-            } else document.getElementById('avisoPromocao').style.display = 'none';
+                    
+                    let jaUsou = false;
+                    if (usuarioLogado && promocaoAtual.telefones && promocaoAtual.telefones.includes(usuarioLogado.phone)) { jaUsou = true; }
+
+                    if (jaUsou) {
+                        avisoPromo.innerHTML = "🏷️ Você já utilizou a promoção! (Limite de 1 por cliente)";
+                        avisoPromo.style.display = 'block'; avisoPromo.style.color = "#aaa"; avisoPromo.style.borderColor = "#aaa"; avisoPromo.style.background = "#222";
+                    } else {
+                        promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor); horasPromo = promocaoAtual.horarios.toString().split(',').map(Number);
+                        avisoPromo.innerHTML = "🏷️ Promoção Ativa Neste Dia!";
+                        avisoPromo.style.display = 'block'; avisoPromo.style.color = "var(--primary)"; avisoPromo.style.borderColor = "var(--primary)"; avisoPromo.style.background = "rgba(255, 215, 0, 0.1)";
+                    }
+                }
+            }
 
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
@@ -503,10 +506,7 @@
 
             if (agendaDataInicio) {
                 let p = agendaDataInicio.split('-'); let dIni = new Date(p[0], p[1]-1, p[2]); dIni.setHours(0,0,0,0);
-                if (dataAlvo < dIni) {
-                    if (delta > 0) alert(`🔒 A agenda está liberada apenas a partir do dia ${p[2]}/${p[1]}/${p[0]}.`);
-                    return; 
-                }
+                if (dataAlvo < dIni) { if (delta > 0) alert(`🔒 A agenda está liberada apenas a partir do dia ${p[2]}/${p[1]}/${p[0]}.`); return; }
             }
 
             if (agendaDataFim) {
@@ -565,28 +565,17 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // --- CORREÇÃO DO REDIRECIONAMENTO WHATSAPP ---
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
-            
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
-            })
-            .then(res => res.text())
-            .then(txt => {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) })
+            .then(res => res.text()).then(txt => {
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
-                
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
-                
-                // Força a abertura do WhatsApp na mesma aba para não ser bloqueado pelos telemóveis
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-                
                 setTimeout(() => { location.reload(); }, 1500);
-            })
-            .catch(e => { alert("Erro de ligação."); btn.disabled = false; });
+            }).catch(e => { alert("Erro de ligação."); btn.disabled = false; });
         }
 
         let pA = 0, pB = 0; let gA = 0, gB = 0; const beachPoints = [0, 15, 30, 40]; let modoJogo = 'beach';
