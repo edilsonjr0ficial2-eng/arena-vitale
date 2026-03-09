@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* --- PALETA DE CORES --- */
         :root { --bg-color: #000; --card-color: #111; --primary: #FFD700; --text-color: #fff; --hover: #E6C300; --instagram: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
@@ -346,7 +345,6 @@
         const whatsappNumber = "5588988229008";
 
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
-        
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
         fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
@@ -465,12 +463,7 @@
         function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString('pt-BR'); } setInterval(atualizarRelogio, 1000);
 
         function calcularValorTotal(horaInicio, duracao, pagamento) {
-            if (isNaN(horaInicio)) return 0; 
-            let total = 0; 
-            let promoAtivaNesteDia = false; 
-            let valorPromo = 0; 
-            let horasPromo = []; 
-            usouPromoFlag = false; 
+            if (isNaN(horaInicio)) return 0; let total = 0; let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = []; usouPromoFlag = false; 
             
             let avisoPromo = document.getElementById('avisoPromocao');
             if(avisoPromo) avisoPromo.style.display = 'none';
@@ -481,7 +474,6 @@
                 let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
                 
                 if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
-                    
                     let jaUsou = false;
                     let listaTelefones = promocaoAtual.telefones ? promocaoAtual.telefones.toString() : "";
                     let meuTelefone = (usuarioLogado && usuarioLogado.phone) ? usuarioLogado.phone.toString() : "";
@@ -494,10 +486,7 @@
                             avisoPromo.style.display = 'block'; avisoPromo.style.color = "#aaa"; avisoPromo.style.borderColor = "#aaa"; avisoPromo.style.background = "#222";
                         }
                     } else {
-                        promoAtivaNesteDia = true; 
-                        valorPromo = parseFloat(promocaoAtual.valor) || 0; 
-                        horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
-                        
+                        promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0; horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
                         if(avisoPromo) {
                             avisoPromo.innerHTML = "🏷️ Promoção Ativa Neste Dia!";
                             avisoPromo.style.display = 'block'; avisoPromo.style.color = "var(--primary)"; avisoPromo.style.borderColor = "var(--primary)"; avisoPromo.style.background = "rgba(255, 215, 0, 0.1)";
@@ -508,14 +497,9 @@
 
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { 
-                    total += valorPromo; 
-                    usouPromoFlag = true; 
-                } 
-                else if (hAtual >= 7 && hAtual <= 16) { total += 35; } 
-                else { total += (pagamento === 'cartao') ? 50 : 45; }
-            } 
-            return total;
+                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { total += valorPromo; usouPromoFlag = true; } 
+                else if (hAtual >= 7 && hAtual <= 16) { total += 35; } else { total += (pagamento === 'cartao') ? 50 : 45; }
+            } return total;
         }
 
         function atualizarPrecoDisplay() {
@@ -564,15 +548,37 @@
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
+        // --- ATUALIZAÇÃO 1 e 2: HORAS DE INÍCIO/FIM E OCULTAR HORAS PASSADAS ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
+            
+            // Lógica para ocultar horas passadas no dia de hoje
+            let hoje = new Date();
+            let isHoje = (dataVisualizada.getDate() === hoje.getDate() && 
+                          dataVisualizada.getMonth() === hoje.getMonth() && 
+                          dataVisualizada.getFullYear() === hoje.getFullYear());
+            let horaAtual = hoje.getHours();
+
             horas.forEach(h => {
-                let option = document.createElement('option'); let texto = `${h}:00 - Livre`; let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = ""; let blocosNecessarios = Math.ceil(duracaoSelecionada);
+                // Se for hoje e a hora já passou ou é a hora atual, pula.
+                if (isHoje && h <= horaAtual) { return; }
+
+                let option = document.createElement('option'); 
+                let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = ""; 
+                let blocosNecessarios = Math.ceil(duracaoSelecionada);
+                
+                // Calcula a hora de término
+                let horaFim = h + blocosNecessarios;
+                
                 for (let i = 0; i < blocosNecessarios; i++) {
                     let horaVerificada = h + i; if (horaVerificada > 22) { estaOcupado = true; break; }
                     let ocupacao = horariosOcupadosDoDia.find(item => item.hora === horaVerificada);
                     if (ocupacao) { estaOcupado = true; if (i === 0) nomeNoHorario = ocupacao.nome; break; }
                 }
+                
+                // Texto padrão se livre
+                let texto = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ✅ Livre`;
+
                 if (estaOcupado) { 
                     disabled = true; let displayTexto = "INDISPONÍVEL";
                     if (nomeNoHorario) {
@@ -581,33 +587,29 @@
                         else if (nomeNoHorario.includes("⏳")) { displayTexto = `${nomeNoHorario.replace('⏳', '').trim()} (Aguardar Confirmação)`; } 
                         else { displayTexto = nomeNoHorario.replace('(Confirmado)', '').trim(); }
                     }
-                    texto = `${h}:00 - ⛔ ${displayTexto}`; 
+                    texto = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ⛔ ${displayTexto}`; 
                 }
                 option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
             });
+
+            // Se não sobrar opções (ex: fim do dia)
+            if (select.options.length === 1) {
+                select.options[0].text = "Sem horários livres para hoje.";
+            }
         }
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
         function prepararAgendamento() { 
             if(usuarioLogado) { document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; document.getElementById('cadTelefone').value = usuarioLogado.phone; }
-            const h = parseInt(document.getElementById('selectHora').value); 
-            const pag = document.getElementById('selectPagamento').value; 
-            let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
-            abrirModal(h, (h + duracaoSelecionada) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
+            const h = parseInt(document.getElementById('selectHora').value); const pag = document.getElementById('selectPagamento').value; let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
+            abrirModal(h, (h + Math.ceil(duracaoSelecionada)) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
         }
         
-        function abrirModal(hora, fim, infoDia, valor) { 
-            tempHora = hora; 
-            tempFim = fim; 
-            tempInfoDia = infoDia; 
-            tempValor = valor; 
-            document.getElementById('modalCadastro').style.display = 'flex'; 
-        }
-        
+        function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // --- CORREÇÃO DO REDIRECIONAMENTO WHATSAPP ---
+        // --- ATUALIZAÇÃO 3 e 4: WHATSAPP COM TERMOS E EMOJIS CORRIGIDOS ---
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
@@ -621,7 +623,17 @@
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
                 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
-                let msg = `*SOLICITAÇÃO DE RESERVA*\n👤 ${usuarioLogado.nome}\n🏟️ ${nomeQuadra}\n🗓️ ${formatarDataHeader(dataVisualizada).texto}\n⏰ ${tempHora}:00 às ${tempFim}\n💰 Valor: R$ ${tempValor},00\n💳 Pagamento: ${pag}`;
+                
+                // Mensagem formatada para não bugar no iOS (emojis padrão)
+                let msg = "*SOLICITAÇÃO DE RESERVA*\n";
+                msg += "👤 Nome: " + usuarioLogado.nome + "\n";
+                msg += "🎾 Quadra: " + nomeQuadra + "\n";
+                msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
+                msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
+                msg += "💰 Valor: R$ " + tempValor + ",00\n";
+                msg += "💳 Pagamento: " + pag + "\n\n";
+                msg += "✅ *Termos de cancelamento aceitos.*\n\n";
+                msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
                 
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
                 
