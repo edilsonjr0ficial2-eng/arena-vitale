@@ -85,8 +85,8 @@
         </div>
         
         <div class="toolbar">
-            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">A carregar...</button>
-            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">A carregar...</button>
+            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
+            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
@@ -120,7 +120,7 @@
 
     <div id="modalCadeado" class="modal-bg">
         <div class="modal-box" style="max-width: 400px;">
-            <h3 style="color:var(--primary)">Controlo da Agenda 🔒</h3>
+            <h3 style="color:var(--primary)">Controle da Agenda 🔒</h3>
             <div style="margin-top: 15px; text-align: left;">
                 <label style="color:#aaa; font-size:0.9rem;">Status Geral (Para o Público):</label>
                 <select id="cadStatus">
@@ -132,7 +132,7 @@
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar a partir de:</label><input type="date" id="cadInicio" style="margin-top: 5px;"></div>
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar até (limite):</label><input type="date" id="cadFim" style="margin-top: 5px;"></div>
             </div>
-            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que pretende focar.</p>
+            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que você quer focar.</p>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
             <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
         </div>
@@ -143,12 +143,10 @@
             <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
             <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim" style="margin-top: 5px;"></div></div>
             <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label><input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas (Opcional):</label><input type="number" id="promoLimite" placeholder="Ex: 10" style="margin-top: 5px;"></div></div>
-            
             <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; font-weight:bold; background: #1a1a1a; padding: 10px; border-radius: 5px; border: 1px solid #333;">
                 ✅ Promoção usada <span id="promoUsosCount"></span> vezes.<br>
                 <div style="margin-top: 5px; color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all;" id="promoListaTelefones"></div>
             </div>
-
             <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários Participantes:</label><div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;"></div></div>
             <div style="display:flex; gap:10px; margin-top: 15px;"><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = true)">Marcar Todos</button><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = false)">Desmarcar</button></div>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarPromocao()">💾 SALVAR PROMOÇÃO</button><button class="primary-btn" style="background: var(--danger); margin-top: 10px;" onclick="desativarPromocao()">❌ DESATIVAR PROMOÇÃO</button><button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
@@ -156,16 +154,20 @@
     </div>
 
     <div id="modalGerenciarClientes" class="modal-bg">
-        <div class="modal-box" style="max-width: 800px; width: 95%;">
+        <div class="modal-box" style="max-width: 900px; width: 95%;">
             <h3 style="color:var(--primary)">Gestão de Clientes & Fidelidade</h3>
+            
             <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                <label style="color:#ccc;">Sem jogar há mais de:</label><input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;"><label style="color:#ccc;">dias</label>
-                <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">🔍 Filtrar</button><button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; renderizarTabelaClientes()">Limpar</button>
+                <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 200px; margin:0; padding:8px; border-color:var(--primary);" oninput="renderizarTabelaClientes()">
+                <label style="color:#ccc;">Inativo há + de:</label><input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;"><label style="color:#ccc;">dias</label>
+                <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">Filtrar</button>
+                <button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; document.getElementById('pesquisaCliente').value=''; renderizarTabelaClientes()">Limpar</button>
             </div>
+
             <div style="max-height: 400px; overflow-y: auto; background: #111; border-radius: 5px; padding: 10px; border: 1px solid #333;">
                 <div id="loadingClientes" style="color:var(--primary);">A carregar base de dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
-                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 8px;">Nome & Contato</th><th style="padding: 8px;">Último Jogo</th><th style="padding: 8px; text-align:center;">Raquetes (Pontos)</th><th style="padding: 8px;">Ação</th></tr></thead>
+                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 8px;">Nome & Contato</th><th style="padding: 8px;">Último Jogo</th><th style="padding: 8px; text-align:center;">Raquetes</th><th style="padding: 8px; text-align:center;">Ações</th></tr></thead>
                     <tbody id="listaClientesBody"></tbody>
                 </table>
             </div>
@@ -226,16 +228,14 @@
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
                 document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda();
-                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             }
         };
 
         function tentarLogin() {
             if(document.getElementById('passInput').value === SENHA_ADMIN) {
                 localStorage.setItem('adminAuth', SENHA_ADMIN); document.getElementById('loginOverlay').style.display = 'none';
-                carregarConfigAdmin(); carregarAgenda();
-                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             } else alert("Senha incorreta!");
         }
 
@@ -243,7 +243,6 @@
         function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); totalPendentesConhecidos = 0; document.title = "Painel Admin | Arena Vitale"; if(modoGradeFixa) atualizarTelaGradeFixa(); else carregarAgenda(); }
         function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
 
-        // --- TRAVAS E LIMPEZA (CADEADO) ---
         function carregarConfigAdmin() {
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.autoLimpeza, data.dataInicio, data.dataFim); });
@@ -252,11 +251,9 @@
         function atualizarBotoesConfig(liberada, autoLimpeza, dIni, dFim) {
             let btnT = document.getElementById('btnTravaAgenda');
             if (liberada) { 
-                let txt = "🔓 Agenda Liberada";
-                if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; }
+                let txt = "🔓 Agenda Liberada"; if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; }
                 btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
             } else { btnT.innerHTML = "🔒 Agenda Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
-            
             let btnL = document.getElementById('btnAutoLimpeza');
             if (autoLimpeza) { btnL.innerHTML = "♻️ Limpeza Semanal: ON"; btnL.style.color = "var(--success)"; btnL.style.borderColor = "var(--success)"; } 
             else { btnL.innerHTML = "♻️ Limpeza Semanal: OFF"; btnL.style.color = "var(--danger)"; btnL.style.borderColor = "var(--danger)"; }
@@ -265,52 +262,33 @@
         function abrirModalCadeado() {
             document.getElementById('modalCadeado').style.display = 'flex';
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_config_admin" }) })
-            .then(r => r.json()).then(data => { 
-                if(data.sucesso) {
-                    document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO";
-                    document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || "";
-                } 
-            });
+            .then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } });
         }
 
         function salvarCadeado() {
             let status = document.getElementById('cadStatus').value; let inicio = document.getElementById('cadInicio').value; let fim = document.getElementById('cadFim').value;
             document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_trava_agenda", status: status, inicio: inicio, fim: fim }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; alert("Configurações da agenda atualizadas no site!"); } });
+            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; alert("Configurações atualizadas!"); } });
         }
 
         function toggleAutoLimpeza() {
             document.getElementById('btnAutoLimpeza').innerText = "Aguarde...";
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "toggle_auto_limpeza" }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); alert(data.autoLimpeza ? "✅ Limpeza Automática ATIVADA no fim da semana." : "❌ Limpeza Automática DESATIVADA."); } });
+            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); alert(data.autoLimpeza ? "✅ Limpeza Automática ATIVADA." : "❌ Limpeza Automática DESATIVADA."); } });
         }
 
-        // --- SISTEMAS EXISTENTES ---
         function abrirModalPromocao() {
             document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
-            horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; });
-            document.getElementById('promoHorariosGrid').innerHTML = html;
-            
+            horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; }); document.getElementById('promoHorariosGrid').innerHTML = html;
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json())
             .then(data => {
                 if(data.sucesso && data.promo) {
                     document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
-                    
                     if (data.promo.limite) { 
-                        document.getElementById('promoUsosDisplay').style.display = 'block'; 
-                        document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; 
-                        
-                        // NOVIDADE: MOSTRA QUEM USOU A PROMOÇÃO!
-                        if(data.promo.telefones) {
-                            document.getElementById('promoListaTelefones').innerText = "Telefones que usaram: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', ');
-                        } else {
-                            document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado ainda.";
-                        }
-                    } else {
-                        document.getElementById('promoUsosDisplay').style.display = 'none';
-                    }
-
+                        document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; 
+                        if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Telefones que usaram: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado."; }
+                    } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
                     let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
                 }
             });
@@ -323,7 +301,7 @@
         }
 
         function desativarPromocao() {
-            if(confirm("Tem certeza que deseja desativar a promoção no site?")) {
+            if(confirm("Desativar a promoção no site?")) {
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção desativada!"); document.getElementById('modalPromocao').style.display = 'none'; } });
             }
         }
@@ -333,17 +311,44 @@
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
         }
 
+        // --- RENDERIZAR TABELA COM PESQUISA E BOTÃO APAGAR ---
         function renderizarTabelaClientes() {
             document.getElementById('loadingClientes').style.display = 'none'; document.getElementById('tabelaClientes').style.display = 'table'; const tbody = document.getElementById('listaClientesBody'); tbody.innerHTML = '';
-            let diasFiltro = parseInt(document.getElementById('filtroDias').value); let hoje = new Date(); hoje.setHours(0,0,0,0);
+            
+            let diasFiltro = parseInt(document.getElementById('filtroDias').value); 
+            let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim();
+            let hoje = new Date(); hoje.setHours(0,0,0,0);
+            
             for(let i = 1; i < clientesCadastrados.length; i++) { 
                 let row = clientesCadastrados[i]; let nome = row[1]; let telefone = row[2]; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
+                
+                // Aplica Filtro de Pesquisa (Nome ou Telefone)
+                if (termoPesquisa && !nome.toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
+
+                // Aplica Filtro de Dias Inativos
                 if(!isNaN(diasFiltro) && diasFiltro > 0 && ultimoAgendamentoStr) { let dataUltimo = parseDataBR(ultimoAgendamentoStr); if(dataUltimo && Math.floor((hoje.getTime() - dataUltimo.getTime()) / (1000 * 60 * 60 * 24)) <= diasFiltro) continue; }
+                
                 let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')" title="Chamar no WhatsApp">📞</button>`;
+                let btnDel = `<button class="btn-icon btn-del" style="font-size:1.3rem; margin-left:8px;" onclick="excluirCliente('${telefone}', '${nome}')" title="Excluir Cliente Permanentemente">🗑️</button>`;
+                
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
-                tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button></td>`; tbody.appendChild(tr);
+                tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
             }
-            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado com este filtro.</td></tr>'; 
+            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
+        }
+
+        // --- FUNÇÃO PARA EXCLUIR CLIENTE ---
+        function excluirCliente(telefone, nome) {
+            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?\nIsso apagará o login, a senha e todos os carimbos de fidelidade.`)) {
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) })
+                .then(r => r.json()).then(data => {
+                    if(data.sucesso) {
+                        alert(`Cliente ${nome} apagado com sucesso do sistema.`);
+                        clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); // Remove da lista na tela
+                        renderizarTabelaClientes(); // Atualiza a tela na hora
+                    } else { alert("Erro ao excluir: " + (data.erro || "Desconhecido")); }
+                }).catch(e => alert("Erro de conexão ao tentar excluir."));
+            }
         }
 
         function parseDataBR(dataStr) { if (!dataStr) return null; let soData = dataStr.split(',')[0].split(' ')[0].trim(); let partes = soData.split('/'); if(partes.length === 3) return new Date(partes[2], partes[1] - 1, partes[0]); return null; }
