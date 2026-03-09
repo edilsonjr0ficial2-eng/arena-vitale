@@ -11,7 +11,6 @@
 
     <style>
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
-        body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
@@ -47,9 +46,8 @@
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
         .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        #loginOverlay, .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .modal-bg { background: rgba(0,0,0,0.8); z-index: 2000; display: none; }
-        .login-box, .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
@@ -64,13 +62,11 @@
         button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
         #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 15px 25px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         #toastNotification.show { bottom: 20px; }
-        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; } .col-header { background: #eee !important; color: black !important; -webkit-print-color-adjust: exact; } .slot-content { color: black; } #printHeader { display: block !important; } }
-        #printHeader { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay">
+    <div id="loginOverlay" class="modal-bg">
         <div class="login-box">
             <img src="logo2.png" alt="Arena Vitale" class="logo-img" style="margin: 0 auto 15px auto;">
             <input type="password" id="passInput" placeholder="Senha">
@@ -79,7 +75,6 @@
     </div>
 
     <div id="toastNotification" onclick="fecharToast()">🔔 <span>Nova Solicitação Pendente!</span></div>
-    <div id="printHeader">AGENDA DO DIA <span id="printDate"></span></div>
 
     <div class="header">
         <div class="top-row">
@@ -99,7 +94,6 @@
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
-            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
@@ -121,104 +115,87 @@
         <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
     </div>
 
-    <div id="modalCadeado" class="modal-bg">
+    <div id="modalCadeado" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 400px;">
             <h3 style="color:var(--primary)">Controle da Agenda 🔒</h3>
             <div style="margin-top: 15px; text-align: left;">
                 <label style="color:#aaa; font-size:0.9rem;">Status Geral (Para o Público):</label>
-                <select id="cadStatus">
-                    <option value="SIM">🔓 Liberada para Agendamentos</option>
-                    <option value="NAO">🔒 Bloqueada (Ninguém agenda)</option>
-                </select>
+                <select id="cadStatus"><option value="SIM">🔓 Liberada</option><option value="NAO">🔒 Bloqueada</option></select>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar a partir de:</label><input type="date" id="cadInicio" style="margin-top: 5px;"></div>
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar até (limite):</label><input type="date" id="cadFim" style="margin-top: 5px;"></div>
             </div>
-            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que você quer focar.</p>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
             <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
         </div>
     </div>
 
-    <div id="modalPromocao" class="modal-bg">
+    <div id="modalPromocao" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 500px;">
             <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
-            <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim" style="margin-top: 5px;"></div></div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor Promocional (R$):</label><input type="number" id="promoValor" placeholder="Ex: 35" style="margin-top: 5px;"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas (Opcional):</label><input type="number" id="promoLimite" placeholder="Ex: 10" style="margin-top: 5px;"></div></div>
-            <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; font-weight:bold; background: #1a1a1a; padding: 10px; border-radius: 5px; border: 1px solid #333;">
-                ✅ Promoção usada <span id="promoUsosCount"></span> vezes.<br>
-                <div style="margin-top: 5px; color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all;" id="promoListaTelefones"></div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim"></div></div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas:</label><input type="number" id="promoLimite" placeholder="Vazio = Ilimitado"></div></div>
+            <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; background: #1a1a1a; padding: 10px; border-radius: 5px;">
+                ✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all;" id="promoListaTelefones"></div>
             </div>
-            <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários Participantes:</label><div class="interdicao-grid" id="promoHorariosGrid" style="margin-top: 10px; max-height: 200px;"></div></div>
-            <div style="display:flex; gap:10px; margin-top: 15px;"><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = true)">Marcar Todos</button><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c => c.checked = false)">Desmarcar</button></div>
-            <button class="primary-btn" style="margin-top:20px;" onclick="salvarPromocao()">💾 SALVAR PROMOÇÃO</button><button class="primary-btn" style="background: var(--danger); margin-top: 10px;" onclick="desativarPromocao()">❌ DESATIVAR PROMOÇÃO</button><button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
+            <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 150px;"></div></div>
+            <div style="display:flex; gap:10px; margin-top: 15px;"><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=true)">Marcar Todos</button><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=false)">Desmarcar</button></div>
+            <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button><button class="primary-btn" style="background: var(--danger);" onclick="desativarPromocao()">❌ DESATIVAR</button><button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
         </div>
     </div>
 
-    <div id="modalGerenciarClientes" class="modal-bg">
+    <div id="modalGerenciarClientes" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 900px; width: 95%;">
-            <h3 style="color:var(--primary)">Gestão de Clientes & Fidelidade</h3>
-            <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; justify-content:center; flex-wrap:wrap;">
-                <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 200px; margin:0; padding:8px; border-color:var(--primary);" oninput="renderizarTabelaClientes()">
-                <label style="color:#ccc;">Inativo há + de:</label><input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;"><label style="color:#ccc;">dias</label>
+            <h3 style="color:var(--primary)">Gestão de Clientes</h3>
+            <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 200px; margin:0;" oninput="renderizarTabelaClientes()">
+                <label style="color:#ccc;">Inativo há + de (dias):</label><input type="number" id="filtroDias" style="width: 80px; margin:0;">
                 <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">Filtrar</button>
-                <button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; document.getElementById('pesquisaCliente').value=''; renderizarTabelaClientes()">Limpar</button>
             </div>
-            <div style="max-height: 400px; overflow-y: auto; background: #111; border-radius: 5px; padding: 10px; border: 1px solid #333;">
-                <div id="loadingClientes" style="color:var(--primary);">A carregar base de dados...</div>
+            <div style="max-height: 400px; overflow-y: auto; background: #111; padding: 10px; border-radius: 5px;">
+                <div id="loadingClientes" style="color:var(--primary);">A carregar dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
                     <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 8px;">Nome & Contato</th><th style="padding: 8px;">Último Jogo</th><th style="padding: 8px; text-align:center;">Raquetes</th><th style="padding: 8px; text-align:center;">Ações</th></tr></thead>
                     <tbody id="listaClientesBody"></tbody>
                 </table>
             </div>
-            <button class="close-btn" style="margin-top: 15px;" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar Gestão</button>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar</button>
         </div>
     </div>
 
-    <div id="modalEstatisticas" class="modal-bg">
+    <div id="modalEstatisticas" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 800px; width: 95%;">
             <h3 style="color:var(--primary); font-size: 1.8rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
-            <p style="color: #aaa; font-size: 0.9rem;">Dados atualizados em tempo real.</p>
-            <div id="statsContent"><p style="color: var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p></div>
-            <button class="close-btn" style="margin-top: 25px;" onclick="document.getElementById('modalEstatisticas').style.display='none'">Fechar Painel</button>
+            <div id="statsContent"><p style="color: var(--primary);">A processar dados...</p></div>
+            <button class="close-btn" style="margin-top: 25px;" onclick="fecharDashboard()">Fechar Painel</button>
         </div>
     </div>
 
-    <div id="modalManual" class="modal-bg">
+    <div id="modalManual" class="modal-bg" style="display:none;">
         <div class="modal-box">
-            <h3 style="color:var(--primary)" id="tituloModalAgenda">Novo Agendamento</h3><p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
+            <h3 style="color:var(--primary)" id="tituloModalAgenda">Agendamento</h3><p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
             <input type="text" id="manualNome" placeholder="Nome do Jogador / Turma">
-            <div class="checkbox-wrapper" id="divMensalista"><input type="checkbox" id="checkMensalista" style="width:auto;"><label>Marcar como Mensalista (M)</label></div>
-            <button class="primary-btn" onclick="salvarManual()">SALVAR</button><button class="close-btn" onclick="fecharModal()">Cancelar</button>
+            <div class="checkbox-wrapper" id="divMensalista"><input type="checkbox" id="checkMensalista" style="width:auto;"><label>Mensalista (M)</label></div>
+            <button class="primary-btn" onclick="salvarManual()">SALVAR</button><button class="close-btn" onclick="document.getElementById('modalManual').style.display='none'">Cancelar</button>
         </div>
     </div>
 
-    <div id="modalAddBlacklist" class="modal-bg">
+    <div id="modalAddBlacklist" class="modal-bg" style="display:none;">
         <div class="modal-box">
-            <h3 style="color:var(--danger)">Adicionar à Lista Negra</h3><input type="text" id="blNome" placeholder="Nome do Bloqueado"><input type="tel" id="blTel" placeholder="Telefone (apenas números)"><button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">CONFIRMAR BLOQUEIO</button><button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
+            <h3 style="color:var(--danger)">Adicionar à Lista Negra</h3><input type="text" id="blNome" placeholder="Nome"><input type="tel" id="blTel" placeholder="Telefone"><button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button><button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
         </div>
     </div>
 
-    <div id="modalGerenciarBlacklist" class="modal-bg">
-        <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--danger)">Gerir Lista Negra</h3><div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar dados...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
-        </div>
+    <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Gerir Lista Negra</h3><div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
     </div>
 
-    <div id="modalInterdicao" class="modal-bg">
-        <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--danger)">Interditar Horários</h3>
-            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="marcarTodos(true)" style="font-size:0.8rem; padding:5px;">Marcar Todos</button><button onclick="marcarTodos(false)" style="font-size:0.8rem; padding:5px;">Desmarcar Todos</button></div>
-            <div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
-        </div>
+    <div id="modalInterdicao" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Interditar Horários</h3><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar Todos</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
     </div>
 
-    <div id="modalSorteio" class="modal-bg">
-        <div class="modal-box">
-            <h3 style="color:var(--primary)">Sorteio de Clientes 🎲</h3><div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR AGORA</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
-        </div>
-    </div>
+    <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary)">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
@@ -229,6 +206,7 @@
         let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
         
+        // VARIÁVEIS DO GRÁFICO
         let chartAcessosInstancia = null; 
         let dadosAcessosGlobais = [];
 
@@ -271,18 +249,13 @@
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } });
         }
-
         function salvarCadeado() {
-            let status = document.getElementById('cadStatus').value; let inicio = document.getElementById('cadInicio').value; let fim = document.getElementById('cadFim').value;
-            document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_trava_agenda", status: status, inicio: inicio, fim: fim }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; alert("Configurações atualizadas!"); } });
+            let status = document.getElementById('cadStatus').value; let inicio = document.getElementById('cadInicio').value; let fim = document.getElementById('cadFim').value; document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_trava_agenda", status: status, inicio: inicio, fim: fim }) }).then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } });
         }
-
         function toggleAutoLimpeza() {
             document.getElementById('btnAutoLimpeza').innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "toggle_auto_limpeza" }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); alert(data.autoLimpeza ? "✅ Limpeza Automática ATIVADA." : "❌ Limpeza Automática DESATIVADA."); } });
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "toggle_auto_limpeza" }) }).then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); } });
         }
 
         function abrirModalPromocao() {
@@ -294,25 +267,22 @@
                     document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
                     if (data.promo.limite) { 
                         document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; 
-                        if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Telefones que usaram: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado."; }
+                        if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Quem usou: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado."; }
                     } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
                     let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
                 }
             });
         }
-
         function salvarPromocao() {
             let inicio = document.getElementById('promoInicio').value; let fim = document.getElementById('promoFim').value; let valor = document.getElementById('promoValor').value; let limite = document.getElementById('promoLimite').value; let selecionados = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => selecionados.push(chk.value));
             if(!inicio || !fim || !valor || selecionados.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_promocao", inicio: inicio, fim: fim, valor: valor, horarios: selecionados.join(','), limite: limite }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção ativada!"); document.getElementById('modalPromocao').style.display = 'none'; } });
         }
-
         function desativarPromocao() {
-            if(confirm("Tem certeza que deseja desativar a promoção no site?")) {
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção desativada!"); document.getElementById('modalPromocao').style.display = 'none'; } });
-            }
+            if(confirm("Desativar a promoção no site?")) { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Desativada!"); document.getElementById('modalPromocao').style.display = 'none'; } }); }
         }
 
+        // --- GESTÃO DE CLIENTES COM PESQUISA E EXCLUSÃO ---
         function abrirGerenciadorClientes() {
             document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
@@ -334,10 +304,10 @@
         }
 
         function excluirCliente(telefone, nome) {
-            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?\nIsso apagará o login, a senha e todos os carimbos de fidelidade.`)) {
+            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?`)) {
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert(`Cliente ${nome} apagado com sucesso.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir: " + (data.erro || "Desconhecido")); }
-                }).catch(e => alert("Erro de conexão ao tentar excluir."));
+                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
+                });
             }
         }
 
@@ -348,94 +318,58 @@
             let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) }).then(r => r.json()).then(data => {
                 if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c[2] == telefone); if(cliente) cliente[6] = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
-            }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
+            });
         }
 
-        // --- DASHBOARD COM GRÁFICO ---
+        // --- DASHBOARD COM GRÁFICO (RESTAURADO E SEGURO) ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex'; 
-            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
+            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar dados...</p>';
             
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json())
             .then(data => {
                 if(data.sucesso) {
-                    let s = data.stats; 
-                    dadosAcessosGlobais = s.historicoAcessos || [];
+                    let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
+                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
                     
-                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join('  |  '); let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
+                    let html = `<div class="dash-grid"><div class="dash-card"><h4>Visitas Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div><div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div></div>`;
                     
-                    let html = `<div class="dash-grid"><div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div><div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação Bruta (Semana Atual)</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados de agendamento"}</div></div></div>`;
-                    
-                    html += `
-                    <div style="margin-top: 20px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid var(--primary);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                            <h4 style="color:#aaa; font-size:0.9rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4>
-                            <select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:5px 10px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:5px; font-weight:bold; cursor:pointer;">
-                                <option value="diario">Diário</option>
-                                <option value="semanal">Semanal</option>
-                                <option value="mensal">Mensal</option>
-                            </select>
-                        </div>
-                        <canvas id="graficoAcessos" height="120"></canvas>
-                    </div>`;
+                    html += `<div style="margin-top: 20px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid var(--primary);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h4 style="color:#aaa; font-size:0.9rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4><select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:5px 10px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:5px; font-weight:bold; cursor:pointer;"><option value="diario">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select></div><canvas id="graficoAcessos" height="120"></canvas></div>`;
 
                     document.getElementById('statsContent').innerHTML = html;
-                    atualizarGraficoAcessos();
-                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
+                    setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas.</p>'; }
             }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
         }
 
         function atualizarGraficoAcessos() {
-            let tipo = document.getElementById('tipoGraficoAcessos').value;
-            let map = {};
-            
+            let tipo = document.getElementById('tipoGraficoAcessos').value; let map = {};
             dadosAcessosGlobais.forEach(item => {
-                if(!item.data) return;
-                let pts = item.data.toString().split('/');
-                if(pts.length !== 3) return;
-                let d = new Date(pts[2], pts[1]-1, pts[0]);
-                let key = "";
-                
+                if(!item.data) return; let pts = item.data.toString().split('/'); if(pts.length !== 3) return;
+                let d = new Date(pts[2], pts[1]-1, pts[0]); let key = "";
                 if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } 
-                else if (tipo === 'semanal') {
-                    let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-                    dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7));
-                    var yearStart = new Date(Date.UTC(dCopy.getUTCFullYear(),0,1));
-                    var weekNo = Math.ceil(( ( (dCopy - yearStart) / 86400000) + 1)/7);
-                    key = `Sem. ${weekNo} (${dCopy.getUTCFullYear()})`;
-                } 
-                else if (tipo === 'mensal') {
-                    let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                    key = `${meses[d.getMonth()]} / ${d.getFullYear()}`;
-                }
-                
+                else if (tipo === 'semanal') { let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7)); var weekNo = Math.ceil(( ( (dCopy - new Date(Date.UTC(dCopy.getUTCFullYear(),0,1))) / 86400000) + 1)/7); key = `Sem. ${weekNo}`; } 
+                else if (tipo === 'mensal') { let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']; key = `${meses[d.getMonth()]} / ${d.getFullYear()}`; }
                 if(!map[key]) map[key] = 0; map[key] += parseInt(item.qtd) || 0;
             });
-
             let labels = Object.keys(map); let values = Object.values(map);
             if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } 
             else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
-
             if(chartAcessosInstancia) chartAcessosInstancia.destroy(); 
-            
             const ctx = document.getElementById('graficoAcessos').getContext('2d');
-            chartAcessosInstancia = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: 'Visitas ao Site', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: '#FFD700', pointRadius: 4, fill: true, tension: 0.3 }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' }, grid: { color: '#333' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, grid: { color: '#333' }, beginAtZero: true } } }
-            });
+            chartAcessosInstancia = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Visitas', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointRadius: 4, fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, beginAtZero: true } } } });
         }
 
+        function fecharDashboard() { document.getElementById('modalEstatisticas').style.display='none'; }
+
+        // --- SISTEMA DE GRADE FIXA ---
         function alternarModoGradeFixa() {
             modoGradeFixa = !modoGradeFixa; const btn = document.getElementById('btnToggleModo');
             if(modoGradeFixa) {
-                btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo de Edição Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
-                document.getElementById('listaQ1').innerHTML = "A carregar molde do servidor..."; document.getElementById('listaQ2').innerHTML = "A carregar molde do servidor...";
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json())
-                .then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro ao carregar Grade Fixa."); alternarModoGradeFixa(); } }).catch(e => { alert("Erro de comunicação com o Google."); alternarModoGradeFixa(); });
+                btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
+                document.getElementById('listaQ1').innerHTML = "A carregar molde..."; document.getElementById('listaQ2').innerHTML = "A carregar molde...";
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json())
+                .then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } }).catch(e => alert("Erro ao carregar."));
             } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "A monitorizar..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
         }
 
@@ -457,7 +391,8 @@
         function apagarFixo(h, q, n) {
              if(confirm(`Remover "${n}" do Molde Permanente de ${diasSemana[formatarData(dataAtual).index]}?`)) {
                 let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) })
+                .then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
              }
         }
 
@@ -498,7 +433,7 @@
 
         function abrirManual(h, q) { 
             tempAgendamento = { hora: h, quadra: q }; let ds = diasSemana[formatarData(dataAtual).index];
-            if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Horário Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } 
+            if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } 
             else { document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento"; document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'flex'; document.getElementById('checkMensalista').checked = false; }
             document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); 
         }
@@ -511,8 +446,8 @@
             fecharModal();
             if(modoGradeFixa) {
                 let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora); if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) })
-                .then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) })
+                .then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
             } else enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
         }
         
@@ -520,7 +455,7 @@
         function enviarComando(a, h, q, n) {
             let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
             if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); renderizarGrid(); 
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) }).catch(e => alert("Erro ao enviar os dados."));
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) });
         }
 
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
@@ -534,22 +469,22 @@
         }
 
         function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
-        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; } }
-
+        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; } }
         function abrirGerenciarBlacklist() {
             document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
                 document.getElementById('loadingBlacklist').style.display = 'none'; let html = "";
-                if(data.lista && data.lista.length > 0) { let isHeader = true; data.lista.forEach((r, idx) => { if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return; let nome = r[0]; let tel = r[1] || "Sem telefone"; html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')" title="Remover da lista negra">🗑️</button></div>`; }); }
+                if(data.lista && data.lista.length > 0) { let isHeader = true; data.lista.forEach((r, idx) => { if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return; let nome = r[0]; let tel = r[1] || "Sem telefone"; html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')">🗑️</button></div>`; }); }
                 if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
             }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
         }
-
-        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover "${nome}" da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>A remover...</p>"; fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()).catch(() => { alert("Erro ao tentar remover."); abrirGerenciarBlacklist(); }); } }
+        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover "${nome}" da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>A remover...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
 
         function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
-        function marcarTodos(status) { document.querySelectorAll('.chk-interdicao').forEach(chk => chk.checked = status); }
-        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
+        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
+
+        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
+        function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "A sortear..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
     </script>
 </body>
 </html>
