@@ -6,6 +6,9 @@
     <title>Painel Admin | Arena Vitale</title>
     <link rel="icon" href="logo2.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
@@ -88,7 +91,7 @@
             <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
             <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
-            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
+            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard & Acessos</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Gestão de Clientes</button>
@@ -156,14 +159,12 @@
     <div id="modalGerenciarClientes" class="modal-bg">
         <div class="modal-box" style="max-width: 900px; width: 95%;">
             <h3 style="color:var(--primary)">Gestão de Clientes & Fidelidade</h3>
-            
             <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; justify-content:center; flex-wrap:wrap;">
                 <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 200px; margin:0; padding:8px; border-color:var(--primary);" oninput="renderizarTabelaClientes()">
                 <label style="color:#ccc;">Inativo há + de:</label><input type="number" id="filtroDias" placeholder="Ex: 3" style="width: 80px; margin:0; padding:8px;"><label style="color:#ccc;">dias</label>
                 <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">Filtrar</button>
                 <button class="tool-btn" onclick="document.getElementById('filtroDias').value=''; document.getElementById('pesquisaCliente').value=''; renderizarTabelaClientes()">Limpar</button>
             </div>
-
             <div style="max-height: 400px; overflow-y: auto; background: #111; border-radius: 5px; padding: 10px; border: 1px solid #333;">
                 <div id="loadingClientes" style="color:var(--primary);">A carregar base de dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
@@ -176,8 +177,11 @@
     </div>
 
     <div id="modalEstatisticas" class="modal-bg">
-        <div class="modal-box" style="max-width: 600px; width: 95%;">
-            <h3 style="color:var(--primary); font-size: 1.8rem; margin-bottom: 5px;">Painel de Análise 📊</h3><p style="color: #aaa; font-size: 0.9rem;">Dados atualizados em tempo real.</p><div id="statsContent"><p style="color: var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p></div><button class="close-btn" style="margin-top: 25px;" onclick="document.getElementById('modalEstatisticas').style.display='none'">Fechar Painel</button>
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <h3 style="color:var(--primary); font-size: 1.8rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
+            <p style="color: #aaa; font-size: 0.9rem;">Dados atualizados em tempo real.</p>
+            <div id="statsContent"><p style="color: var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p></div>
+            <button class="close-btn" style="margin-top: 25px;" onclick="document.getElementById('modalEstatisticas').style.display='none'">Fechar Painel</button>
         </div>
     </div>
 
@@ -224,6 +228,9 @@
         let dataAtual = new Date(); const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
+        
+        let chartAcessosInstancia = null; 
+        let dadosAcessosGlobais = [];
 
         window.onload = function() {
             if(localStorage.getItem('adminAuth') === SENHA_ADMIN) {
@@ -301,7 +308,7 @@
         }
 
         function desativarPromocao() {
-            if(confirm("Desativar a promoção no site?")) {
+            if(confirm("Tem certeza que deseja desativar a promoção no site?")) {
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção desativada!"); document.getElementById('modalPromocao').style.display = 'none'; } });
             }
         }
@@ -311,42 +318,25 @@
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
         }
 
-        // --- RENDERIZAR TABELA COM PESQUISA E BOTÃO APAGAR ---
         function renderizarTabelaClientes() {
             document.getElementById('loadingClientes').style.display = 'none'; document.getElementById('tabelaClientes').style.display = 'table'; const tbody = document.getElementById('listaClientesBody'); tbody.innerHTML = '';
-            
-            let diasFiltro = parseInt(document.getElementById('filtroDias').value); 
-            let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim();
-            let hoje = new Date(); hoje.setHours(0,0,0,0);
-            
+            let diasFiltro = parseInt(document.getElementById('filtroDias').value); let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); let hoje = new Date(); hoje.setHours(0,0,0,0);
             for(let i = 1; i < clientesCadastrados.length; i++) { 
                 let row = clientesCadastrados[i]; let nome = row[1]; let telefone = row[2]; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
-                
-                // Aplica Filtro de Pesquisa (Nome ou Telefone)
                 if (termoPesquisa && !nome.toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
-
-                // Aplica Filtro de Dias Inativos
                 if(!isNaN(diasFiltro) && diasFiltro > 0 && ultimoAgendamentoStr) { let dataUltimo = parseDataBR(ultimoAgendamentoStr); if(dataUltimo && Math.floor((hoje.getTime() - dataUltimo.getTime()) / (1000 * 60 * 60 * 24)) <= diasFiltro) continue; }
-                
                 let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')" title="Chamar no WhatsApp">📞</button>`;
                 let btnDel = `<button class="btn-icon btn-del" style="font-size:1.3rem; margin-left:8px;" onclick="excluirCliente('${telefone}', '${nome}')" title="Excluir Cliente Permanentemente">🗑️</button>`;
-                
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
                 tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
             }
             if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
         }
 
-        // --- FUNÇÃO PARA EXCLUIR CLIENTE ---
         function excluirCliente(telefone, nome) {
             if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?\nIsso apagará o login, a senha e todos os carimbos de fidelidade.`)) {
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) })
-                .then(r => r.json()).then(data => {
-                    if(data.sucesso) {
-                        alert(`Cliente ${nome} apagado com sucesso do sistema.`);
-                        clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); // Remove da lista na tela
-                        renderizarTabelaClientes(); // Atualiza a tela na hora
-                    } else { alert("Erro ao excluir: " + (data.erro || "Desconhecido")); }
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
+                    if(data.sucesso) { alert(`Cliente ${nome} apagado com sucesso.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir: " + (data.erro || "Desconhecido")); }
                 }).catch(e => alert("Erro de conexão ao tentar excluir."));
             }
         }
@@ -359,6 +349,84 @@
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) }).then(r => r.json()).then(data => {
                 if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c[2] == telefone); if(cliente) cliente[6] = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
+        }
+
+        // --- DASHBOARD COM GRÁFICO ---
+        function abrirEstatisticas() {
+            document.getElementById('modalEstatisticas').style.display = 'flex'; 
+            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
+            
+            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json())
+            .then(data => {
+                if(data.sucesso) {
+                    let s = data.stats; 
+                    dadosAcessosGlobais = s.historicoAcessos || [];
+                    
+                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join('  |  '); let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
+                    
+                    let html = `<div class="dash-grid"><div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div><div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação Bruta (Semana Atual)</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados de agendamento"}</div></div></div>`;
+                    
+                    html += `
+                    <div style="margin-top: 20px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid var(--primary);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <h4 style="color:#aaa; font-size:0.9rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4>
+                            <select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:5px 10px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:5px; font-weight:bold; cursor:pointer;">
+                                <option value="diario">Diário</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="mensal">Mensal</option>
+                            </select>
+                        </div>
+                        <canvas id="graficoAcessos" height="120"></canvas>
+                    </div>`;
+
+                    document.getElementById('statsContent').innerHTML = html;
+                    atualizarGraficoAcessos();
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
+            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
+        }
+
+        function atualizarGraficoAcessos() {
+            let tipo = document.getElementById('tipoGraficoAcessos').value;
+            let map = {};
+            
+            dadosAcessosGlobais.forEach(item => {
+                if(!item.data) return;
+                let pts = item.data.toString().split('/');
+                if(pts.length !== 3) return;
+                let d = new Date(pts[2], pts[1]-1, pts[0]);
+                let key = "";
+                
+                if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } 
+                else if (tipo === 'semanal') {
+                    let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                    dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7));
+                    var yearStart = new Date(Date.UTC(dCopy.getUTCFullYear(),0,1));
+                    var weekNo = Math.ceil(( ( (dCopy - yearStart) / 86400000) + 1)/7);
+                    key = `Sem. ${weekNo} (${dCopy.getUTCFullYear()})`;
+                } 
+                else if (tipo === 'mensal') {
+                    let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                    key = `${meses[d.getMonth()]} / ${d.getFullYear()}`;
+                }
+                
+                if(!map[key]) map[key] = 0; map[key] += parseInt(item.qtd) || 0;
+            });
+
+            let labels = Object.keys(map); let values = Object.values(map);
+            if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } 
+            else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
+
+            if(chartAcessosInstancia) chartAcessosInstancia.destroy(); 
+            
+            const ctx = document.getElementById('graficoAcessos').getContext('2d');
+            chartAcessosInstancia = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Visitas ao Site', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: '#FFD700', pointRadius: 4, fill: true, tension: 0.3 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' }, grid: { color: '#333' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, grid: { color: '#333' }, beginAtZero: true } } }
+            });
         }
 
         function alternarModoGradeFixa() {
@@ -389,8 +457,7 @@
         function apagarFixo(h, q, n) {
              if(confirm(`Remover "${n}" do Molde Permanente de ${diasSemana[formatarData(dataAtual).index]}?`)) {
                 let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) })
-                .then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
              }
         }
 
@@ -427,17 +494,6 @@
             let ocupado = n.length > 0; let isPendente = n.includes("⏳");
             let botoes = ocupado ? (isPendente ? `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n.replace('⏳','').trim()}', ${h})">📞</button><button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${n}')">🆗</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>` : `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${n}', ${h})">📞</button><button class="btn-icon btn-pay ${n.includes('✅')?'paid':''}" onclick="togglePago(${h}, ${q}, '${n}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${n}')">🗑️</button>`) : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
             let classe = isPendente ? "pending" : (ocupado ? "booked" : ""); return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
-        }
-
-        function abrirEstatisticas() {
-            document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
-            fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json())
-            .then(data => {
-                if(data.sucesso) {
-                    let s = data.stats; let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jogos)`).join('  |  '); let preferida = s.q1 > s.q2 ? "Quadra Chicashoes" : (s.q2 > s.q1 ? "Quadra Padaria do Helder" : "Ambas iguais");
-                    document.getElementById('statsContent').innerHTML = `<div class="dash-grid"><div class="dash-card"><h4>Visitas ao Site Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div></div><div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação Bruta (Semana Atual)</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados de agendamento"}</div></div></div>`;
-                } else document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>';
-            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google. Certifique-se de que publicou a "Nova Versão" no Apps Script.</p>'; });
         }
 
         function abrirManual(h, q) { 
