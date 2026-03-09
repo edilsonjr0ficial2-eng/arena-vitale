@@ -11,6 +11,7 @@
 
     <style>
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
+        body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
@@ -47,7 +48,10 @@
         .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; }
+        
+        /* CORREÇÃO DO SCROLL NA JANELA MODAL AQUI 👇 */
+        .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
+        
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
@@ -261,6 +265,7 @@
         function abrirModalPromocao() {
             document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
             horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; }); document.getElementById('promoHorariosGrid').innerHTML = html;
+            
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json())
             .then(data => {
                 if(data.sucesso && data.promo) {
@@ -293,10 +298,15 @@
             let diasFiltro = parseInt(document.getElementById('filtroDias').value); let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); let hoje = new Date(); hoje.setHours(0,0,0,0);
             for(let i = 1; i < clientesCadastrados.length; i++) { 
                 let row = clientesCadastrados[i]; let nome = row[1]; let telefone = row[2]; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
+                
+                // Aplica Filtro de Pesquisa
                 if (termoPesquisa && !nome.toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
+                // Aplica Filtro de Dias
                 if(!isNaN(diasFiltro) && diasFiltro > 0 && ultimoAgendamentoStr) { let dataUltimo = parseDataBR(ultimoAgendamentoStr); if(dataUltimo && Math.floor((hoje.getTime() - dataUltimo.getTime()) / (1000 * 60 * 60 * 24)) <= diasFiltro) continue; }
+                
                 let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')" title="Chamar no WhatsApp">📞</button>`;
                 let btnDel = `<button class="btn-icon btn-del" style="font-size:1.3rem; margin-left:8px;" onclick="excluirCliente('${telefone}', '${nome}')" title="Excluir Cliente Permanentemente">🗑️</button>`;
+                
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
                 tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
             }
@@ -304,9 +314,9 @@
         }
 
         function excluirCliente(telefone, nome) {
-            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?`)) {
+            if(confirm(`⚠️ ATENÇÃO: Tem certeza que deseja excluir o cliente ${nome} permanentemente?\nIsso apagará o login e todos os carimbos de fidelidade dele.`)) {
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
+                    if(data.sucesso) { alert(`Cliente ${nome} apagado com sucesso.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
                 });
             }
         }
@@ -318,13 +328,13 @@
             let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) }).then(r => r.json()).then(data => {
                 if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c[2] == telefone); if(cliente) cliente[6] = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
-            });
+            }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
-        // --- DASHBOARD COM GRÁFICO (RESTAURADO E SEGURO) ---
+        // --- DASHBOARD COM GRÁFICO ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex'; 
-            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar dados...</p>';
+            document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
             
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json())
             .then(data => {
@@ -338,7 +348,7 @@
 
                     document.getElementById('statsContent').innerHTML = html;
                     setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
-                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas.</p>'; }
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
             }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
         }
 
