@@ -14,29 +14,23 @@
         body.light-mode { --bg: #f4f4f4; --card: #fff; --text: #000; --primary: #e6c300; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
-        
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 70px; width: auto; display: block; }
-        
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
         .tool-btn { padding: 8px 12px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-modo-fixo { background: transparent; border-color: var(--primary); color: var(--primary); }
         .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
         .btn-logout { background: var(--danger); border: none; color: white; }
-        
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
         .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
-        
         .controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--card); padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; border-radius: 5px; }
         .date-display { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
-        
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.9rem; }
-        
         .slot { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.85rem; }
         .time-label { font-weight: bold; color: #777; width: 50px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -44,7 +38,6 @@
         .slot-content.pending { color: var(--pending); font-style: italic; }
         .slot.slot-fixo { background: rgba(255, 215, 0, 0.05); }
         .slot-content.fixo-booked { color: var(--primary); }
-        
         .actions { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
@@ -53,32 +46,23 @@
         .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
         .btn-confirm:hover { color: var(--success); transform: scale(1.2); }
-        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        
         .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
-        /* CORREÇÃO DO SCROLL DA JANELA: Mantém a janela no ecrã e permite rolar para ver os botões de baixo */
         .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
-        
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .dash-card { background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--primary); }
         .dash-card h4 { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
         .dash-card .value { font-size: 1.8rem; font-weight: 900; color: white; }
         .dash-card .sub { font-size: 0.85rem; color: var(--success); margin-top: 8px; }
         .dash-card .sub.pending { color: var(--pending); }
-        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
         button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
-        
         #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 15px 25px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         #toastNotification.show { bottom: 20px; }
-        
         @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; } .col-header { background: #eee !important; color: black !important; -webkit-print-color-adjust: exact; } .slot-content { color: black; } #printHeader { display: block !important; } }
         #printHeader { display: none; }
     </style>
@@ -94,7 +78,6 @@
     </div>
 
     <div id="toastNotification" onclick="fecharToast()">🔔 <span>Nova Solicitação Pendente!</span></div>
-
     <div id="printHeader">AGENDA DO DIA <span id="printDate"></span></div>
 
     <div class="header">
@@ -104,8 +87,8 @@
         </div>
         
         <div class="toolbar">
-            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
-            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
+            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">A carregar...</button>
+            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">A carregar...</button>
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard & Acessos</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
@@ -115,6 +98,7 @@
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
+            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
@@ -141,16 +125,12 @@
             <h3 style="color:var(--primary)">Controle da Agenda 🔒</h3>
             <div style="margin-top: 15px; text-align: left;">
                 <label style="color:#aaa; font-size:0.9rem;">Status Geral (Para o Público):</label>
-                <select id="cadStatus">
-                    <option value="SIM">🔓 Liberada para Agendamentos</option>
-                    <option value="NAO">🔒 Bloqueada (Ninguém agenda)</option>
-                </select>
+                <select id="cadStatus"><option value="SIM">🔓 Liberada</option><option value="NAO">🔒 Bloqueada</option></select>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar a partir de:</label><input type="date" id="cadInicio" style="margin-top: 5px;"></div>
                 <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Liberar até (limite):</label><input type="date" id="cadFim" style="margin-top: 5px;"></div>
             </div>
-            <p style="font-size: 0.8rem; color: var(--pending); margin-top: 10px; line-height: 1.4;">⚠️ <b>Lembrete:</b> O quadro visual deste painel é de 1 semana. Mantenha o período limite configurado para no máximo 7 dias da semana que você quer focar.</p>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
             <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
         </div>
@@ -159,34 +139,14 @@
     <div id="modalPromocao" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 500px;">
             <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio"></div>
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim"></div>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div>
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas:</label><input type="number" id="promoLimite" placeholder="Vazio = Ilimitado"></div>
-            </div>
-            
+            <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim"></div></div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas:</label><input type="number" id="promoLimite" placeholder="Vazio = Ilimitado"></div></div>
             <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; background: #1a1a1a; padding: 10px; border-radius: 5px;">
-                ✅ Usada <span id="promoUsosCount"></span> vezes.<br>
-                <div style="color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all; margin-top:5px;" id="promoListaTelefones"></div>
+                ✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all; margin-top:5px;" id="promoListaTelefones"></div>
             </div>
-            
-            <div style="text-align: left; margin-top: 15px;">
-                <label style="font-size: 0.8rem; color: #aaa;">Horários:</label>
-                <div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 150px;"></div>
-            </div>
-            
-            <div style="display:flex; gap:10px; margin-top: 15px;">
-                <button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=true)">Marcar Todos</button>
-                <button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=false)">Desmarcar</button>
-            </div>
-            
-            <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button>
-            <button class="primary-btn" style="background: var(--danger);" onclick="desativarPromocao()">❌ DESATIVAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
+            <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 150px;"></div></div>
+            <div style="display:flex; gap:10px; margin-top: 15px;"><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=true)">Marcar Todos</button><button class="tool-btn" style="flex:1; justify-content:center;" onclick="document.querySelectorAll('.chk-promo').forEach(c=>c.checked=false)">Desmarcar</button></div>
+            <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button><button class="primary-btn" style="background: var(--danger);" onclick="desativarPromocao()">❌ DESATIVAR</button><button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -195,21 +155,13 @@
             <h3 style="color:var(--primary)">Gestão de Clientes</h3>
             <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; flex-wrap:wrap;">
                 <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 200px; margin:0;" oninput="renderizarTabelaClientes()">
-                <label style="color:#ccc;">Inativo há + de (dias):</label>
-                <input type="number" id="filtroDias" style="width: 80px; margin:0;">
+                <label style="color:#ccc;">Inativo há + de (dias):</label><input type="number" id="filtroDias" style="width: 80px; margin:0;">
                 <button class="tool-btn" style="background:var(--primary); color:black;" onclick="renderizarTabelaClientes()">Filtrar</button>
             </div>
             <div style="max-height: 400px; overflow-y: auto; background: #111; padding: 10px; border-radius: 5px;">
                 <div id="loadingClientes" style="color:var(--primary);">A carregar dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none;" id="tabelaClientes">
-                    <thead>
-                        <tr style="border-bottom: 2px solid var(--primary); color:var(--primary);">
-                            <th style="padding: 8px;">Nome & Contato</th>
-                            <th style="padding: 8px;">Último Jogo</th>
-                            <th style="padding: 8px; text-align:center;">Raquetes</th>
-                            <th style="padding: 8px; text-align:center;">Ações</th>
-                        </tr>
-                    </thead>
+                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 8px;">Nome & Contato</th><th style="padding: 8px;">Último Jogo</th><th style="padding: 8px; text-align:center;">Raquetes</th><th style="padding: 8px; text-align:center;">Ações</th></tr></thead>
                     <tbody id="listaClientesBody"></tbody>
                 </table>
             </div>
@@ -230,51 +182,25 @@
             <h3 style="color:var(--primary)" id="tituloModalAgenda">Agendamento</h3><p id="modalInfo" style="margin:10px 0; color:#aaa; font-size:0.9rem;"></p>
             <input type="text" id="manualNome" placeholder="Nome do Jogador / Turma">
             <div class="checkbox-wrapper" id="divMensalista"><input type="checkbox" id="checkMensalista" style="width:auto;"><label>Mensalista (M)</label></div>
-            <button class="primary-btn" onclick="salvarManual()">SALVAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalManual').style.display='none'">Cancelar</button>
+            <button class="primary-btn" onclick="salvarManual()">SALVAR</button><button class="close-btn" onclick="document.getElementById('modalManual').style.display='none'">Cancelar</button>
         </div>
     </div>
 
     <div id="modalAddBlacklist" class="modal-bg" style="display:none;">
         <div class="modal-box">
-            <h3 style="color:var(--danger)">Adicionar à Lista Negra</h3>
-            <input type="text" id="blNome" placeholder="Nome">
-            <input type="tel" id="blTel" placeholder="Telefone">
-            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
+            <h3 style="color:var(--danger)">Adicionar à Lista Negra</h3><input type="text" id="blNome" placeholder="Nome"><input type="tel" id="blTel" placeholder="Telefone"><button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button><button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
         </div>
     </div>
 
     <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--danger)">Gerir Lista Negra</h3>
-            <div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar...</div>
-            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div>
-            <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
-        </div>
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Gerir Lista Negra</h3><div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
     </div>
 
     <div id="modalInterdicao" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--danger)">Interditar Horários</h3>
-            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
-                <button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button>
-                <button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar</button>
-            </div>
-            <div class="interdicao-grid" id="listaInterdicao"></div>
-            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button>
-        </div>
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Interditar Horários</h3><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar Todos</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
     </div>
 
-    <div id="modalSorteio" class="modal-bg" style="display:none;">
-        <div class="modal-box">
-            <h3 style="color:var(--primary)">Sorteio 🎲</h3>
-            <div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div>
-            <button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button>
-        </div>
-    </div>
+    <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary)">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
@@ -909,7 +835,11 @@
             if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
             if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); 
             renderizarGrid(); 
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) }).catch(e => alert("Erro ao enviar os dados."));
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) 
+            }).then(r => r.text()).catch(e => alert("Erro ao enviar os dados."));
         }
 
         function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
@@ -929,8 +859,14 @@
             const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; 
             if(!n) return alert("Indique um nome."); 
             if(confirm(`Bloquear?`)) { 
-                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }); 
-                document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; 
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) 
+                }).then(r => r.text()).then(() => {
+                    document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; 
+                    alert("Bloqueado com sucesso!");
+                });
             } 
         }
 
@@ -968,8 +904,13 @@
             let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); 
             if(sel.length === 0) return alert("Selecione um horário."); 
             if(confirm(`Interditar ${sel.length} horários?`)) { 
-                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); 
-                document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); 
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) 
+                }).then(r => r.text()).then(() => {
+                    document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 1000); 
+                });
             } 
         }
 
