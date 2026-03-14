@@ -542,32 +542,33 @@
                 const rows = data.split('\n').map(row => row.split(',')); let colOffset = (quadraSelecionada === 2) ? 8 : 0; horariosOcupadosDoDia = [];
                 rows.forEach((row, rowIndex) => {
                     if (rowIndex === 0) return; const hLinha = parseInt(row[0]);
-                    if (!isNaN(hLinha)) { let diaPlan = formatarDataHeader(dataVisualizada).index + 1; let colReal = diaPlan + colOffset; let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); }
+                    if (!isNaN(hLinha)) { 
+                        let diaPlan = formatarDataHeader(dataVisualizada).index + 1; 
+                        let colReal = diaPlan + colOffset; 
+                        let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; 
+                        
+                        // ESCONDE A ASSINATURA DO FUNCIONÁRIO NO SITE PÚBLICO
+                        val = val.split('||')[0].trim();
+
+                        if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); 
+                    }
                 });
                 atualizarMenuHorarios(); atualizarPrecoDisplay();
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
-        // --- ATUALIZAÇÃO 1 e 2: HORAS DE INÍCIO/FIM E OCULTAR HORAS PASSADAS ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
             
-            // Lógica para ocultar horas passadas no dia de hoje
             let hoje = new Date();
-            let isHoje = (dataVisualizada.getDate() === hoje.getDate() && 
-                          dataVisualizada.getMonth() === hoje.getMonth() && 
-                          dataVisualizada.getFullYear() === hoje.getFullYear());
+            let isHoje = (dataVisualizada.getDate() === hoje.getDate() && dataVisualizada.getMonth() === hoje.getMonth() && dataVisualizada.getFullYear() === hoje.getFullYear());
             let horaAtual = hoje.getHours();
 
             horas.forEach(h => {
-                // Se for hoje e a hora já passou ou é a hora atual, pula.
                 if (isHoje && h <= horaAtual) { return; }
 
-                let option = document.createElement('option'); 
-                let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = ""; 
+                let option = document.createElement('option'); let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = ""; 
                 let blocosNecessarios = Math.ceil(duracaoSelecionada);
-                
-                // Calcula a hora de término
                 let horaFim = h + blocosNecessarios;
                 
                 for (let i = 0; i < blocosNecessarios; i++) {
@@ -576,7 +577,6 @@
                     if (ocupacao) { estaOcupado = true; if (i === 0) nomeNoHorario = ocupacao.nome; break; }
                 }
                 
-                // Texto padrão se livre
                 let texto = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ✅ Livre`;
 
                 if (estaOcupado) { 
@@ -592,10 +592,7 @@
                 option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
             });
 
-            // Se não sobrar opções (ex: fim do dia)
-            if (select.options.length === 1) {
-                select.options[0].text = "Sem horários livres para hoje.";
-            }
+            if (select.options.length === 1) { select.options[0].text = "Sem horários livres para hoje."; }
         }
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
@@ -609,7 +606,6 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // --- ATUALIZAÇÃO 3 e 4: WHATSAPP COM TERMOS E EMOJIS CORRIGIDOS ---
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
@@ -624,7 +620,6 @@
                 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 
-                // Mensagem formatada para não bugar no iOS (emojis padrão)
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
                 msg += "👤 Nome: " + usuarioLogado.nome + "\n";
                 msg += "🎾 Quadra: " + nomeQuadra + "\n";
