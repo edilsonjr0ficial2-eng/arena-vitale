@@ -547,7 +547,7 @@
                         let colReal = diaPlan + colOffset; 
                         let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; 
                         
-                        // CORTE DA ASSINATURA ANTES DE EXIBIR
+                        // CORTE DA ASSINATURA ANTES DE EXIBIR NO SITE DOS CLIENTES
                         val = val.split('||')[0].trim();
 
                         if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); 
@@ -564,33 +564,55 @@
             let isHoje = (dataVisualizada.getDate() === hoje.getDate() && dataVisualizada.getMonth() === hoje.getMonth() && dataVisualizada.getFullYear() === hoje.getFullYear());
             let horaAtual = hoje.getHours();
 
-            horas.forEach(h => {
-                if (isHoje && h <= horaAtual) { return; }
+            let h = 7;
+            let blocosNecessarios = Math.ceil(duracaoSelecionada);
 
-                let option = document.createElement('option'); let valor = h; let disabled = false; let estaOcupado = false; let nomeNoHorario = ""; 
-                let blocosNecessarios = Math.ceil(duracaoSelecionada);
+            while (h <= 22 - blocosNecessarios + 1) {
+                // Pular horas passadas se for hoje
+                if (isHoje && h <= horaAtual) { 
+                    h++; 
+                    continue; 
+                }
+
+                let estaOcupado = false; 
+                let nomeNoHorario = ""; 
                 let horaFim = h + blocosNecessarios;
                 
+                // Verifica se o bloco inteiro está livre
                 for (let i = 0; i < blocosNecessarios; i++) {
-                    let horaVerificada = h + i; if (horaVerificada > 22) { estaOcupado = true; break; }
+                    let horaVerificada = h + i; 
+                    if (horaVerificada > 22) { estaOcupado = true; break; }
                     let ocupacao = horariosOcupadosDoDia.find(item => item.hora === horaVerificada);
-                    if (ocupacao) { estaOcupado = true; if (i === 0) nomeNoHorario = ocupacao.nome; break; }
+                    if (ocupacao) { estaOcupado = true; if (nomeNoHorario === "") nomeNoHorario = ocupacao.nome; break; }
                 }
                 
-                let texto = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ✅ Livre`;
+                let option = document.createElement('option'); 
+                option.value = h; 
 
                 if (estaOcupado) { 
-                    disabled = true; let displayTexto = "INDISPONÍVEL";
+                    let displayTexto = "INDISPONÍVEL";
                     if (nomeNoHorario) {
                         let nl = nomeNoHorario.toLowerCase().trim();
                         if (nl === 'x' || nl === 'ok' || nl === 'indisponivel' || nl === 'indisponível' || nl === 'bloqueado' || nl === 'reservado' || nl === '⛔ interditado') { displayTexto = "INDISPONÍVEL"; } 
                         else if (nomeNoHorario.includes("⏳")) { displayTexto = `${nomeNoHorario.replace('⏳', '').trim()} (Aguardar Confirmação)`; } 
                         else { displayTexto = nomeNoHorario.replace('(Confirmado)', '').trim(); }
                     }
-                    texto = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ⛔ ${displayTexto}`; 
+                    option.text = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ⛔ ${displayTexto}`; 
+                    option.disabled = true; 
+                    select.appendChild(option);
+                    h++; // Avança 1 hora para encontrar o próximo espaço livre
+                } else {
+                    option.text = `Início: ${h}:00 | Encerra: ${horaFim}:00 - ✅ Livre`; 
+                    select.appendChild(option);
+                    
+                    // UNIFICAÇÃO DOS HORÁRIOS LIVRES
+                    if (duracaoSelecionada >= 2) {
+                        h += blocosNecessarios; // Pula as horas internas do bloco para não sobrepor
+                    } else {
+                        h++;
+                    }
                 }
-                option.value = valor; option.text = texto; option.disabled = disabled; select.appendChild(option);
-            });
+            }
 
             if (select.options.length === 1) { select.options[0].text = "Sem horários livres para hoje."; }
         }
@@ -620,6 +642,7 @@
                 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 
+                // MENSAGEM DO WHATSAPP COM AVISO DO SITE
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
                 msg += "👤 Nome: " + usuarioLogado.nome + "\n";
                 msg += "🎾 Quadra: " + nomeQuadra + "\n";
