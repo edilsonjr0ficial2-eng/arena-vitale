@@ -547,7 +547,7 @@
                         let colReal = diaPlan + colOffset; 
                         let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; 
                         
-                        // ESCONDE A ASSINATURA DO FUNCIONÁRIO NO SITE PÚBLICO
+                        // CORTE DA ASSINATURA ANTES DE EXIBIR
                         val = val.split('||')[0].trim();
 
                         if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); 
