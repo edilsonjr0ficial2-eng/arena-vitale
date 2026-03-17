@@ -269,13 +269,24 @@
                 <button class="btn-court active" onclick="mudarQuadra(1, this)"><span>Quadra Chicashoes</span></button>
                 <button class="btn-court" onclick="mudarQuadra(2, this)"><span>Quadra Padaria do Helder</span></button>
             </div>
+            
             <div class="day-navigation">
                 <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
                 <div class="current-date-display" id="dateDisplay">A carregar...</div>
                 <button class="nav-btn" onclick="mudarDia(1)">❯</button>
             </div>
+            
+            <div class="time-selector-container" style="margin-top: 0; margin-bottom: 20px;">
+                <p class="duration-title" style="color:white; font-weight:bold;">2. Modalidade:</p>
+                <select id="selectModalidade" class="time-select" style="margin-top: 10px;">
+                    <option value="Beach Tennis" selected>🎾 Beach Tennis</option>
+                    <option value="Futevôlei">⚽ Futevôlei</option>
+                    <option value="Vôlei de Praia">🏐 Vôlei de Praia</option>
+                </select>
+            </div>
+
             <div class="duration-selector">
-                <p class="duration-title">Tempo de jogo:</p>
+                <p class="duration-title" style="color:white; font-weight:bold;">3. Tempo de jogo:</p>
                 <div style="display:flex; justify-content:center; flex-wrap:wrap;">
                     <button class="btn-duration active" onclick="setDuracao(1, this)">1h</button>
                     <button class="btn-duration" onclick="setDuracao(2, this)">2h</button>
@@ -287,15 +298,17 @@
                     <span style="color:#777;">h</span>
                 </div>
             </div>
+            
             <div class="time-selector-container">
-                <p class="duration-title" style="color:white;">2. Forma de Pagamento:</p>
+                <p class="duration-title" style="color:white; font-weight:bold;">4. Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="atualizarPrecoDisplay()">
                     <option value="dinheiro" selected>Espécie / Pix</option>
                     <option value="cartao">Cartão (Crédito/Débito)</option>
                 </select>
             </div>
+            
             <div class="time-selector-container">
-                <p class="duration-title" style="color:white;">3. Selecione um horário disponível:</p>
+                <p class="duration-title" style="color:white; font-weight:bold;">5. Selecione um horário disponível:</p>
                 
                 <div id="avisoPromocao" class="promo-alert">🏷️ Promoção Ativa Neste Dia!</div>
                 
@@ -557,7 +570,6 @@
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
-        // --- SISTEMA DE UNIFICAÇÃO DOS HORÁRIOS ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); 
             select.innerHTML = '<option value="">Selecione o horário...</option>';
@@ -568,10 +580,9 @@
 
             let h = 7;
             let blocosNecessarios = Math.ceil(duracaoSelecionada);
-            let limiteH = 22 - blocosNecessarios + 1;
 
-            while (h <= limiteH) {
-                // Pular horas passadas se for hoje
+            while (h <= 22) {
+                // Ocultar horas passadas se for hoje
                 if (isHoje && h <= horaAtual) { 
                     h++; 
                     continue; 
@@ -580,16 +591,14 @@
                 let ocupacaoAtual = horariosOcupadosDoDia.find(item => item.hora === h);
 
                 if (ocupacaoAtual) {
-                    // Achar o tamanho total do bloco ocupado por essa pessoa
+                    // Agrupar bloco inteiro ocupado por essa pessoa
                     let nomeOcupante = ocupacaoAtual.nome;
                     let horaFimOcupacao = h + 1;
                     while (horaFimOcupacao <= 22) {
                         let proxOcupacao = horariosOcupadosDoDia.find(item => item.hora === horaFimOcupacao);
                         if (proxOcupacao && proxOcupacao.nome === nomeOcupante) {
                             horaFimOcupacao++;
-                        } else {
-                            break;
-                        }
+                        } else { break; }
                     }
                     
                     let option = document.createElement('option');
@@ -611,7 +620,7 @@
                     h = horaFimOcupacao; 
                 } else {
                     let temConflito = false;
-                    for (let i = 1; i < blocosNecessarios; i++) {
+                    for (let i = 0; i < blocosNecessarios; i++) {
                         let horaVerificada = h + i;
                         if (horaVerificada > 22 || horariosOcupadosDoDia.find(item => item.hora === horaVerificada)) {
                             temConflito = true;
@@ -623,20 +632,16 @@
                     option.value = h;
 
                     if (temConflito) {
-                        option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ⚠️ Conflito de horário`;
+                        option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ⚠️ Conflito/Tempo insuficiente`;
                         option.disabled = true;
                         select.appendChild(option);
-                        h++;
                     } else {
                         option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ✅ Livre`;
                         select.appendChild(option);
-                        
-                        if (duracaoSelecionada >= 2) {
-                            h += blocosNecessarios;
-                        } else {
-                            h++;
-                        }
                     }
+                    
+                    // Incrementa sempre de 1 em 1 para as horas livres, não importa a duração escolhida.
+                    h++;
                 }
             }
 
@@ -669,11 +674,13 @@
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
                 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
+                let mod = document.getElementById('selectModalidade').options[document.getElementById('selectModalidade').selectedIndex].text;
                 
-                // MENSAGEM DO WHATSAPP BLINDADA PARA IPHONE
+                // MENSAGEM DO WHATSAPP BLINDADA PARA IPHONE E COM MODALIDADE
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
                 msg += "👤 Nome: " + usuarioLogado.nome + "\n";
-                msg += "🎾 Quadra: " + nomeQuadra + "\n";
+                msg += "🏟️ Quadra: " + nomeQuadra + "\n";
+                msg += "🏆 Modalidade: " + mod + "\n";
                 msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
                 msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
                 msg += "💰 Valor: R$ " + tempValor + ",00\n";
