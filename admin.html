@@ -12,27 +12,34 @@
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+        
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 70px; width: auto; display: block; }
+        
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
         .tool-btn { padding: 10px 14px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
         .btn-logout { background: var(--danger); border: none; color: white; }
+        
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
         .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.2rem; }
+        
         .controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--card); padding: 10px; border-radius: 10px; }
         .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.4rem; cursor: pointer; padding: 5px 20px; border-radius: 5px; }
         .date-display { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; }
+        
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 12px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.95rem; }
+        
         .slot { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #333; font-size: 0.9rem; }
         .time-label { font-weight: bold; color: #777; width: 50px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slot-content.booked { color: var(--primary); font-weight: bold; }
         .slot-content.pending { color: var(--pending); font-style: italic; }
+        
         .actions { display: flex; gap: 8px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 4px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
@@ -40,20 +47,26 @@
         .btn-wa { color: var(--success); } .btn-wa:hover { transform: scale(1.2); }
         .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
+        
         .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
+        
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .dash-card { background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--primary); }
         .dash-card h4 { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
         .dash-card .value { font-size: 1.8rem; font-weight: 900; color: white; }
+        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
         button.primary-btn { padding: 12px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
         button.close-btn { background: #333; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
+        
         #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 15px 25px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         #toastNotification.show { bottom: 20px; }
+        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         @media (max-width: 768px) {
@@ -409,7 +422,7 @@
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
-        // --- DASHBOARD COM BOTÃO "VER QUEM ACESSOU" ---
+        // --- DASHBOARD COM BOTÃO DO WHATSAPP DE VENDAS ATIVAS ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json()).then(data => {
@@ -417,7 +430,14 @@
                     let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
                     
-                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').map(v => `<div style="padding:5px 0; border-bottom:1px solid #333;">👤 ${v.trim()}</div>`).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
+                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').map(v => {
+                        let text = v.trim();
+                        let phoneMatch = text.match(/\(([^)]+)\)/);
+                        let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
+                        // BOTÃO WHATSAPP EXTRAÍDO E FORMATADO:
+                        let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.2rem; background:#222; border-radius:50%; padding:5px; margin-left:10px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : "";
+                        return `<div style="padding:8px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`;
+                    }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
 
                     let html = `
                     <div class="dash-grid">
@@ -425,7 +445,7 @@
                             <h4>Visitas Hoje</h4>
                             <div class="value">👁️ ${s.acessosHoje}</div>
                             <button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:10px; background:var(--primary); color:black; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem; font-weight:bold; width:100%;">Ver Quem Acessou</button>
-                            <div id="listaVisitantes" style="display:none; margin-top:10px; max-height:120px; overflow-y:auto; background:#111; padding:10px; border-radius:5px; font-size:0.8rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
+                            <div id="listaVisitantes" style="display:none; margin-top:10px; max-height:160px; overflow-y:auto; background:#111; padding:10px; border-radius:5px; font-size:0.85rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
                         </div>
                         <div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
