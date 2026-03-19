@@ -12,50 +12,88 @@
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+        
         .header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 70px; width: auto; display: block; }
+        
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
-        .tool-btn { padding: 8px 12px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
+        .tool-btn { padding: 10px 14px; border-radius: 5px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
         .btn-logout { background: var(--danger); border: none; color: white; }
-        .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
-        .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
+        
+        .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; font-size: 0.9rem; justify-content: space-around; }
+        .stat-item span { color: var(--primary); font-weight: 900; font-size: 1.2rem; }
+        
         .controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--card); padding: 10px; border-radius: 10px; }
-        .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; border-radius: 5px; }
-        .date-display { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; }
+        .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.4rem; cursor: pointer; padding: 5px 20px; border-radius: 5px; }
+        .date-display { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; }
+        
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid #333; }
-        .col-header { background: var(--primary); color: #000; padding: 10px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.9rem; }
-        .slot { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #333; font-size: 0.85rem; }
+        .col-header { background: var(--primary); color: #000; padding: 12px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.95rem; }
+        
+        .slot { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #333; font-size: 0.9rem; }
         .time-label { font-weight: bold; color: #777; width: 50px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slot-content.booked { color: var(--primary); font-weight: bold; }
         .slot-content.pending { color: var(--pending); font-style: italic; }
-        .actions { display: flex; gap: 5px; }
-        .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
+        
+        .actions { display: flex; gap: 8px; }
+        .btn-icon { border: none; background: none; cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 4px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
         .btn-del { color: var(--danger); } .btn-del:hover { transform: scale(1.2); }
         .btn-wa { color: var(--success); } .btn-wa:hover { transform: scale(1.2); }
         .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
         .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
+        
         .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .modal-box { background: var(--card); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
+        
         .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; max-height: 300px; overflow-y: auto; text-align: left; }
         .interdicao-item { background: #333; padding: 8px; border-radius: 5px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .dash-card { background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--primary); }
         .dash-card h4 { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
         .dash-card .value { font-size: 1.8rem; font-weight: 900; color: white; }
+        
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; border-radius: 5px; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc; }
-        button.primary-btn { padding: 10px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
-        button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
+        button.primary-btn { padding: 12px 20px; font-size: 1rem; background: var(--primary); border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+        button.close-btn { background: #333; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%; }
+        
         #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 15px 25px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         #toastNotification.show { bottom: 20px; }
+        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; } }
+
+        /* --- OTIMIZAÇÃO EXCLUSIVA PARA SMARTPHONES (ANDROID E IPHONE) --- */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .top-row { flex-direction: column; gap: 15px; }
+            .logo-img { max-height: 50px; }
+            
+            .toolbar { justify-content: center; gap: 8px; }
+            .tool-btn { flex: 1 1 calc(50% - 8px); justify-content: center; text-align: center; padding: 12px 10px; font-size: 0.8rem; }
+            
+            .stats-bar { flex-direction: column; text-align: center; gap: 10px; padding: 10px; }
+            
+            .grid-container { grid-template-columns: 1fr; gap: 20px; } /* Quadras uma por cima da outra */
+            
+            .slot { padding: 15px 10px; } /* Mais altura para facilitar o toque */
+            .slot-content { font-size: 0.95rem; white-space: normal; overflow: visible; word-break: break-word; } /* Permite quebrar linha no telemóvel */
+            .btn-icon { font-size: 1.4rem; padding: 8px; } /* Ícones bem maiores para os dedos */
+            
+            .controls { flex-wrap: wrap; }
+            .date-display { font-size: 1.1rem; }
+            
+            .dash-grid { grid-template-columns: 1fr; } /* Gráficos do dashboard em 1 coluna */
+            .interdicao-grid { grid-template-columns: 1fr; } /* Janelas pop-up (modais) em 1 coluna */
+        }
+
+        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; margin-bottom:20px; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; font-weight:bold; font-size:1.5rem; margin-bottom:15px; text-align:center;} }
         #printHeader { display: none; }
     </style>
 </head>
@@ -76,32 +114,32 @@
     <div class="header">
         <div class="top-row">
             <img src="logo2.png" alt="Arena Vitale" class="logo-img">
-            <div>
-                <span id="nomeLogadoDisplay" style="color: var(--primary); font-weight: bold; margin-right: 15px;"></span>
-                <button class="tool-btn btn-logout" onclick="fazerLogout()" style="display:inline-flex;">Sair 🚪</button>
+            <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px;">
+                <span id="nomeLogadoDisplay" style="color: var(--primary); font-weight: bold;"></span>
+                <button class="tool-btn btn-logout" onclick="fazerLogout()">Sair 🚪</button>
             </div>
         </div>
         
         <div class="toolbar">
-            <button class="tool-btn" id="btnGerirAdmins" onclick="abrirModalAdmins()" style="display:none; border-color:var(--primary); color:var(--primary);">🔐 Gerir Contas Admin</button>
+            <button class="tool-btn" id="btnGerirAdmins" onclick="abrirModalAdmins()" style="display:none; border-color:var(--primary); color:var(--primary);">🔐 Contas Admin</button>
             <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">Carregando...</button>
             <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">Carregando...</button>
-            <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa (Molde)</button>
-            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard & Acessos</button>
-            <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Criar Promoção</button>
-            <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Gestão de Clientes</button>
+            <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa</button>
+            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
+            <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
+            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
-            <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar p/ Grupo</button>
-            <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar Horários</button>
+            <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
+            <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar</button>
+            <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
     <div class="stats-bar">
         <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
-        <div class="stat-item">Faturação do Dia (Agenda): <span id="statFaturamento">R$ 0,00</span></div>
+        <div class="stat-item">Faturação do Dia: <span id="statFaturamento">R$ 0,00</span></div>
     </div>
 
     <div class="controls">
@@ -120,9 +158,9 @@
     <div id="modalGerenciarAdmins" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width:500px;">
             <h3 style="color:var(--primary)">Gerir Administradores</h3>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <input type="text" id="novoAdmUser" placeholder="Novo Usuário" style="flex:1;">
-                <input type="text" id="novoAdmPass" placeholder="Senha" style="flex:1;">
+            <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                <input type="text" id="novoAdmUser" placeholder="Novo Usuário" style="flex:1; min-width: 150px;">
+                <input type="text" id="novoAdmPass" placeholder="Senha" style="flex:1; min-width: 150px;">
             </div>
             <button class="primary-btn" onclick="salvarNovoAdmin()">➕ Adicionar Admin</button>
             <div class="interdicao-grid" id="listaAdminsConteudo" style="margin-top: 15px;"></div>
@@ -137,9 +175,9 @@
                 <label style="color:#aaa; font-size:0.9rem;">Status Geral:</label>
                 <select id="cadStatus"><option value="SIM">🔓 Liberada</option><option value="NAO">🔒 Bloqueada</option></select>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data de Início:</label><input type="date" id="cadInicio"></div>
-                <div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="cadFim"></div>
+            <div style="display: flex; flex-direction:column; gap: 10px; margin-top: 15px;">
+                <div style="text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data de Início:</label><input type="date" id="cadInicio"></div>
+                <div style="text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="cadFim"></div>
             </div>
             <button class="primary-btn" style="margin-top:20px;" onclick="salvarCadeado()">💾 SALVAR REGRAS</button>
             <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
@@ -149,11 +187,9 @@
     <div id="modalPromocao" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 500px;">
             <h3 style="color:var(--primary)">Configurar Promoção 🏷️</h3>
-            <div style="display: flex; gap: 10px; margin-top: 15px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim"></div></div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;"><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas:</label><input type="number" id="promoLimite" placeholder="Vazio = Ilimitado"></div></div>
-            <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; background: #1a1a1a; padding: 10px; border-radius: 5px;">
-                ✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all; margin-top:5px;" id="promoListaTelefones"></div>
-            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap:wrap;"><div style="flex: 1; min-width:120px; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; min-width:120px; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Data Fim:</label><input type="date" id="promoFim"></div></div>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap:wrap;"><div style="flex: 1; min-width:120px; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; min-width:120px; text-align: left;"><label style="font-size: 0.8rem; color: #aaa;">Limite de Pessoas:</label><input type="number" id="promoLimite" placeholder="Ilimitado"></div></div>
+            <div id="promoUsosDisplay" style="text-align: left; margin-top: 10px; font-size: 0.85rem; color: var(--success); display: none; background: #1a1a1a; padding: 10px; border-radius: 5px;">✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.8rem; word-break: break-all; margin-top:5px;" id="promoListaTelefones"></div></div>
             <div style="text-align: left; margin-top: 15px;"><label style="font-size: 0.8rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 150px;"></div></div>
             <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button>
             <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
@@ -203,6 +239,12 @@
     <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Gerir Lista Negra</h3><div id="loadingBlacklist" style="margin: 15px 0; color: var(--primary); display: none;">A carregar...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
     </div>
+
+    <div id="modalInterdicao" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Interditar Horários</h3><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
+    </div>
+
+    <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary)">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
@@ -319,8 +361,8 @@
                 let row = clientesCadastrados[i]; let nome = row[1]; let telefone = row[2]; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
                 if (termoPesquisa && !nome.toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
                 if(!isNaN(diasFiltro) && diasFiltro > 0 && ultimoAgendamentoStr) { let dataUltimo = parseDataBR(ultimoAgendamentoStr); if(dataUltimo && Math.floor((hoje.getTime() - dataUltimo.getTime()) / (1000 * 60 * 60 * 24)) <= diasFiltro) continue; }
-                let btnWa = `<button class="btn-icon btn-wa" style="font-size:1.3rem; margin-right:8px;" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
-                let btnDel = `<button class="btn-icon btn-del" style="font-size:1.3rem; margin-left:8px;" onclick="excluirCliente('${telefone}', '${nome.replace(/'/g, "\\'")}')">🗑️</button>`;
+                let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
+                let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${telefone}', '${nome.replace(/'/g, "\\'")}')">🗑️</button>`;
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
                 tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
             }
