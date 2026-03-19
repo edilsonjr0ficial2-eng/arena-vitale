@@ -69,28 +69,21 @@
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* --- OTIMIZAÇÃO EXCLUSIVA PARA SMARTPHONES (ANDROID E IPHONE) --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .top-row { flex-direction: column; gap: 15px; }
             .logo-img { max-height: 50px; }
-            
             .toolbar { justify-content: center; gap: 8px; }
             .tool-btn { flex: 1 1 calc(50% - 8px); justify-content: center; text-align: center; padding: 12px 10px; font-size: 0.8rem; }
-            
             .stats-bar { flex-direction: column; text-align: center; gap: 10px; padding: 10px; }
-            
-            .grid-container { grid-template-columns: 1fr; gap: 20px; } /* Quadras uma por cima da outra */
-            
-            .slot { padding: 15px 10px; } /* Mais altura para facilitar o toque */
-            .slot-content { font-size: 0.95rem; white-space: normal; overflow: visible; word-break: break-word; } /* Permite quebrar linha no telemóvel */
-            .btn-icon { font-size: 1.4rem; padding: 8px; } /* Ícones bem maiores para os dedos */
-            
+            .grid-container { grid-template-columns: 1fr; gap: 20px; } 
+            .slot { padding: 15px 10px; } 
+            .slot-content { font-size: 0.95rem; white-space: normal; overflow: visible; word-break: break-word; } 
+            .btn-icon { font-size: 1.4rem; padding: 8px; } 
             .controls { flex-wrap: wrap; }
             .date-display { font-size: 1.1rem; }
-            
-            .dash-grid { grid-template-columns: 1fr; } /* Gráficos do dashboard em 1 coluna */
-            .interdicao-grid { grid-template-columns: 1fr; } /* Janelas pop-up (modais) em 1 coluna */
+            .dash-grid { grid-template-columns: 1fr; } 
+            .interdicao-grid { grid-template-columns: 1fr; } 
         }
 
         @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; margin-bottom:20px; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; font-weight:bold; font-size:1.5rem; margin-bottom:15px; text-align:center;} }
@@ -241,7 +234,7 @@
     </div>
 
     <div id="modalInterdicao" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Interditar Horários</h3><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
+        <div class="modal-box" style="max-width:500px;"><h3 style="color:var(--danger)">Interditar Horários</h3><div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:5px;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:5px;">Desmarcar Todos</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
     </div>
 
     <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary)">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:20px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
@@ -354,19 +347,64 @@
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
         }
 
+        function parseDataBR(dataStr) { 
+            if (!dataStr) return null; 
+            let str = dataStr.toString().trim();
+            if (str.includes('T') && str.includes('-')) {
+                let d = new Date(str);
+                if (!isNaN(d.getTime())) return d;
+            }
+            let partesTempo = str.split(' ');
+            let soData = partesTempo[0].replace(/,/g, '').trim(); 
+            let partes = soData.split('/'); 
+            if(partes.length === 3) {
+                return new Date(partes[2], partes[1] - 1, partes[0]); 
+            }
+            let fallback = new Date(str);
+            return isNaN(fallback.getTime()) ? null : fallback;
+        }
+
         function renderizarTabelaClientes() {
             document.getElementById('loadingClientes').style.display = 'none'; document.getElementById('tabelaClientes').style.display = 'table'; const tbody = document.getElementById('listaClientesBody'); tbody.innerHTML = '';
             let diasFiltro = parseInt(document.getElementById('filtroDias').value); let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); let hoje = new Date(); hoje.setHours(0,0,0,0);
+            
             for(let i = 1; i < clientesCadastrados.length; i++) { 
-                let row = clientesCadastrados[i]; let nome = row[1]; let telefone = row[2]; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
-                if (termoPesquisa && !nome.toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
-                if(!isNaN(diasFiltro) && diasFiltro > 0 && ultimoAgendamentoStr) { let dataUltimo = parseDataBR(ultimoAgendamentoStr); if(dataUltimo && Math.floor((hoje.getTime() - dataUltimo.getTime()) / (1000 * 60 * 60 * 24)) <= diasFiltro) continue; }
+                let row = clientesCadastrados[i]; let nome = row[1] || ""; let telefone = row[2] || ""; let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
+                
+                if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
+                
+                let dataUltimo = parseDataBR(ultimoAgendamentoStr);
+                
+                if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { 
+                    dataUltimo.setHours(0,0,0,0);
+                    let diffTime = hoje.getTime() - dataUltimo.getTime();
+                    let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    if (diasInativo <= diasFiltro) continue;
+                }
+                
+                // Formatação Bonita "18/03/2026 às 19:27"
+                let displayData = "Nunca";
+                if (ultimoAgendamentoStr) {
+                    let strD = ultimoAgendamentoStr.toString();
+                    if(strD.includes('T')) {
+                        let dO = new Date(strD);
+                        if(!isNaN(dO.getTime())) {
+                            let d = String(dO.getDate()).padStart(2, '0');
+                            let m = String(dO.getMonth() + 1).padStart(2, '0');
+                            let a = dO.getFullYear();
+                            let h = String(dO.getHours()).padStart(2, '0');
+                            let mn = String(dO.getMinutes()).padStart(2, '0');
+                            displayData = `${d}/${m}/${a} às ${h}:${mn}`;
+                        } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); }
+                    } else { displayData = strD.replace('.000Z', ''); }
+                }
+
                 let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
-                let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${telefone}', '${nome.replace(/'/g, "\\'")}')">🗑️</button>`;
+                let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${telefone}', '${nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`;
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
-                tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${ultimoAgendamentoStr || "Nunca"}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
+                tr.innerHTML = `<td style="padding: 10px 8px;"><b>${nome}</b><br><small style="color:#aaa">${telefone}</small></td><td style="padding: 10px 8px; color:#aaa;">${displayData}</td><td style="padding: 10px 8px; text-align:center;"><input type="number" id="pts_${telefone}" value="${pontos}" style="width: 55px; padding: 5px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 10px 8px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block;" onclick="salvarPontosAdmin(event, '${telefone}')">Salvar</button>${btnDel}</td>`; tbody.appendChild(tr);
             }
-            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
+            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#aaa;">Nenhum cliente encontrado com este filtro.</td></tr>'; 
         }
 
         function excluirCliente(telefone, nome) {
@@ -376,7 +414,6 @@
                 });
             }
         }
-        function parseDataBR(dataStr) { if (!dataStr) return null; let soData = dataStr.split(',')[0].split(' ')[0].trim(); let partes = soData.split('/'); if(partes.length === 3) return new Date(partes[2], partes[1] - 1, partes[0]); return null; }
 
         function salvarPontosAdmin(event, telefone) {
             let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value); if(isNaN(novosPontos)) return alert("Valor inválido.");
