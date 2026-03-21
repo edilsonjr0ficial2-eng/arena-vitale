@@ -422,7 +422,7 @@
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
-        // --- DASHBOARD COM BOTÃO DO WHATSAPP DE VENDAS ATIVAS ---
+        // --- ATUALIZAÇÃO: DASHBOARD COM CLIENTES NOVOS DE HOJE ---
         function abrirEstatisticas() {
             document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json()).then(data => {
@@ -431,13 +431,20 @@
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
                     
                     let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').map(v => {
-                        let text = v.trim();
-                        let phoneMatch = text.match(/\(([^)]+)\)/);
-                        let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
-                        // BOTÃO WHATSAPP EXTRAÍDO E FORMATADO:
+                        let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
                         let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.2rem; background:#222; border-radius:50%; padding:5px; margin-left:10px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : "";
                         return `<div style="padding:8px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`;
                     }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
+
+                    // CRIA A LISTA DE NOVOS CLIENTES CADASTRADOS HOJE
+                    let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 
+                        ? s.novosClientesHoje.map(c => {
+                            let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.2rem; background:#222; border-radius:50%; padding:5px; margin-left:10px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : "";
+                            return `<div style="padding:8px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`;
+                        }).join('') 
+                        : "<div style='padding:5px 0;'>Nenhum novo cadastro hoje.</div>";
+
+                    let qtdNovosHoje = s.novosClientesHoje ? s.novosClientesHoje.length : 0;
 
                     let html = `
                     <div class="dash-grid">
@@ -447,7 +454,13 @@
                             <button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:10px; background:var(--primary); color:black; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem; font-weight:bold; width:100%;">Ver Quem Acessou</button>
                             <div id="listaVisitantes" style="display:none; margin-top:10px; max-height:160px; overflow-y:auto; background:#111; padding:10px; border-radius:5px; font-size:0.85rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
                         </div>
-                        <div class="dash-card"><h4>Clientes Registados</h4><div class="value">👥 ${s.totalClientes}</div></div>
+                        <div class="dash-card">
+                            <h4>Clientes Registados</h4>
+                            <div class="value">👥 ${s.totalClientes}</div>
+                            <div style="font-size: 0.85rem; color: var(--success); margin-top: 5px;">+${qtdNovosHoje} hoje</div>
+                            <button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:10px; background:var(--success); color:black; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem; font-weight:bold; width:100%;">Ver Cadastros de Hoje</button>
+                            <div id="listaNovosClientes" style="display:none; margin-top:10px; max-height:160px; overflow-y:auto; background:#111; padding:10px; border-radius:5px; font-size:0.85rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div>
+                        </div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.4rem;">🎾 ${preferida}</div></div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.2rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div>
