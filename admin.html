@@ -242,6 +242,7 @@
         let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
         let chartAcessosInstancia = null; let dadosAcessosGlobais = [];
+        let promocaoAtual = null;
 
         window.onload = function() {
             let user = localStorage.getItem('adminUser');
@@ -249,7 +250,15 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('nomeLogadoDisplay').innerText = "👤 " + user;
                 if(localStorage.getItem('adminMaster') === 'true') document.getElementById('btnGerirAdmins').style.display = 'flex';
-                carregarConfigAdmin(); carregarAgenda(); setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+                carregarConfigAdmin(); 
+                
+                // CARREGA A PROMOÇÃO PRIMEIRO PARA DEPOIS CALCULAR A AGENDA
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
+                    if(d.sucesso && d.promo) promocaoAtual = d.promo;
+                    carregarAgenda(); 
+                }).catch(()=>carregarAgenda());
+                
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
             }
         };
 
@@ -273,7 +282,7 @@
                 document.getElementById('btnRecarregar').innerText = "A limpar...";
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "executar_limpeza" }) })
                 .then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); carregarAgenda(); }
+                    if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); location.reload(); }
                     else { alert("Erro: " + data.erro); document.getElementById('btnRecarregar').innerText = "↻"; }
                 }).catch(e => { alert("Erro de conexão."); document.getElementById('btnRecarregar').innerText = "↻"; });
             }
@@ -337,10 +346,19 @@
         function salvarPromocao() {
             let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value));
             if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção ativada!"); document.getElementById('modalPromocao').style.display = 'none'; } });
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { 
+                if(data.sucesso) { 
+                    alert("Promoção ativada!"); 
+                    location.reload(); 
+                } 
+            });
         }
         function desativarPromocao() {
-            if(confirm("Desativar a promoção?")) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('modalPromocao').style.display = 'none'; } }); }
+            if(confirm("Desativar a promoção?")) { 
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { 
+                    if(data.sucesso) { location.reload(); } 
+                }); 
+            }
         }
 
         function abrirGerenciadorClientes() {
@@ -351,18 +369,10 @@
         function parseDataBR(dataStr) { 
             if (!dataStr) return null; 
             let str = dataStr.toString().trim();
-            if (str.includes('T') && str.includes('-')) {
-                let d = new Date(str);
-                if (!isNaN(d.getTime())) return d;
-            }
-            let partesTempo = str.split(' ');
-            let soData = partesTempo[0].replace(/,/g, '').trim(); 
-            let partes = soData.split('/'); 
-            if(partes.length === 3) {
-                return new Date(partes[2], partes[1] - 1, partes[0]); 
-            }
-            let fallback = new Date(str);
-            return isNaN(fallback.getTime()) ? null : fallback;
+            if (str.includes('T') && str.includes('-')) { let d = new Date(str); if (!isNaN(d.getTime())) return d; }
+            let partesTempo = str.split(' '); let soData = partesTempo[0].replace(/,/g, '').trim(); let partes = soData.split('/'); 
+            if(partes.length === 3) { return new Date(partes[2], partes[1] - 1, partes[0]); }
+            let fallback = new Date(str); return isNaN(fallback.getTime()) ? null : fallback;
         }
 
         function renderizarTabelaClientes() {
@@ -375,11 +385,8 @@
                 if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
                 
                 let dataUltimo = parseDataBR(ultimoAgendamentoStr);
-                
                 if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { 
-                    dataUltimo.setHours(0,0,0,0);
-                    let diffTime = hoje.getTime() - dataUltimo.getTime();
-                    let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    dataUltimo.setHours(0,0,0,0); let diffTime = hoje.getTime() - dataUltimo.getTime(); let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     if (diasInativo <= diasFiltro) continue;
                 }
                 
@@ -389,11 +396,7 @@
                     if(strD.includes('T')) {
                         let dO = new Date(strD);
                         if(!isNaN(dO.getTime())) {
-                            let d = String(dO.getDate()).padStart(2, '0');
-                            let m = String(dO.getMonth() + 1).padStart(2, '0');
-                            let a = dO.getFullYear();
-                            let h = String(dO.getHours()).padStart(2, '0');
-                            let mn = String(dO.getMinutes()).padStart(2, '0');
+                            let d = String(dO.getDate()).padStart(2, '0'); let m = String(dO.getMonth() + 1).padStart(2, '0'); let a = dO.getFullYear(); let h = String(dO.getHours()).padStart(2, '0'); let mn = String(dO.getMinutes()).padStart(2, '0');
                             displayData = `${d}/${m}/${a} às ${h}:${mn}`;
                         } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); }
                     } else { displayData = strD.replace('.000Z', ''); }
@@ -528,18 +531,49 @@
         }
 
         function processarCSV(csv, diaIndex) {
-            const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0;
+            const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0; faturamentoDia = 0;
+            
+            let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = [];
+            if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
+                let dataEscolhida = new Date(dataAtual); dataEscolhida.setHours(0,0,0,0);
+                let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]);
+                let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
+                if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
+                    promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0;
+                    horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
+                }
+            }
+
             rows.forEach((row, idx) => {
                 if(idx === 0) return; let h = parseInt(row[0]);
                 if(!isNaN(h)) {
-                    let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
-                    if(n1) ocupados++; if(n2) ocupados++; if(n1.includes("⏳")) pendentesAtuais++; if(n2.includes("⏳")) pendentesAtuais++;
+                    let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; 
+                    let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
+                    
+                    let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 7 && h <= 16 ? 35 : 45);
+
+                    if(n1) {
+                        ocupados++; 
+                        if(n1.includes("⏳")) pendentesAtuais++;
+                        if(!n1.includes("⛔")) faturamentoDia += vHora;
+                    }
+                    if(n2) {
+                        ocupados++; 
+                        if(n2.includes("⏳")) pendentesAtuais++;
+                        if(!n2.includes("⛔")) faturamentoDia += vHora;
+                    }
+                    
                     dadosAgenda.push({ hora: h, q1: n1, q2: n2 });
                 }
             });
-            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100); faturamentoDia = ocupados * 45; 
-            document.getElementById('statOcupacao').innerText = porc + "%"; document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); renderizarGrid();
-            if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos); if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; totalPendentesConhecidos = pendentesAtuais; 
+            
+            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100); 
+            document.getElementById('statOcupacao').innerText = porc + "%"; 
+            document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); 
+            renderizarGrid();
+            if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos); 
+            if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; 
+            totalPendentesConhecidos = pendentesAtuais; 
         }
 
         function renderizarGrid() {
