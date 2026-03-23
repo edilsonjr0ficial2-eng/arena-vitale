@@ -252,7 +252,6 @@
                 if(localStorage.getItem('adminMaster') === 'true') document.getElementById('btnGerirAdmins').style.display = 'flex';
                 carregarConfigAdmin(); 
                 
-                // CARREGA A PROMOÇÃO PRIMEIRO PARA DEPOIS CALCULAR A AGENDA
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
                     if(d.sucesso && d.promo) promocaoAtual = d.promo;
                     carregarAgenda(); 
@@ -347,10 +346,7 @@
             let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value));
             if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { 
-                if(data.sucesso) { 
-                    alert("Promoção ativada!"); 
-                    location.reload(); 
-                } 
+                if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } 
             });
         }
         function desativarPromocao() {
@@ -433,14 +429,14 @@
                     let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
                     
-                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').map(v => {
+                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').reverse().map(v => {
                         let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
                         let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : "";
                         return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`;
                     }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
 
                     let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 
-                        ? s.novosClientesHoje.map(c => {
+                        ? s.novosClientesHoje.reverse().map(c => {
                             let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : "";
                             return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`;
                         }).join('') 
