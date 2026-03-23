@@ -11,43 +11,35 @@
     <style>
         :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-        /* Reduzido o padding geral */
         body { background: var(--bg); color: var(--text); padding: 10px 20px; transition: 0.3s; }
         
-        /* Cabeçalho mais compacto */
         .header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
         .logo-img { max-height: 45px; width: auto; display: block; }
         
-        /* Botões menores */
         .toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
         .tool-btn { padding: 6px 10px; border-radius: 4px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: 0.2s; }
         .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
         .btn-logout { background: var(--danger); border: none; color: white; }
         
-        /* Barra de estatísticas mais fina */
         .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 8px 15px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; font-size: 0.8rem; justify-content: space-around; }
         .stat-item span { color: var(--primary); font-weight: 900; font-size: 1rem; }
         
-        /* Controles de dia menores */
         .controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; background: var(--card); padding: 6px; border-radius: 8px; }
         .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.1rem; cursor: pointer; padding: 2px 15px; border-radius: 4px; }
         .date-display { font-size: 1rem; font-weight: bold; text-transform: uppercase; }
         
-        /* Grid da agenda super compacto */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 1200px; margin: auto; }
         .column { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
         .col-header { background: var(--primary); color: #000; padding: 6px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; }
         
-        /* Linhas de horário bem mais finas */
         .slot { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 1px solid #333; font-size: 0.8rem; }
         .time-label { font-weight: bold; color: #777; width: 45px; }
         .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .slot-content.booked { color: var(--primary); font-weight: bold; }
         .slot-content.pending { color: var(--pending); font-style: italic; }
         
-        /* Ícones de ação menores */
         .actions { display: flex; gap: 4px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
         .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
@@ -77,7 +69,6 @@
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Mantém responsivo para telemóveis */
         @media (max-width: 768px) {
             body { padding: 8px; }
             .top-row { flex-direction: column; gap: 10px; }
@@ -120,8 +111,8 @@
         <div class="toolbar">
             <button class="tool-btn" id="btnGerirAdmins" onclick="abrirModalAdmins()" style="display:none; border-color:var(--primary); color:var(--primary);">🔐 Contas</button>
             <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">...</button>
-            <button class="tool-btn" id="btnAutoLimpeza" onclick="toggleAutoLimpeza()" style="border-color: #555;">...</button>
             <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa</button>
+            <button class="tool-btn" onclick="aplicarMoldeNaAgenda()" style="border-color: var(--success); color: var(--success);" title="Copia o Molde para a Agenda da Semana">🔄 Sincronizar Molde</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
             <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
@@ -277,6 +268,17 @@
 
         function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
 
+        function aplicarMoldeNaAgenda() {
+            if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsto vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem a certeza que deseja aplicar o molde agora?")) {
+                document.getElementById('btnRecarregar').innerText = "A limpar...";
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "executar_limpeza" }) })
+                .then(r => r.json()).then(data => {
+                    if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); carregarAgenda(); }
+                    else { alert("Erro: " + data.erro); document.getElementById('btnRecarregar').innerText = "↻"; }
+                }).catch(e => { alert("Erro de conexão."); document.getElementById('btnRecarregar').innerText = "↻"; });
+            }
+        }
+
         function abrirModalAdmins() {
             document.getElementById('modalGerenciarAdmins').style.display = 'flex';
             document.getElementById('listaAdminsConteudo').innerHTML = "A carregar...";
@@ -303,14 +305,12 @@
         function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
 
         function carregarConfigAdmin() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.autoLimpeza, data.dataInicio, data.dataFim); });
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.dataInicio, data.dataFim); });
         }
-        function atualizarBotoesConfig(liberada, autoLimpeza, dIni, dFim) {
+        function atualizarBotoesConfig(liberada, dIni, dFim) {
             let btnT = document.getElementById('btnTravaAgenda');
             if (liberada) { let txt = "🔓 Liberada"; if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; } btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
             } else { btnT.innerHTML = "🔒 Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
-            let btnL = document.getElementById('btnAutoLimpeza');
-            if (autoLimpeza) { btnL.innerHTML = "♻️ Limpeza: ON"; btnL.style.color = "var(--success)"; btnL.style.borderColor = "var(--success)"; } else { btnL.innerHTML = "♻️ Limpeza: OFF"; btnL.style.color = "var(--danger)"; btnL.style.borderColor = "var(--danger)"; }
         }
 
         function abrirModalCadeado() {
@@ -321,9 +321,6 @@
             document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_trava_agenda", status: document.getElementById('cadStatus').value, inicio: document.getElementById('cadInicio').value, fim: document.getElementById('cadFim').value }) })
             .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } });
-        }
-        function toggleAutoLimpeza() {
-            document.getElementById('btnAutoLimpeza').innerText = "Aguarde..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "toggle_auto_limpeza" }) }).then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); } });
         }
 
         function abrirModalPromocao() {
