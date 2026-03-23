@@ -80,25 +80,16 @@
         .fidelidade-nota { margin-top: 25px; font-size: 0.85rem; color: #888; border-top: 1px solid #333; padding-top: 15px;}
         .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
         .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
-        .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; }
+        
+        /* CORREÇÃO DO BOTÃO WHATSAPP NO IPHONE */
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
+        .wa-float i { color: white; font-size: 35px; }
         .wa-float:hover { transform: scale(1.1); }
+        
         .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
         .ig-float i { color: white; font-size: 30px; }
         .ig-float:hover { transform: scale(1.1); }
-        .chat-float-btn { position: fixed; bottom: 170px; right: 30px; background-color: var(--primary); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; cursor: pointer; color: black; font-size: 24px; display: none; border: none; outline: none; }
-        .chat-float-btn:hover { transform: scale(1.1); background-color: var(--hover); }
-        .chatbot-window { position: fixed; bottom: 90px; right: 30px; width: 320px; height: 450px; background: var(--card-color); border: 2px solid var(--primary); border-radius: 15px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; font-family: 'Montserrat', sans-serif; }
-        .chat-header { background: var(--primary); color: black; padding: 15px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
-        .chat-header span { cursor: pointer; font-size: 1.2rem; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; background: #0a0a0a; }
-        .msg-user { align-self: flex-end; background: #333; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%; word-wrap: break-word; }
-        .msg-bot { align-self: flex-start; background: var(--primary); color: black; padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%; word-wrap: break-word; font-weight: 500;}
-        .chat-input-area { display: flex; padding: 10px; border-top: 1px solid #333; background: var(--card-color); }
-        .chat-input-area input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; outline: none; }
-        .chat-input-area input:focus { border-color: var(--primary); }
-        .chat-input-area button { background: var(--primary); color: black; border: none; padding: 10px 15px; margin-left: 8px; cursor: pointer; border-radius: 8px; font-weight: bold; transition: 0.2s; }
-        .chat-input-area button:hover { background: var(--hover); }
-        .typing-indicator { font-size: 0.8rem; color: #888; align-self: flex-start; margin-left: 5px; display: none; }
+        
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none;}
         footer p { margin: 5px 0; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
@@ -144,7 +135,6 @@
 
         @media (max-width: 600px) { 
             .hero h1 { font-size: 3rem; } 
-            .chatbot-window { width: 90%; right: 5%; bottom: 80px;}
         }
         @media (max-width: 1100px) { 
             .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background-color: #111; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; border-bottom: 1px solid var(--primary); display: none; }
@@ -182,12 +172,12 @@
             <h2 class="auth-title">Recuperar Senha</h2>
             <p style="color:#ccc; margin-bottom:15px; font-size:0.9rem;">Enviaremos um código para seu número cadastrado.</p>
             <div id="etapa1-rec">
-                <input type="tel" id="recPhone" class="auth-input" placeholder="Seu Telefone">
-                <button class="auth-btn" onclick="enviarCodigoRecuperacao()">ENVIAR CÓDIGO</button>
+                <input type="tel" id="recPhone" class="auth-input" placeholder="Seu Telefone (Com DDD)">
+                <button class="auth-btn" onclick="enviarCodigoRecuperacao()">GERAR CÓDIGO</button>
             </div>
             <div id="etapa2-rec" style="display:none;">
                 <input type="number" id="recCodigo" class="auth-input" placeholder="Código Recebido">
-                <input type="password" id="recNovaSenha" class="auth-input" placeholder="Nova Senha">
+                <input type="password" id="recNovaSenha" class="auth-input" placeholder="Criar Nova Senha">
                 <button class="auth-btn" onclick="confirmarNovaSenha()">ALTERAR SENHA</button>
             </div>
             <div class="auth-link" onclick="mostrarLogin()">Cancelar</div>
@@ -225,23 +215,6 @@
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
         <button class="btn-main" onclick="navegarPara('tela-agendamento')">🔍 VERIFICAR HORÁRIOS</button>
-    </div>
-
-    <button class="chat-float-btn" onclick="toggleChat()" title="Falar com a IA">🤖</button>
-    
-    <div class="chatbot-window" id="chatbotWindow">
-        <div class="chat-header">
-            Areninha Vitalezinha 🎾
-            <span onclick="toggleChat()">✖</span>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="msg-bot">Olá! Eu sou a Areninha Vitalezinha 🎾, a assistente da Arena Vitale. Posso tirar suas dúvidas sobre a arena e no final das nossas conversas sempre te conto uma curiosidade incrível sobre o Beach Tennis! Como posso ajudar hoje? 😊</div>
-        </div>
-        <div class="typing-indicator" id="typingIndicator">A Areninha está a digitar...</div>
-        <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Escreva a sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
-            <button onclick="enviarMensagemChat()">➤</button>
-        </div>
     </div>
 
     <div id="tela-fidelidade" class="secao-conteudo">
@@ -349,7 +322,9 @@
 
     <footer id="footerPrincipal"><p>Desenvolvido por Edilson Renovato</p><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
     
-    <a href="https://wa.me/5588988229008" class="wa-float" target="_blank" title="Falar no WhatsApp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></a>
+    <a href="https://wa.me/5588988229008" class="wa-float" target="_blank" title="Falar no WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
     <a href="https://www.instagram.com/arenavitale/" class="ig-float" target="_blank" title="Siga no Instagram"><i class="fab fa-instagram"></i></a>
 
     <script>
@@ -377,16 +352,14 @@
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
                 
-                // NOVO: AVISA O GOOGLE APENAS DEPOIS DE SABER QUEM É O CLIENTE
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso", nome: usuarioLogado.nome, telefone: usuarioLogado.phone }) }).catch(e => console.log(e));
 
-                document.getElementById('tela-auth').style.display = 'none'; document.querySelector('.navbar').style.display = 'block'; document.getElementById('relogioFlutuante').style.display = 'block'; document.querySelector('.btn-refresh-float').style.display = 'flex'; document.querySelector('.wa-float').style.display = 'flex'; document.querySelector('.ig-float').style.display = 'flex'; document.querySelector('.chat-float-btn').style.display = 'flex'; document.querySelector('footer').style.display = 'block';
+                document.getElementById('tela-auth').style.display = 'none'; document.querySelector('.navbar').style.display = 'block'; document.getElementById('relogioFlutuante').style.display = 'block'; document.querySelector('.btn-refresh-float').style.display = 'flex'; document.querySelector('.wa-float').style.display = 'flex'; document.querySelector('.ig-float').style.display = 'flex'; document.querySelector('footer').style.display = 'block';
                 atualizarRelogio(); document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
                 carregarDadosDoDia(); carregarClima(); buscarPontosNoServidor(); 
                 const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
                 if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) navegarPara(telaSalvaSessao); else navegarPara('tela-inicial');
             } else { 
-                // AVISA O GOOGLE QUE É UM VISITANTE ANÓNIMO (SÓ +1 NA CONTA)
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
                 navegarPara('tela-inicial'); 
             }
@@ -427,22 +400,41 @@
             } else if (senhaAdmin !== null && senhaAdmin !== "") { alert("❌ Senha incorreta! O resgate não foi realizado."); }
         }
 
-        function toggleChat() { const cw = document.getElementById('chatbotWindow'); cw.style.display = cw.style.display === 'flex' ? 'none' : 'flex'; }
-
-        async function enviarMensagemChat() {
-            const inputField = document.getElementById('chatInput'); const userMessage = inputField.value.trim(); if (!userMessage) return;
-            adicionarMensagemUI('user', userMessage); inputField.value = ''; document.getElementById('typingIndicator').style.display = 'block';
-            try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: "chat_ia", mensagem: userMessage }) });
-                const data = await response.json(); document.getElementById('typingIndicator').style.display = 'none';
-                if (data.sucesso && data.resposta) adicionarMensagemUI('bot', data.resposta); else adicionarMensagemUI('bot', "Poxa, deu-me um branco agora. Pode repetir a pergunta? 😕");
-            } catch (error) { document.getElementById('typingIndicator').style.display = 'none'; adicionarMensagemUI('bot', "Estou sem internet para pensar agora. Por favor, chame-nos no WhatsApp!"); }
+        // --- SISTEMA DE RECUPERAÇÃO DE SENHA ---
+        let codigoRecuperacao = ""; let telefoneRecuperacao = "";
+        function enviarCodigoRecuperacao() {
+            telefoneRecuperacao = document.getElementById('recPhone').value.replace(/\D/g, "");
+            if(telefoneRecuperacao.length !== 11) return alert("Digite o número correto com DDD (11 dígitos).");
+            
+            const btn = document.querySelector('#etapa1-rec button'); btn.innerText = "A aguardar..."; btn.disabled = true;
+            
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: telefoneRecuperacao }) })
+            .then(r => r.json()).then(data => {
+                btn.innerText = "GERAR CÓDIGO"; btn.disabled = false;
+                if(data.sucesso) {
+                    codigoRecuperacao = data.codigo;
+                    alert("⚠️ CÓDIGO GERADO ⚠️\n\nO seu código de recuperação é: " + codigoRecuperacao + "\n\n(Futuramente, este código será enviado para o seu WhatsApp).");
+                    document.getElementById('etapa1-rec').style.display = 'none';
+                    document.getElementById('etapa2-rec').style.display = 'block';
+                } else { alert("Erro: " + data.erro); }
+            }).catch(e => { btn.innerText = "GERAR CÓDIGO"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
-        function adicionarMensagemUI(tipo, texto) {
-            const chatMessages = document.getElementById('chatMessages'); const msgDiv = document.createElement('div');
-            msgDiv.classList.add(tipo === 'user' ? 'msg-user' : 'msg-bot'); msgDiv.innerHTML = texto.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); 
-            chatMessages.appendChild(msgDiv); chatMessages.scrollTop = chatMessages.scrollHeight;
+        function confirmarNovaSenha() {
+            const cod = document.getElementById('recCodigo').value;
+            const nova = document.getElementById('recNovaSenha').value;
+            
+            if(cod !== codigoRecuperacao) return alert("Código incorreto!");
+            if(!nova || nova.length < 4) return alert("A nova senha deve ter no mínimo 4 caracteres.");
+            
+            const btn = document.querySelector('#etapa2-rec button'); btn.innerText = "A salvar..."; btn.disabled = true;
+            
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_nova_senha", telefone: telefoneRecuperacao, senha: nova }) })
+            .then(r => r.json()).then(data => {
+                btn.innerText = "ALTERAR SENHA"; btn.disabled = false;
+                if(data.sucesso) { alert("Senha alterada com sucesso! Agora faça login com a nova senha."); mostrarLogin(); } 
+                else { alert("Erro ao salvar: " + data.erro); }
+            }).catch(e => { btn.innerText = "ALTERAR SENHA"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
         function mostrarCadastro() { document.getElementById('box-login').style.display='none'; document.getElementById('box-cadastro').style.display='block'; }
@@ -455,6 +447,8 @@
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "login", telefone: phone, senha: pass }) })
             .then(res => res.text()).then(text => { btn.innerText = "ENTRAR"; btn.disabled = false; try { const data = JSON.parse(text); if (data.erro) alert("❌ " + data.erro); else if (data.sucesso) { usuarioLogado = { nome: data.nome, phone: data.telefone }; localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado)); location.reload(); } } catch(e) { alert("⚠️ Erro no servidor."); } }).catch(e => { btn.innerText = "ENTRAR"; btn.disabled = false; alert("Erro de conexão."); });
         }
+
+        function fazerLogout() { localStorage.removeItem('usuarioArenaVitale'); location.reload(); }
 
         function realizarCadastro() {
             const nome = document.getElementById('cadNome').value; const phone = document.getElementById('cadPhone').value; const pass = document.getElementById('cadPass').value; const btn = document.getElementById('btnCadastrar');
@@ -565,10 +559,7 @@
                         let diaPlan = formatarDataHeader(dataVisualizada).index + 1; 
                         let colReal = diaPlan + colOffset; 
                         let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; 
-                        
-                        // CORTE DA ASSINATURA ANTES DE EXIBIR NO SITE DOS CLIENTES
                         val = val.split('||')[0].trim();
-
                         if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); 
                     }
                 });
@@ -576,7 +567,6 @@
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
-        // --- SISTEMA DE UNIFICAÇÃO DE HORÁRIOS COM PRIVACIDADE ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora'); 
             select.innerHTML = '<option value="">Selecione o horário...</option>';
@@ -590,7 +580,6 @@
             let limiteH = 22 - blocosNecessarios + 1;
 
             while (h <= 22) {
-                // Ocultar horas passadas se for hoje
                 if (isHoje && h <= horaAtual) { 
                     h++; 
                     continue; 
@@ -599,7 +588,6 @@
                 let ocupacaoAtual = horariosOcupadosDoDia.find(item => item.hora === h);
 
                 if (ocupacaoAtual) {
-                    // Agrupar bloco inteiro ocupado por essa pessoa (ex: Lorena 8h-10h)
                     let nomeOcupante = ocupacaoAtual.nome;
                     let horaFimOcupacao = h + 1;
                     while (horaFimOcupacao <= 22) {
@@ -611,7 +599,6 @@
                     
                     let option = document.createElement('option');
                     
-                    // NOVO: TEXTOS GENÉRICOS DE PRIVACIDADE
                     let displayTexto = "INDISPONÍVEL";
                     let nl = nomeOcupante.toLowerCase().trim();
                     if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { 
@@ -629,17 +616,14 @@
 
                     h = horaFimOcupacao; 
                 } else {
-                    // Para horários LIVRES
                     let option = document.createElement('option');
                     option.value = h;
 
                     if (h > limiteH) {
-                        // Ex: Cliente quer 2h mas já são 22h, não dá tempo
                         option.text = `Início: ${h}:00 | Encerra: ${h + 1}:00 - ⚠️ Tempo insuficiente`;
                         option.disabled = true;
                         select.appendChild(option);
                     } else {
-                        // Verifica se existe um bloqueio no meio do caminho da duração escolhida
                         let temConflito = false;
                         for (let i = 1; i < blocosNecessarios; i++) {
                             let horaVerificada = h + i;
@@ -659,7 +643,6 @@
                         }
                     }
                     
-                    // Incrementa sempre de 1 em 1 para as horas livres
                     h++;
                 }
             }
