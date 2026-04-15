@@ -39,14 +39,51 @@
         .floating-clock { position: fixed; top: 95px; right: 20px; background-color: rgba(0, 0, 0, 0.8); border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 1rem; font-weight: 900; z-index: 1000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); display: none; }
         .btn-refresh-float { position: fixed; top: 140px; right: 20px; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); color: var(--primary); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; z-index: 1000; transition: 0.5s; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); display: none; }
         .btn-refresh-float:hover { transform: rotate(360deg); background: var(--primary); color: black; }
-        #tela-inicial { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; overflow: hidden; position: relative; }
+        
+        #tela-inicial { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px 0; overflow: hidden; position: relative; }
         #tela-inicial::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(6px) brightness(0.6); transform: scale(1.1); z-index: 1; }
         #tela-inicial > * { position: relative; z-index: 2; }
+        
         .hero-logo { max-width: 90%; width: 600px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
         .weather-widget { background: rgba(0, 0, 0, 0.7); border: 1px solid var(--primary); padding: 8px 20px; border-radius: 50px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); font-weight: bold; color: var(--primary); }
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
-        .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        
+        /* BOTÃO ORIGINAL - MANTIDO INTACTO */
+        .btn-main { background-color: var(--primary); color: black; padding: 18px 40px; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); margin-bottom: 10px; }
         .btn-main:hover { transform: scale(1.05); background-color: var(--hover); }
+        
+        /* LAYOUT CENTRALIZADO DO BOTÃO COM CARDS MENORES À ESQUERDA */
+        .hero-bottom-bar { 
+            position: relative; 
+            width: 100%; 
+            max-width: 1300px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            padding: 0 40px; 
+            margin-top: 40px; 
+            min-height: 120px; 
+        }
+        
+        .partners-vertical-list { 
+            position: absolute; 
+            left: 40px; 
+            bottom: 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            text-align: left; 
+        }
+        .partners-vertical-title { color: #aaa; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: -3px; padding-left: 5px; }
+        
+        /* CARDS MENORES */
+        .partner-card { background: rgba(17, 17, 17, 0.85); border: 1px solid #333; border-radius: 10px; padding: 5px 10px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); min-width: 160px; }
+        .partner-card:hover { border-color: var(--primary); transform: translateX(5px); background: #1a1a1a; }
+        .partner-card img { height: 26px; width: auto; border-radius: 4px; object-fit: contain; }
+        .partner-info { display: flex; flex-direction: column; }
+        .partner-tag { font-size: 0.55rem; color: var(--primary); text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+        .partner-name { font-size: 0.75rem; font-weight: bold; margin-top: 1px; }
+
         .section-title { font-size: 2rem; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; text-align: center; width: 100%; }
         .agenda-box { background: var(--card-color); padding: 20px; border-radius: 15px; max-width: 600px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .court-selector { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
@@ -81,7 +118,6 @@
         .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
         .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
         
-        /* CORREÇÃO DO BOTÃO WHATSAPP NO IPHONE */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
         .wa-float i { color: white; font-size: 35px; }
         .wa-float:hover { transform: scale(1.1); }
@@ -96,10 +132,6 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
         .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
         .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
-        .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
-        .partner-link { text-decoration: none; display: inline-block; }
-        .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
-        .partner-logo:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
@@ -133,7 +165,22 @@
         .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
         .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
 
-        @media (max-width: 600px) { 
+        @media (max-width: 768px) {
+            .hero-bottom-bar { 
+                flex-direction: column-reverse; 
+                align-items: center; 
+                gap: 30px; 
+                margin-top: 20px; 
+                padding: 0 10px; 
+            }
+            .partners-vertical-list { 
+                position: relative; 
+                left: 0; 
+                bottom: 0; 
+                align-items: center; 
+                text-align: center; 
+            }
+            .partners-vertical-title { padding-left: 0; margin-bottom: 5px; }
             .hero h1 { font-size: 3rem; } 
         }
         @media (max-width: 1100px) { 
@@ -208,9 +255,45 @@
             <span id="clima-temp">--°C</span>
             <span id="clima-desc" style="font-weight:normal; font-size:0.9rem;">Russas-CE</span>
         </div>
+        
         <img src="logo2.png" alt="Arena Vitale" class="hero-logo">
         <p>A nova experiência do Beach Tennis de Russas e região.</p>
-        <button class="btn-main" onclick="navegarPara('tela-agendamento')">🔍 VERIFICAR HORÁRIOS</button>
+        
+        <div class="hero-bottom-bar">
+            
+            <div class="partners-vertical-list">
+                <span class="partners-vertical-title">Apoio Oficial:</span>
+                
+                <a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-card">
+                    <img src="quadra-chicashoes.jpg" alt="Chicashoes">
+                    <div class="partner-info">
+                        <span class="partner-tag">Patrocinador</span>
+                        <span class="partner-name">Chicashoes</span>
+                    </div>
+                </a>
+
+                <a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-card">
+                    <img src="quadra-panificadora.jpg" alt="Padaria do Helder">
+                    <div class="partner-info">
+                        <span class="partner-tag">Patrocinador</span>
+                        <span class="partner-name">Padaria do Helder</span>
+                    </div>
+                </a>
+
+                <a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-card">
+                    <img src="vitale.jpg" alt="Vitale Blend">
+                    <div class="partner-info">
+                        <span class="partner-tag">Apoio Oficial</span>
+                        <span class="partner-name">Vitale Blend</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div style="margin-bottom: 20px; z-index: 10;">
+                <button class="btn-main" onclick="navegarPara('tela-agendamento')">🔍 VERIFICAR HORÁRIOS</button>
+            </div>
+            
+        </div>
     </div>
 
     <div id="tela-fidelidade" class="secao-conteudo">
@@ -684,7 +767,7 @@
                 msg += "💰 Valor: R$ " + tempValor + ",00\n";
                 msg += "💳 Pagamento: " + pag + "\n\n";
                 msg += "✅ *Termos de cancelamento aceitos.*\n\n";
-                msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
+                msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar o ecrã, mas não se preocupe! Assim que confirmarmos a sua mensagem por aqui, o seu horário estará 100% garantido!";
                 
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
                 
