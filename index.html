@@ -342,7 +342,7 @@
 
         let usuarioLogado = null; let duracaoSelecionada = 1; let quadraSelecionada = 1; let dataVisualizada = new Date();
         let promocaoAtual = null; let usouPromoFlag = false; 
-        let horariosOcupadosDoDia = {}; // Alterado para objeto para guardar o texto (Pendente/Ocupado)
+        let horariosOcupadosDoDia = {}; 
 
         window.onload = function() {
             const savedUser = localStorage.getItem('usuarioArenaVitale');
@@ -370,8 +370,21 @@
                 }
                 widget.style.display = 'block';
                 if(data.sucesso && data.ranking && data.ranking.length > 0) {
+                    // CORREÇÃO: Agrupar nomes iguais caso a base de dados envie duplicados
+                    let agregados = {};
+                    data.ranking.forEach(r => {
+                        let nomeLimpo = r.nome.trim();
+                        if(!agregados[nomeLimpo]) agregados[nomeLimpo] = 0;
+                        agregados[nomeLimpo] += parseInt(r.horas) || 0;
+                    });
+                    
+                    let rankingOrdenado = Object.keys(agregados)
+                        .map(k => ({nome: k, horas: agregados[k]}))
+                        .sort((a,b) => b.horas - a.horas)
+                        .slice(0, 5); // Garante que só mostra os 5 primeiros
+                    
                     list.innerHTML = '';
-                    data.ranking.forEach((r, i) => list.innerHTML += `<li>${i+1}º ${r.nome} <span>${r.horas}h</span></li>`);
+                    rankingOrdenado.forEach((r, i) => list.innerHTML += `<li>${i+1}º ${r.nome} <span>${r.horas}h</span></li>`);
                 } else { list.innerHTML = '<li>Sem registos ainda.</li>'; }
             }).catch(e => { list.innerHTML = '<li>Erro ao carregar.</li>'; });
         }
@@ -416,14 +429,13 @@
                     p.push(val); return p;
                 });
 
-                horariosOcupadosDoDia = {}; // Limpa o objeto de horários
+                horariosOcupadosDoDia = {}; 
                 const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
                 
                 rows.forEach((r, i) => { 
                     if(i>0 && r[col]) {
                         let texto = r[col].replace(/[\r\n"]/g, '').trim();
                         if (texto !== "") {
-                            // Guarda o texto para saber se tem a ampulheta (⏳)
                             horariosOcupadosDoDia[parseInt(r[0])] = texto; 
                         }
                     }
@@ -440,26 +452,47 @@
             const select = document.getElementById('selectHora');
             select.innerHTML = '<option value="">Escolha o horário</option>';
             
-            // INTELIGÊNCIA: Identificar a hora atual para esconder o passado
+            // Identificar a hora atual para esconder o passado
             let dataHoje = new Date();
             let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && 
                           dataVisualizada.getMonth() === dataHoje.getMonth() && 
                           dataVisualizada.getFullYear() === dataHoje.getFullYear());
             let horaAtual = dataHoje.getHours();
 
-            for(let h=5; h<=22; h++) {
-                // Esconde as horas que já passaram (ex: se são 15:20, não mostra as 15h nem as anteriores)
-                if (isHoje && h <= horaAtual) {
+            let i = 5;
+            while (i <= 22) {
+                // Esconde as horas que já passaram (ex: se são 15:20, salta as 15h)
+                if (isHoje && i <= horaAtual) {
+                    i++;
                     continue; 
                 }
 
-                // INTELIGÊNCIA: Verifica no objeto se existe texto guardado para esta hora
-                if(horariosOcupadosDoDia[h]) {
-                    // Se o texto tiver a ampulheta, mostra Pendente, senão mostra Ocupado
-                    let statusTxt = horariosOcupadosDoDia[h].includes("⏳") ? "⏳ Pendente" : "❌ Ocupado";
-                    select.innerHTML += `<option disabled>${h}:00 - ${statusTxt}</option>`;
+                // INTELIGÊNCIA: Agrupar blocos contínuos da mesma pessoa ou status
+                if(horariosOcupadosDoDia[i]) {
+                    let startHour = i;
+                    let text = horariosOcupadosDoDia[i];
+                    
+                    // Definir visualmente se está Pendente, Interditado ou Ocupado
+                    let statusTxt = "❌ Ocupado";
+                    if (text.includes("⏳")) statusTxt = "⏳ Pendente";
+                    if (text.includes("⛔")) statusTxt = "⛔ Interditado";
+
+                    // Procura até que hora este bloco se estende
+                    let endHour = startHour;
+                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === text) {
+                        endHour++;
+                    }
+
+                    // Calcula a hora final real (ex: se termina na hora 14, significa 14h-15h, logo finaliza às 15:00)
+                    let displayEndHour = endHour + 1;
+                    
+                    select.innerHTML += `<option disabled>${startHour}:00 às ${displayEndHour}:00 - ${statusTxt}</option>`;
+
+                    // Faz o ciclo avançar para o próximo bloco livre
+                    i = endHour + 1;
                 } else {
-                    select.innerHTML += `<option value="${h}">✅ ${h}:00 - Livre</option>`;
+                    select.innerHTML += `<option value="${i}">✅ ${i}:00 - Livre</option>`;
+                    i++;
                 }
             }
         }
