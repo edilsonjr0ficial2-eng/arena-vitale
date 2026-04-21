@@ -119,6 +119,7 @@
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
+            <button class="tool-btn" onclick="alternarRanking()" style="border-color: var(--primary); color: var(--primary);">👁️ Ranking</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
             <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
@@ -280,6 +281,25 @@
         }
 
         function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
+
+        function alternarRanking() {
+            if(confirm("Tem a certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
+                fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ acao: "toggle_ranking" })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.sucesso) {
+                        if(data.statusAtual === "SIM") {
+                            alert("✅ O Ranking agora está VISÍVEL para os clientes.");
+                        } else {
+                            alert("🚫 O Ranking agora está OCULTO no site.");
+                        }
+                    }
+                }).catch(e => alert("Erro de conexão."));
+            }
+        }
 
         function aplicarMoldeNaAgenda() {
             if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsto vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem a certeza que deseja aplicar o molde agora?")) {
@@ -576,6 +596,13 @@
             if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; 
             totalPendentesConhecidos = pendentesAtuais; 
         }
+
+        function dispararNotificacao(novos) {
+            alertaSom.play().catch(e => console.log("Áudio bloqueado.")); document.title = `(${novos}) NOVO JOGO - Arena Vitale`;
+            const toast = document.getElementById('toastNotification'); toast.querySelector('span').innerText = novos === 1 ? "Nova Solicitação Pendente!" : `${novos} Novas Solicitações Pendentes!`; toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 6000);
+        }
+        function fecharToast() { document.getElementById('toastNotification').classList.remove('show'); }
 
         function renderizarGrid() {
             let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2); });
