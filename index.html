@@ -341,7 +341,8 @@
         const whatsappNumber = "5588988229008";
 
         let usuarioLogado = null; let duracaoSelecionada = 1; let quadraSelecionada = 1; let dataVisualizada = new Date();
-        let promocaoAtual = null; let usouPromoFlag = false; let horariosOcupadosDoDia = [];
+        let promocaoAtual = null; let usouPromoFlag = false; 
+        let horariosOcupadosDoDia = {}; // Alterado para objeto para guardar o texto (Pendente/Ocupado)
 
         window.onload = function() {
             const savedUser = localStorage.getItem('usuarioArenaVitale');
@@ -389,7 +390,7 @@
             if(id === 'tela-inicial') target.style.display = 'flex'; else target.style.display = 'block';
             if(id === 'tela-agendamento') carregarDadosDoDia();
             if(id === 'tela-fidelidade') renderizarFidelidade();
-            document.getElementById('navLinks').classList.remove('active'); // Fecha o menu no mobile ao clicar
+            document.getElementById('navLinks').classList.remove('active'); 
         }
 
         function mudarDia(delta) { dataVisualizada.setDate(dataVisualizada.getDate() + delta); carregarDadosDoDia(); }
@@ -405,7 +406,6 @@
                 const res = await fetch(SHEET_URL + '&t=' + Date.now());
                 const csv = await res.text();
                 
-                // Leitura blindada do CSV (ignora vírgulas dentro de nomes)
                 const rows = csv.split('\n').map(r => {
                     let p = []; let inQ = false; let val = "";
                     for(let c of r){
@@ -416,13 +416,16 @@
                     p.push(val); return p;
                 });
 
-                horariosOcupadosDoDia = [];
-                // CORREÇÃO: Mudado de "10 : 2" para "9 : 1" para alinhar com o Google Sheets
+                horariosOcupadosDoDia = {}; // Limpa o objeto de horários
                 const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
                 
                 rows.forEach((r, i) => { 
-                    if(i>0 && r[col] && r[col].replace(/[\r\n"]/g, '').trim() !== "") {
-                        horariosOcupadosDoDia.push(parseInt(r[0])); 
+                    if(i>0 && r[col]) {
+                        let texto = r[col].replace(/[\r\n"]/g, '').trim();
+                        if (texto !== "") {
+                            // Guarda o texto para saber se tem a ampulheta (⏳)
+                            horariosOcupadosDoDia[parseInt(r[0])] = texto; 
+                        }
                     }
                 });
                 atualizarMenuHorarios();
@@ -436,11 +439,27 @@
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora');
             select.innerHTML = '<option value="">Escolha o horário</option>';
+            
+            // INTELIGÊNCIA: Identificar a hora atual para esconder o passado
+            let dataHoje = new Date();
+            let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && 
+                          dataVisualizada.getMonth() === dataHoje.getMonth() && 
+                          dataVisualizada.getFullYear() === dataHoje.getFullYear());
+            let horaAtual = dataHoje.getHours();
+
             for(let h=5; h<=22; h++) {
-                if(horariosOcupadosDoDia.includes(h)) {
-                    select.innerHTML += `<option disabled>${h}:00 - Ocupado</option>`;
+                // Esconde as horas que já passaram (ex: se são 15:20, não mostra as 15h nem as anteriores)
+                if (isHoje && h <= horaAtual) {
+                    continue; 
+                }
+
+                // INTELIGÊNCIA: Verifica no objeto se existe texto guardado para esta hora
+                if(horariosOcupadosDoDia[h]) {
+                    // Se o texto tiver a ampulheta, mostra Pendente, senão mostra Ocupado
+                    let statusTxt = horariosOcupadosDoDia[h].includes("⏳") ? "⏳ Pendente" : "❌ Ocupado";
+                    select.innerHTML += `<option disabled>${h}:00 - ${statusTxt}</option>`;
                 } else {
-                    select.innerHTML += `<option value="${h}">${h}:00 - Livre</option>`;
+                    select.innerHTML += `<option value="${h}">✅ ${h}:00 - Livre</option>`;
                 }
             }
         }
