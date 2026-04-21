@@ -55,9 +55,9 @@
         .hero p { font-size: 1.2rem; color: #ddd; margin-bottom: 30px; max-width: 600px; text-shadow: 1px 1px 5px black; }
         
         .ranking-widget { 
-            position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important; 
+            position: absolute; top: 20px; left: 20px; margin: 0; 
             background: rgba(0, 0, 0, 0.75); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; 
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); color: white; text-align: left; z-index: 100 !important; 
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); color: white; text-align: left; z-index: 100; 
             min-width: 220px; backdrop-filter: blur(8px); display: none; 
         }
         .ranking-widget h4 { color: var(--primary); margin-bottom: 12px; font-size: 0.95rem; text-transform: uppercase; text-align: center; font-weight: 900; }
@@ -68,6 +68,7 @@
         
         .weather-widget { 
             background: rgba(0, 0, 0, 0.75); border: 1px solid var(--primary); padding: 8px 20px; border-radius: 50px; 
+            position: absolute; top: 20px; right: 20px;
             display: inline-flex; align-items: center; gap: 10px; margin-bottom: 25px;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); font-weight: bold; color: var(--primary); z-index: 100; backdrop-filter: blur(8px); 
         }
@@ -140,15 +141,21 @@
         .btn-cancel { background: rgba(255,255,255,0.1); color: white; border: 1px solid #555; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
         .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
 
+        /* CORREÇÃO DO LAYOUT PARA TELEMÓVEL (MOBILE) */
         @media (max-width: 768px) {
-            #tela-inicial { padding-top: 210px !important; justify-content: flex-start; } 
+            #tela-inicial { 
+                padding-top: 30px !important; /* Retirado o espaçamento exagerado */
+                display: flex; flex-direction: column; align-items: center; gap: 15px; 
+            } 
             .floating-clock { display: none !important; }
-            .ranking-widget { top: 15px !important; left: 10px !important; width: 145px !important; min-width: 145px !important; padding: 10px !important; }
-            .ranking-widget h4 { font-size: 0.75rem !important; margin-bottom: 8px !important; }
-            .ranking-list li { font-size: 0.7rem !important; padding: 4px 0 !important; }
-            .ranking-list li span { font-size: 0.6rem !important; padding: 2px 4px !important; }
-            .weather-widget { position: absolute !important; top: 15px !important; right: 10px !important; margin: 0 !important; padding: 5px 10px !important; font-size: 0.8rem !important; }
-            /* Correção da ordem no mobile */
+            
+            /* Ajuste para que o Ranking e Clima não se sobreponham e fiquem organizados */
+            .ranking-widget { position: relative !important; top: 0 !important; left: 0 !important; margin: 0 !important; width: 100% !important; max-width: 320px !important; }
+            .ranking-widget h4 { font-size: 0.9rem !important; margin-bottom: 8px !important; }
+            .ranking-list li { font-size: 0.8rem !important; padding: 4px 0 !important; }
+            .weather-widget { position: relative !important; top: 0 !important; right: 0 !important; margin: 0 !important; width: 100% !important; max-width: 320px !important; justify-content: center; }
+            
+            .hero-logo { margin-top: 5px; max-height: 120px; min-height: unset; }
             .hero-bottom-bar { flex-direction: column !important; align-items: center; gap: 20px; margin-top: 20px; }
             .partners-container { margin-top: 10px; width: 100%; }
             .partner-card { width: calc(50% - 10px); min-width: unset; padding: 15px 10px; }
@@ -343,8 +350,14 @@
         let usuarioLogado = null; let duracaoSelecionada = 1; let quadraSelecionada = 1; let dataVisualizada = new Date();
         let promocaoAtual = null; let usouPromoFlag = false; 
         let horariosOcupadosDoDia = {}; 
+        
+        // Novo: Vai guardar a configuração feita no painel admin (Liberação de Agenda)
+        let configAgenda = { liberada: true, inicio: null, fim: null };
 
         window.onload = function() {
+            // Busca imediatamente as regras da agenda configuradas no Painel
+            carregarConfigAdmin();
+            
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
@@ -359,6 +372,17 @@
             }
         }
 
+        function carregarConfigAdmin() {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) })
+            .then(r => r.json()).then(data => {
+                if(data.sucesso) {
+                    configAgenda.liberada = data.liberada;
+                    configAgenda.inicio = data.dataInicio;
+                    configAgenda.fim = data.dataFim;
+                }
+            }).catch(e => console.log("Erro ao carregar configurações da agenda."));
+        }
+
         async function carregarRanking() {
             const widget = document.getElementById('rankingWidget');
             const list = document.getElementById('rankingList');
@@ -370,7 +394,7 @@
                 }
                 widget.style.display = 'block';
                 if(data.sucesso && data.ranking && data.ranking.length > 0) {
-                    // CORREÇÃO: Agrupar nomes iguais caso a base de dados envie duplicados
+                    // Impede duplicados: Soma as horas caso a mesma pessoa apareça mais de uma vez
                     let agregados = {};
                     data.ranking.forEach(r => {
                         let nomeLimpo = r.nome.trim();
@@ -381,7 +405,7 @@
                     let rankingOrdenado = Object.keys(agregados)
                         .map(k => ({nome: k, horas: agregados[k]}))
                         .sort((a,b) => b.horas - a.horas)
-                        .slice(0, 5); // Garante que só mostra os 5 primeiros
+                        .slice(0, 5); 
                     
                     list.innerHTML = '';
                     rankingOrdenado.forEach((r, i) => list.innerHTML += `<li>${i+1}º ${r.nome} <span>${r.horas}h</span></li>`);
@@ -406,7 +430,41 @@
             document.getElementById('navLinks').classList.remove('active'); 
         }
 
-        function mudarDia(delta) { dataVisualizada.setDate(dataVisualizada.getDate() + delta); carregarDadosDoDia(); }
+        // --- SISTEMA DE BLOQUEIO / INTELIGÊNCIA NA NAVEGAÇÃO DOS DIAS ---
+        function mudarDia(delta) { 
+            let novaData = new Date(dataVisualizada);
+            novaData.setDate(novaData.getDate() + delta);
+            
+            let hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            
+            // 1. Não deixa voltar para dias que já passaram
+            if (novaData < hoje) return; 
+
+            if (delta > 0) {
+                // 2. Trava Principal do Administrador
+                if (!configAgenda.liberada) {
+                    alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
+                    return;
+                }
+                
+                // 3. Trava de Data Final estipulada no Painel Admin
+                if (configAgenda.fim) {
+                    let partes = configAgenda.fim.split('-'); // "YYYY-MM-DD"
+                    let dataLimite = new Date(partes[0], partes[1] - 1, partes[2]);
+                    dataLimite.setHours(23,59,59,999);
+                    
+                    if (novaData > dataLimite) {
+                        alert(`Agenda bloqueada! Os horários estão liberados apenas até o dia ${dataLimite.toLocaleDateString('pt-BR')}. Aguarde a liberação de novas datas.`);
+                        return;
+                    }
+                }
+            }
+
+            dataVisualizada = novaData; 
+            carregarDadosDoDia(); 
+        }
+
         function mudarQuadra(id, btn) { quadraSelecionada = id; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
         function setDuracao(h, btn) { duracaoSelecionada = h; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
 
@@ -432,11 +490,22 @@
                 horariosOcupadosDoDia = {}; 
                 const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
                 
+                // EXTRAÇÃO PRIVADA: Apenas grava o "status" e ignora o nome das pessoas
                 rows.forEach((r, i) => { 
                     if(i>0 && r[col]) {
                         let texto = r[col].replace(/[\r\n"]/g, '').trim();
                         if (texto !== "") {
-                            horariosOcupadosDoDia[parseInt(r[0])] = texto; 
+                            let status = "❌ Ocupado"; // Padrão
+                            
+                            if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) {
+                                status = "⛔ Interditado";
+                            } else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) {
+                                status = "✅ Confirmado";
+                            } else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) {
+                                status = "⏳ Aguardando Confirmação";
+                            }
+                            
+                            horariosOcupadosDoDia[parseInt(r[0])] = status; 
                         }
                     }
                 });
@@ -448,11 +517,11 @@
             }
         }
 
+        // --- AGRUPAMENTO INTELIGENTE DE HORÁRIOS ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora');
             select.innerHTML = '<option value="">Escolha o horário</option>';
             
-            // Identificar a hora atual para esconder o passado
             let dataHoje = new Date();
             let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && 
                           dataVisualizada.getMonth() === dataHoje.getMonth() && 
@@ -461,34 +530,28 @@
 
             let i = 5;
             while (i <= 22) {
-                // Esconde as horas que já passaram (ex: se são 15:20, salta as 15h)
+                // Esconde as horas passadas (se for hoje e a hora já tiver passado)
                 if (isHoje && i <= horaAtual) {
                     i++;
                     continue; 
                 }
 
-                // INTELIGÊNCIA: Agrupar blocos contínuos da mesma pessoa ou status
                 if(horariosOcupadosDoDia[i]) {
                     let startHour = i;
-                    let text = horariosOcupadosDoDia[i];
-                    
-                    // Definir visualmente se está Pendente, Interditado ou Ocupado
-                    let statusTxt = "❌ Ocupado";
-                    if (text.includes("⏳")) statusTxt = "⏳ Pendente";
-                    if (text.includes("⛔")) statusTxt = "⛔ Interditado";
+                    let statusTxt = horariosOcupadosDoDia[i];
 
-                    // Procura até que hora este bloco se estende
+                    // Procura até que hora este bloco se estende (agrupamento)
                     let endHour = startHour;
-                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === text) {
+                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) {
                         endHour++;
                     }
 
-                    // Calcula a hora final real (ex: se termina na hora 14, significa 14h-15h, logo finaliza às 15:00)
+                    // Calcula a hora final correta (ex: 14h-15h finaliza às 15:00 ou 16:00 dependendo da duração)
                     let displayEndHour = endHour + 1;
                     
                     select.innerHTML += `<option disabled>${startHour}:00 às ${displayEndHour}:00 - ${statusTxt}</option>`;
 
-                    // Faz o ciclo avançar para o próximo bloco livre
+                    // Avança o contador para ignorar os blocos que já foram agrupados
                     i = endHour + 1;
                 } else {
                     select.innerHTML += `<option value="${i}">✅ ${i}:00 - Livre</option>`;
@@ -540,7 +603,6 @@
         function fazerLogout() { localStorage.clear(); location.reload(); }
         function atualizarPagina() { location.reload(); }
         
-        // Funções para controle das telas de auth
         function mostrarCadastro() { document.getElementById('box-login').style.display = 'none'; document.getElementById('box-cadastro').style.display = 'block'; }
         function mostrarLogin() { document.getElementById('box-cadastro').style.display = 'none'; document.getElementById('box-recuperar').style.display = 'none'; document.getElementById('box-login').style.display = 'block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display = 'none'; document.getElementById('box-recuperar').style.display = 'block'; }
