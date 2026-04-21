@@ -389,36 +389,12 @@
             if(id === 'tela-inicial') target.style.display = 'flex'; else target.style.display = 'block';
             if(id === 'tela-agendamento') carregarDadosDoDia();
             if(id === 'tela-fidelidade') renderizarFidelidade();
-            document.getElementById('navLinks').classList.remove('active'); 
+            document.getElementById('navLinks').classList.remove('active'); // Fecha o menu no mobile ao clicar
         }
 
-        // --- LÓGICA RESTAURADA (Não volta no passado) ---
-        function mudarDia(delta) { 
-            let novaData = new Date(dataVisualizada);
-            novaData.setDate(novaData.getDate() + delta);
-            
-            let hoje = new Date();
-            hoje.setHours(0,0,0,0);
-            
-            // Impede voltar para dias anteriores a hoje
-            if (novaData < hoje) return; 
-
-            dataVisualizada = novaData; 
-            carregarDadosDoDia(); 
-        }
-
+        function mudarDia(delta) { dataVisualizada.setDate(dataVisualizada.getDate() + delta); carregarDadosDoDia(); }
         function mudarQuadra(id, btn) { quadraSelecionada = id; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
-        function setDuracao(h, btn) { duracaoSelecionada = parseInt(h); document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
-        
-        // --- FUNÇÃO RESTAURADA (Para funcionar quando alguém digitar um valor personalizado) ---
-        function usarPersonalizado(val) {
-            let v = parseInt(val);
-            if(v > 0) {
-                duracaoSelecionada = v;
-                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-                carregarDadosDoDia();
-            }
-        }
+        function setDuracao(h, btn) { duracaoSelecionada = h; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
 
         async function carregarDadosDoDia() {
             document.getElementById('dateDisplay').innerText = dataVisualizada.toLocaleDateString('pt-BR');
@@ -428,59 +404,50 @@
             try {
                 const res = await fetch(SHEET_URL + '&t=' + Date.now());
                 const csv = await res.text();
-                const rows = csv.split('\n').map(r => r.split(','));
+                
+                // Leitura blindada do CSV (ignora vírgulas dentro de nomes)
+                const rows = csv.split('\n').map(r => {
+                    let p = []; let inQ = false; let val = "";
+                    for(let c of r){
+                        if(c==='"') inQ = !inQ;
+                        else if(c===',' && !inQ) { p.push(val); val=""; }
+                        else val+=c;
+                    }
+                    p.push(val); return p;
+                });
+
                 horariosOcupadosDoDia = [];
-                const col = (quadraSelecionada === 2 ? 10 : 2) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
-                rows.forEach((r, i) => { if(i>0 && r[col] && r[col].trim()) horariosOcupadosDoDia.push(parseInt(r[0])); });
+                // CORREÇÃO: Mudado de "10 : 2" para "9 : 1" para alinhar com o Google Sheets
+                const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
+                
+                rows.forEach((r, i) => { 
+                    if(i>0 && r[col] && r[col].replace(/[\r\n"]/g, '').trim() !== "") {
+                        horariosOcupadosDoDia.push(parseInt(r[0])); 
+                    }
+                });
                 atualizarMenuHorarios();
-            } catch(e) { console.log(e); } finally { document.getElementById('loading').style.display = 'none'; }
+            } catch(e) { 
+                console.log(e); 
+            } finally { 
+                document.getElementById('loading').style.display = 'none'; 
+            }
         }
 
-        // --- LÓGICA RESTAURADA (Intuitiva, agrupa horas e apaga passadas) ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora');
             select.innerHTML = '<option value="">Escolha o horário</option>';
-            
-            let hoje = new Date();
-            let isHoje = dataVisualizada.toDateString() === hoje.toDateString();
-            let horaAtual = hoje.getHours();
-
-            for(let h = 5; h <= 22; h++) {
-                // 1. Esconde horários que já passaram no dia de hoje
-                if (isHoje && h <= horaAtual) continue;
-
-                // 2. Verifica se todas as horas do bloco (ex: 2h seguidas) estão livres
-                let blocoOcupado = false;
-                for(let i = 0; i < duracaoSelecionada; i++) {
-                    let horaVerificar = h + i;
-                    // Se a próxima hora estiver ocupada ou passar do último horário (22h)
-                    if (horaVerificar > 22 || horariosOcupadosDoDia.includes(horaVerificar)) {
-                        blocoOcupado = true;
-                        break;
-                    }
-                }
-
-                let horaFim = h + duracaoSelecionada;
-                // Previne passar da meia-noite (máximo é acabar às 23:00)
-                if (horaFim > 23) continue;
-
-                if(blocoOcupado) {
-                    select.innerHTML += `<option disabled>🚫 ${h}:00 às ${horaFim}:00 - Ocupado</option>`;
+            for(let h=5; h<=22; h++) {
+                if(horariosOcupadosDoDia.includes(h)) {
+                    select.innerHTML += `<option disabled>${h}:00 - Ocupado</option>`;
                 } else {
-                    select.innerHTML += `<option value="${h}">✅ ${h}:00 às ${horaFim}:00 - Livre</option>`;
+                    select.innerHTML += `<option value="${h}">${h}:00 - Livre</option>`;
                 }
             }
-            
-            document.getElementById('btnAgendar').style.display = 'none';
-            document.getElementById('priceDisplay').innerText = "Valor: Selecione o horário";
         }
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = 'block'; atualizarPrecoDisplay(); }
-        
         function atualizarPrecoDisplay() {
-            const hStr = document.getElementById('selectHora').value;
-            if(!hStr) return;
-            const h = parseInt(hStr);
+            const h = parseInt(document.getElementById('selectHora').value);
             const pag = document.getElementById('selectPagamento').value;
             let total = 0;
             for(let i=0; i<duracaoSelecionada; i++) {
@@ -521,6 +488,7 @@
         function fazerLogout() { localStorage.clear(); location.reload(); }
         function atualizarPagina() { location.reload(); }
         
+        // Funções para controle das telas de auth
         function mostrarCadastro() { document.getElementById('box-login').style.display = 'none'; document.getElementById('box-cadastro').style.display = 'block'; }
         function mostrarLogin() { document.getElementById('box-cadastro').style.display = 'none'; document.getElementById('box-recuperar').style.display = 'none'; document.getElementById('box-login').style.display = 'block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display = 'none'; document.getElementById('box-recuperar').style.display = 'block'; }
