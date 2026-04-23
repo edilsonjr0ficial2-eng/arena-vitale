@@ -32,7 +32,7 @@
         .nav-links a:hover { color: var(--primary); }
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
         
-        /* Tela de Autenticação transparente para mostrar o vídeo */
+        /* Tela de Autenticação */
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; text-align: center; background: transparent; position: fixed; top: 0; left: 0; width: 100%; z-index: 3000; }
         .auth-box { background: rgba(17, 17, 17, 0.90); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 100%; max-width: 400px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); backdrop-filter: blur(10px); }
         .auth-logo { max-width: 150px; margin-bottom: 20px; }
@@ -540,7 +540,8 @@
                             let status = "❌ Ocupado"; 
                             if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) status = "⛔ Interditado";
                             else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) status = "✅ Confirmado";
-                            else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) status = "⏳ Aguardando Confirmação";
+                            else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) status = "⏳ Pendente";
+                            
                             horariosOcupadosDoDia[parseInt(r[0])] = status; 
                         }
                     }
@@ -556,21 +557,25 @@
             let dataHoje = new Date();
             let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && dataVisualizada.getMonth() === dataHoje.getMonth() && dataVisualizada.getFullYear() === dataHoje.getFullYear());
             let horaAtual = dataHoje.getHours();
+            
+            const formatH = h => h.toString().padStart(2, '0');
 
             let i = 5;
             while (i <= 22) {
                 if (isHoje && i <= horaAtual) { i++; continue; }
 
-                if(horariosOcupadosDoDia[i]) {
+                if (horariosOcupadosDoDia[i]) {
+                    // Ocupado: agrupa para ficar limpo a visualização de bloqueio
                     let startHour = i;
                     let statusTxt = horariosOcupadosDoDia[i];
                     let endHour = startHour;
                     while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) { endHour++; }
                     let displayEndHour = endHour + 1;
-                    select.innerHTML += `<option disabled>${startHour}:00 às ${displayEndHour}:00 - ${statusTxt}</option>`;
+                    
+                    select.innerHTML += `<option disabled>Início ${formatH(startHour)}:00 Encerra ${formatH(displayEndHour)}:00 - ${statusTxt}</option>`;
                     i = endHour + 1;
                 } else {
-                    // INTELIGÊNCIA NOVA: Só mostra se houver espaço livre suficiente e mostra "Início às Fim"
+                    // É livre: verifica se há espaço suficiente para a duração selecionada
                     let espacoSuficiente = true;
                     for(let j=0; j<duracaoSelecionada; j++) {
                         if ((i + j) > 22 || horariosOcupadosDoDia[i + j]) {
@@ -581,7 +586,7 @@
 
                     if (espacoSuficiente) {
                         let endHour = i + duracaoSelecionada;
-                        select.innerHTML += `<option value="${i}">✅ ${i}:00 às ${endHour}:00 - Livre</option>`;
+                        select.innerHTML += `<option value="${i}">✅ Início ${formatH(i)}:00 Encerra ${formatH(endHour)}:00 - Livre</option>`;
                     }
                     i++;
                 }
