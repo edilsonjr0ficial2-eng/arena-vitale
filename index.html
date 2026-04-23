@@ -369,161 +369,90 @@
             }
         }
 
-        // ======= FUNÇÕES DE AUTENTICAÇÃO LIMPAS (SEM HEADERS QUE CAUSAVAM ERRO) ======= 
         function realizarCadastro() {
             const nome = document.getElementById('cadNome').value.trim();
             const phone = document.getElementById('cadPhone').value.trim();
             const pass = document.getElementById('cadPass').value.trim();
-            
-            if(!nome || !phone || !pass) {
-                alert("Por favor, preencha todos os campos!");
-                return;
-            }
+            if(!nome || !phone || !pass) return alert("Por favor, preencha todos os campos!");
             
             const btn = document.getElementById('btnCadastrar');
-            btn.innerText = "Aguarde...";
-            btn.disabled = true;
+            btn.innerText = "Aguarde..."; btn.disabled = true;
 
             fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify({ acao: "cadastrar", nome: nome, telefone: phone, senha: pass })
             })
-            .then(r => r.json())
-            .then(d => {
+            .then(r => r.json()).then(d => {
                 if(d.sucesso) {
                     alert("Cadastro realizado com sucesso! Faça login para continuar.");
-                    document.getElementById('cadNome').value = "";
-                    document.getElementById('cadPhone').value = "";
-                    document.getElementById('cadPass').value = "";
+                    document.getElementById('cadNome').value = ""; document.getElementById('cadPhone').value = ""; document.getElementById('cadPass').value = "";
                     mostrarLogin();
-                } else {
-                    alert(d.erro || "Erro ao realizar o cadastro. Tente novamente.");
-                }
-            })
-            .catch(e => {
-                alert("Erro de comunicação com o servidor. Verifique a internet ou tente novamente.");
-                console.error(e);
-            })
-            .finally(() => {
-                btn.innerText = "CADASTRAR";
-                btn.disabled = false;
-            });
+                } else alert(d.erro || "Erro ao realizar o cadastro. Tente novamente.");
+            }).catch(e => alert("Erro de comunicação com o servidor."))
+            .finally(() => { btn.innerText = "CADASTRAR"; btn.disabled = false; });
         }
 
         function fazerLogin() {
-            const p = document.getElementById('loginPhone').value.trim(); 
-            const s = document.getElementById('loginPass').value.trim();
-            
-            if(!p || !s) {
-                alert("Preencha o telefone e a senha!");
-                return;
-            }
-
+            const p = document.getElementById('loginPhone').value.trim(); const s = document.getElementById('loginPass').value.trim();
+            if(!p || !s) return alert("Preencha o telefone e a senha!");
             const btn = document.getElementById('btnLogin');
-            btn.innerText = "Aguarde...";
-            btn.disabled = true;
+            btn.innerText = "Aguarde..."; btn.disabled = true;
 
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "login", telefone: p, senha: s }) 
-            })
-            .then(r => r.json())
-            .then(d => {
-                if(d.sucesso) { 
-                    localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); 
-                    location.reload(); 
-                } else {
-                    alert(d.erro || "Erro ou utilizador não encontrado!");
-                }
-            })
-            .catch(e => alert("Erro de comunicação com o servidor."))
-            .finally(() => {
-                btn.innerText = "ENTRAR";
-                btn.disabled = false;
-            });
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "login", telefone: p, senha: s }) })
+            .then(r => r.json()).then(d => {
+                if(d.sucesso) { localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); location.reload(); } 
+                else alert(d.erro || "Erro ou utilizador não encontrado!");
+            }).catch(e => alert("Erro de comunicação com o servidor."))
+            .finally(() => { btn.innerText = "ENTRAR"; btn.disabled = false; });
         }
 
         function enviarCodigoRecuperacao() {
             const phone = document.getElementById('recPhone').value.trim();
             if(!phone) return alert("Preencha o telefone!");
-            
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) 
-            })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) })
             .then(r => r.json()).then(d => {
                 if(d.sucesso) {
-                    document.getElementById('etapa1-rec').style.display = 'none';
-                    document.getElementById('etapa2-rec').style.display = 'block';
+                    document.getElementById('etapa1-rec').style.display = 'none'; document.getElementById('etapa2-rec').style.display = 'block';
                     alert("Código de segurança enviado para o seu WhatsApp!");
                 } else alert(d.erro || "Ocorreu um erro!");
             }).catch(e => alert("Erro de comunicação com o servidor."));
         }
 
         function confirmarNovaSenha() {
-            const phone = document.getElementById('recPhone').value.trim();
-            const codigo = document.getElementById('recCodigo').value.trim();
-            const novaSenha = document.getElementById('recNovaSenha').value.trim();
+            const phone = document.getElementById('recPhone').value.trim(); const codigo = document.getElementById('recCodigo').value.trim(); const novaSenha = document.getElementById('recNovaSenha').value.trim();
             if(!codigo || !novaSenha) return alert("Preencha o código recebido e a nova senha!");
-            
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) 
-            })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) })
             .then(r => r.json()).then(d => {
-                if(d.sucesso) {
-                    alert("Senha alterada com sucesso! Já pode fazer login.");
-                    mostrarLogin();
-                } else alert(d.erro || "Código inválido!");
+                if(d.sucesso) { alert("Senha alterada com sucesso! Já pode fazer login."); mostrarLogin(); } 
+                else alert(d.erro || "Código inválido!");
             }).catch(e => alert("Erro de comunicação com o servidor."));
         }
 
-        // ===============================================================
-
         function renderizarFidelidade() {
             if(!usuarioLogado) return;
-            const pts = usuarioLogado.pontos || 0;
-            const grid = document.getElementById('stampGrid');
-            grid.innerHTML = '';
+            const pts = usuarioLogado.pontos || 0; const grid = document.getElementById('stampGrid'); grid.innerHTML = '';
             for(let i=1; i<=10; i++) {
-                if(i <= pts) {
-                    grid.innerHTML += `<div class="stamp-box stamped">🎾</div>`;
-                } else {
-                    grid.innerHTML += `<div class="stamp-box">${i}</div>`;
-                }
+                if(i <= pts) grid.innerHTML += `<div class="stamp-box stamped">🎾</div>`;
+                else grid.innerHTML += `<div class="stamp-box">${i}</div>`;
             }
             const btn = document.getElementById('btnResgatar');
-            if(pts >= 10) {
-                btn.style.display = 'block';
-            } else {
-                btn.style.display = 'none';
-            }
+            if(pts >= 10) btn.style.display = 'block'; else btn.style.display = 'none';
         }
 
-        function resgatarPremio() {
-            window.open(`https://wa.me/${whatsappNumber}?text=Olá! Completei meu cartão fidelidade na Arena Vitale e gostaria de agendar a minha hora grátis.`, '_blank');
-        }
+        function resgatarPremio() { window.open(`https://wa.me/${whatsappNumber}?text=Olá! Completei meu cartão fidelidade na Arena Vitale e gostaria de agendar a minha hora grátis.`, '_blank'); }
 
         function carregarConfigAdmin() {
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => {
-                if(data.sucesso) {
-                    configAgenda.liberada = data.liberada;
-                    configAgenda.inicio = data.dataInicio;
-                    configAgenda.fim = data.dataFim;
-                }
+                if(data.sucesso) { configAgenda.liberada = data.liberada; configAgenda.inicio = data.dataInicio; configAgenda.fim = data.dataFim; }
             }).catch(e => console.log("Erro ao carregar configurações."));
         }
 
         async function carregarRanking() {
-            const widget = document.getElementById('rankingWidget');
-            const list = document.getElementById('rankingList');
+            const widget = document.getElementById('rankingWidget'); const list = document.getElementById('rankingList');
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_ranking" }) })
             .then(r => r.json()).then(data => {
-                if(data.oculto) {
-                    widget.style.display = 'none';
-                    return;
-                }
+                if(data.oculto) { widget.style.display = 'none'; return; }
                 widget.style.display = 'block';
                 if(data.sucesso && data.ranking && data.ranking.length > 0) {
                     let agregados = {};
@@ -532,12 +461,7 @@
                         if(!agregados[nomeLimpo]) agregados[nomeLimpo] = 0;
                         agregados[nomeLimpo] += parseInt(r.horas) || 0;
                     });
-                    
-                    let rankingOrdenado = Object.keys(agregados)
-                        .map(k => ({nome: k, horas: agregados[k]}))
-                        .sort((a,b) => b.horas - a.horas)
-                        .slice(0, 5); 
-                    
+                    let rankingOrdenado = Object.keys(agregados).map(k => ({nome: k, horas: agregados[k]})).sort((a,b) => b.horas - a.horas).slice(0, 5); 
                     list.innerHTML = '';
                     rankingOrdenado.forEach((r, i) => list.innerHTML += `<li>${i+1}º ${r.nome} <span>${r.horas}h</span></li>`);
                 } else { list.innerHTML = '<li>Sem registos ainda.</li>'; }
@@ -562,85 +486,67 @@
         }
 
         function mudarDia(delta) { 
-            let novaData = new Date(dataVisualizada);
-            novaData.setDate(novaData.getDate() + delta);
-            
-            let hoje = new Date();
-            hoje.setHours(0,0,0,0);
-            
+            let novaData = new Date(dataVisualizada); novaData.setDate(novaData.getDate() + delta);
+            let hoje = new Date(); hoje.setHours(0,0,0,0);
             if (novaData < hoje) return; 
-
             if (delta > 0) {
-                if (!configAgenda.liberada) {
-                    alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
-                    return;
-                }
-                
+                if (!configAgenda.liberada) return alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
                 if (configAgenda.fim) {
-                    let partes = configAgenda.fim.split('-'); 
-                    let dataLimite = new Date(partes[0], partes[1] - 1, partes[2]);
-                    dataLimite.setHours(23,59,59,999);
-                    
-                    if (novaData > dataLimite) {
-                        alert(`Agenda bloqueada! Os horários estão liberados apenas até o dia ${dataLimite.toLocaleDateString('pt-BR')}. Aguarde a liberação de novas datas.`);
-                        return;
-                    }
+                    let partes = configAgenda.fim.split('-'); let dataLimite = new Date(partes[0], partes[1] - 1, partes[2]); dataLimite.setHours(23,59,59,999);
+                    if (novaData > dataLimite) return alert(`Agenda bloqueada! Os horários estão liberados apenas até o dia ${dataLimite.toLocaleDateString('pt-BR')}. Aguarde a liberação de novas datas.`);
                 }
             }
-
-            dataVisualizada = novaData; 
-            carregarDadosDoDia(); 
+            dataVisualizada = novaData; carregarDadosDoDia(); 
         }
 
         function mudarQuadra(id, btn) { quadraSelecionada = id; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
-        function setDuracao(h, btn) { duracaoSelecionada = h; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
+        
+        function setDuracao(h, btn) { 
+            duracaoSelecionada = h; 
+            document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); 
+            btn.classList.add('active'); 
+            carregarDadosDoDia(); 
+        }
+
+        function usarPersonalizado(val) {
+            let v = parseInt(val);
+            if(v > 0) {
+                duracaoSelecionada = v;
+                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
+                carregarDadosDoDia();
+            }
+        }
 
         async function carregarDadosDoDia() {
             document.getElementById('dateDisplay').innerText = dataVisualizada.toLocaleDateString('pt-BR');
             document.getElementById('loading').style.display = 'block';
-            const select = document.getElementById('selectHora');
-            select.innerHTML = '<option value="">A carregar...</option>';
+            const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">A carregar...</option>';
             try {
-                const res = await fetch(SHEET_URL + '&t=' + Date.now());
-                const csv = await res.text();
-                
+                const res = await fetch(SHEET_URL + '&t=' + Date.now()); const csv = await res.text();
                 const rows = csv.split('\n').map(r => {
                     let p = []; let inQ = false; let val = "";
                     for(let c of r){
                         if(c==='"') inQ = !inQ;
                         else if(c===',' && !inQ) { p.push(val); val=""; }
                         else val+=c;
-                    }
-                    p.push(val); return p;
+                    } p.push(val); return p;
                 });
-
-                horariosOcupadosDoDia = {}; 
-                const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
+                horariosOcupadosDoDia = {}; const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
                 
                 rows.forEach((r, i) => { 
                     if(i>0 && r[col]) {
                         let texto = r[col].replace(/[\r\n"]/g, '').trim();
                         if (texto !== "") {
                             let status = "❌ Ocupado"; 
-                            
-                            if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) {
-                                status = "⛔ Interditado";
-                            } else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) {
-                                status = "✅ Confirmado";
-                            } else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) {
-                                status = "⏳ Aguardando Confirmação";
-                            }
-                            
+                            if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) status = "⛔ Interditado";
+                            else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) status = "✅ Confirmado";
+                            else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) status = "⏳ Aguardando Confirmação";
                             horariosOcupadosDoDia[parseInt(r[0])] = status; 
                         }
                     }
                 });
                 atualizarMenuHorarios();
-            } catch(e) { 
-                console.log(e); 
-            } finally { 
-                document.getElementById('loading').style.display = 'none'; 
-            }
+            } catch(e) { console.log(e); } finally { document.getElementById('loading').style.display = 'none'; }
         }
 
         function atualizarMenuHorarios() {
@@ -648,32 +554,35 @@
             select.innerHTML = '<option value="">Escolha o horário</option>';
             
             let dataHoje = new Date();
-            let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && 
-                          dataVisualizada.getMonth() === dataHoje.getMonth() && 
-                          dataVisualizada.getFullYear() === dataHoje.getFullYear());
+            let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && dataVisualizada.getMonth() === dataHoje.getMonth() && dataVisualizada.getFullYear() === dataHoje.getFullYear());
             let horaAtual = dataHoje.getHours();
 
             let i = 5;
             while (i <= 22) {
-                if (isHoje && i <= horaAtual) {
-                    i++;
-                    continue; 
-                }
+                if (isHoje && i <= horaAtual) { i++; continue; }
 
                 if(horariosOcupadosDoDia[i]) {
                     let startHour = i;
                     let statusTxt = horariosOcupadosDoDia[i];
-
                     let endHour = startHour;
-                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) {
-                        endHour++;
-                    }
-
+                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) { endHour++; }
                     let displayEndHour = endHour + 1;
                     select.innerHTML += `<option disabled>${startHour}:00 às ${displayEndHour}:00 - ${statusTxt}</option>`;
                     i = endHour + 1;
                 } else {
-                    select.innerHTML += `<option value="${i}">✅ ${i}:00 - Livre</option>`;
+                    // INTELIGÊNCIA NOVA: Só mostra se houver espaço livre suficiente e mostra "Início às Fim"
+                    let espacoSuficiente = true;
+                    for(let j=0; j<duracaoSelecionada; j++) {
+                        if ((i + j) > 22 || horariosOcupadosDoDia[i + j]) {
+                            espacoSuficiente = false;
+                            break;
+                        }
+                    }
+
+                    if (espacoSuficiente) {
+                        let endHour = i + duracaoSelecionada;
+                        select.innerHTML += `<option value="${i}">✅ ${i}:00 às ${endHour}:00 - Livre</option>`;
+                    }
                     i++;
                 }
             }
@@ -681,9 +590,7 @@
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = 'block'; atualizarPrecoDisplay(); }
         function atualizarPrecoDisplay() {
-            const h = parseInt(document.getElementById('selectHora').value);
-            const pag = document.getElementById('selectPagamento').value;
-            let total = 0;
+            const h = parseInt(document.getElementById('selectHora').value); const pag = document.getElementById('selectPagamento').value; let total = 0;
             for(let i=0; i<duracaoSelecionada; i++) {
                 let hora = h + i;
                 if(hora >= 7 && hora <= 16) total += 35; else total += (pag === 'cartao' ? 50 : 45);
@@ -691,11 +598,8 @@
             document.getElementById('priceDisplay').innerText = `Total: R$ ${total},00`;
         }
 
-        function prepararAgendamento() {
-            document.getElementById('cadNomeCompleto').value = usuarioLogado.nome;
-            document.getElementById('modalCadastro').style.display = 'flex';
-        }
-
+        function prepararAgendamento() { document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; document.getElementById('modalCadastro').style.display = 'flex'; }
+        
         function enviarAgendamento() {
             const h = parseInt(document.getElementById('selectHora').value);
             fetch(SCRIPT_URL, { 
@@ -704,7 +608,7 @@
             })
             .then(() => {
                 alert("Pedido enviado! Redirecionando para o WhatsApp...");
-                window.location.href = `https://wa.me/${whatsappNumber}?text=Reserva: ${usuarioLogado.nome} às ${h}:00`;
+                window.location.href = `https://wa.me/${whatsappNumber}?text=Reserva: ${usuarioLogado.nome} das ${h}:00 às ${h + duracaoSelecionada}:00`;
             });
         }
 
