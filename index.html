@@ -369,7 +369,7 @@
             }
         }
 
-        // ======= FUNÇÕES DE AUTENTICAÇÃO COM CABEÇALHOS DE SEGURANÇA (HEADERS) ======= 
+        // ======= FUNÇÕES DE AUTENTICAÇÃO LIMPAS (SEM HEADERS QUE CAUSAVAM ERRO) ======= 
         function realizarCadastro() {
             const nome = document.getElementById('cadNome').value.trim();
             const phone = document.getElementById('cadPhone').value.trim();
@@ -386,7 +386,6 @@
 
             fetch(SCRIPT_URL, {
                 method: "POST",
-                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "cadastrar", nome: nome, telefone: phone, senha: pass })
             })
             .then(r => r.json())
@@ -426,7 +425,6 @@
 
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "login", telefone: p, senha: s }) 
             })
             .then(r => r.json())
@@ -451,7 +449,6 @@
             
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) 
             })
             .then(r => r.json()).then(d => {
@@ -471,7 +468,6 @@
             
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) 
             })
             .then(r => r.json()).then(d => {
@@ -509,7 +505,7 @@
         }
 
         function carregarConfigAdmin() {
-            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "buscar_config_admin" }) })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => {
                 if(data.sucesso) {
                     configAgenda.liberada = data.liberada;
@@ -522,7 +518,7 @@
         async function carregarRanking() {
             const widget = document.getElementById('rankingWidget');
             const list = document.getElementById('rankingList');
-            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "buscar_ranking" }) })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_ranking" }) })
             .then(r => r.json()).then(data => {
                 if(data.oculto) {
                     widget.style.display = 'none';
@@ -704,7 +700,6 @@
             const h = parseInt(document.getElementById('selectHora').value);
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', diaIndex: (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1) }) 
             })
             .then(() => {
