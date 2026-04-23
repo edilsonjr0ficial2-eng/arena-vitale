@@ -32,7 +32,7 @@
         .nav-links a:hover { color: var(--primary); }
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
         
-        /* Tela de Autenticação */
+        /* Tela de Autenticação transparente para mostrar o vídeo */
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; text-align: center; background: transparent; position: fixed; top: 0; left: 0; width: 100%; z-index: 3000; }
         .auth-box { background: rgba(17, 17, 17, 0.90); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 100%; max-width: 400px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); backdrop-filter: blur(10px); }
         .auth-logo { max-width: 150px; margin-bottom: 20px; }
@@ -113,9 +113,7 @@
         .stamp-box { background: rgba(0,0,0,0.5); border: 2px dashed #555; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #555; font-weight: 900; margin: auto; transition: 0.3s; }
         .stamp-box.stamped { background: var(--primary); border-color: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); transform: scale(1.1); animation: popIn 0.4s ease; }
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
-        .btn-resgate { background: var(--primary); color: black; padding: 12px 25px; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; margin-top: 20px; font-size: 1rem; display: none; margin-left: auto; margin-right: auto; transition: 0.3s; }
-        .btn-resgate:hover { transform: scale(1.05); background: var(--hover); }
-
+        
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
         .wa-float i { color: white; font-size: 35px; }
         .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
@@ -123,26 +121,35 @@
         footer { margin-top: 50px; padding: 20px; background-color: rgba(0,0,0,0.8); font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none; position: relative; z-index: 10;}
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; text-shadow: 1px 1px 2px black;}
         
+        .scoreboard-container { background: var(--card-color); padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 2px solid var(--primary); position: relative; backdrop-filter: blur(10px); }
+        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .team-score { flex: 1; text-align: center; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px; border: 1px solid #444; }
+        .team-score input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
+        .btn-point { background: #333; color: var(--primary); border: 2px solid var(--primary); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .btn-point:hover { background: var(--primary); color: black; }
+        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+        .reset-btn { margin-top: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; backdrop-filter: blur(10px); }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-        .terms-box { background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6; text-align: left; }
-        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; justify-content: flex-start;}
-        .checkbox-container input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;}
+        .terms-box { background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #ccc; line-height: 1.6; }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-cancel { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; transition: 0.3s; font-weight: bold;}
-        .btn-cancel:hover { background: #444; }
-        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 10px; flex: 1; cursor: pointer; font-weight: bold; transition: 0.3s;}
-        .btn-confirm:hover { transform: scale(1.02); background: var(--hover); }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: white; border: 1px solid #555; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
+        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
 
         /* CORREÇÃO DO LAYOUT PARA TELEMÓVEL (MOBILE) */
         @media (max-width: 768px) {
             #tela-inicial { 
-                padding-top: 30px !important; 
+                padding-top: 30px !important; /* Retirado o espaçamento exagerado */
                 display: flex; flex-direction: column; align-items: center; gap: 15px; 
             } 
             .floating-clock { display: none !important; }
             
+            /* Ajuste para que o Ranking e Clima não se sobreponham e fiquem organizados */
             .ranking-widget { position: relative !important; top: 0 !important; left: 0 !important; margin: 0 !important; width: 100% !important; max-width: 320px !important; }
             .ranking-widget h4 { font-size: 0.9rem !important; margin-bottom: 8px !important; }
             .ranking-list li { font-size: 0.8rem !important; padding: 4px 0 !important; }
@@ -213,6 +220,7 @@
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
+                <li><a onclick="navegarPara('tela-placar')">Marcar Placar</a></li>
                 <li><a onclick="fazerLogout()" style="color:red;">SAIR</a></li>
             </ul>
         </div>
@@ -300,6 +308,17 @@
         </div>
     </div>
 
+    <div id="tela-placar" class="secao-conteudo">
+        <h2 class="section-title">Marcar Placar ⚡</h2>
+        <div class="scoreboard-container">
+            <div class="score-box">
+                <div class="team-score"><input type="text" value="Dupla A"><div class="points-display" id="scoreA" onclick="addPonto('A')">0</div></div>
+                <div class="team-score"><input type="text" value="Dupla B"><div class="points-display" id="scoreB" onclick="addPonto('B')">0</div></div>
+            </div>
+            <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar</button>
+        </div>
+    </div>
+
     <div id="tela-local" class="secao-conteudo" style="display:none; text-align:center;">
         <h2 class="section-title">Onde Estamos 📍</h2>
         <div class="agenda-box" style="color:white;">
@@ -311,31 +330,11 @@
 
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">🎾 Confirmar Reserva</h3>
-            
-            <label style="color: white; font-size: 0.9rem; margin-bottom: 5px; display: block;">Nome e Sobrenome:</label>
-            <input type="text" id="cadNomeCompleto" disabled class="auth-input" style="background:#333; color: #aaa; border: none; margin-bottom: 15px; border-radius: 8px;">
-            
-            <label style="color: white; font-size: 0.9rem; margin-bottom: 5px; display: block;">Telefone (WhatsApp):</label>
-            <input type="text" id="cadTelefoneCompleto" disabled class="auth-input" style="background:#333; color: #aaa; border: none; margin-bottom: 15px; border-radius: 8px;">
-
-            <div class="terms-box" style="text-align: left; background: transparent; border: 1px solid var(--primary); border-radius: 8px; padding: 15px;">
-                <h4 style="color: var(--primary); font-size: 0.9rem; margin-bottom: 15px; text-transform: uppercase;">⚠️ POLÍTICA DE CANCELAMENTO</h4>
-                <p style="margin-bottom: 15px;">• Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.</p>
-                <p style="margin-bottom: 15px;">• Menos de 3 horas: cobrança de 50% sobre <strong>o valor total das horas marcadas</strong>.</p>
-                <p style="margin-bottom: 15px;"><strong><span style="color: var(--primary);">• O utilizador que realiza o agendamento é o único responsável</span></strong> <span style="color: #ccc;">pelo pagamento integral da reserva.</span></p>
-                <p>• O não comparecimento sem aviso prévio resultará em <strong><span style="color: var(--primary);">bloqueio para novos agendamentos</span></strong>.</p>
-            </div>
-            
-            <div class="checkbox-container" style="justify-content: flex-start; margin-top: 20px;">
-                <input type="checkbox" id="checkTermos" style="width: 20px; height: 20px; cursor: pointer;">
-                <label for="checkTermos">Concordo com os termos e valores.</label>
-            </div>
-            
-            <div class="modal-buttons" style="margin-top: 20px;">
-                <button class="btn-cancel" onclick="fecharModal()" style="background: #333; border: none; border-radius: 10px;">Cancelar</button>
-                <button class="btn-confirm" onclick="enviarAgendamento()" style="background: var(--primary); color: black; border-radius: 10px; font-weight: bold;">Ir para WhatsApp</button>
-            </div>
+            <h3>Confirmar Reserva</h3>
+            <input type="text" id="cadNomeCompleto" disabled class="auth-input" style="background:rgba(0,0,0,0.5)">
+            <div class="terms-box">⚠️ Cancelamentos até 3h antes sem custo. Menos de 3h: taxa de 50%.</div>
+            <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Aceito os termos.</label></div>
+            <div class="modal-buttons"><button class="btn-cancel" onclick="fecharModal()">Sair</button><button class="btn-confirm" onclick="enviarAgendamento()">Confirmar</button></div>
         </div>
     </div>
 
@@ -351,10 +350,14 @@
         let usuarioLogado = null; let duracaoSelecionada = 1; let quadraSelecionada = 1; let dataVisualizada = new Date();
         let promocaoAtual = null; let usouPromoFlag = false; 
         let horariosOcupadosDoDia = {}; 
+        
+        // Novo: Vai guardar a configuração feita no painel admin (Liberação de Agenda)
         let configAgenda = { liberada: true, inicio: null, fim: null };
 
         window.onload = function() {
+            // Busca imediatamente as regras da agenda configuradas no Painel
             carregarConfigAdmin();
+            
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
@@ -369,99 +372,41 @@
             }
         }
 
-        function realizarCadastro() {
-            const nome = document.getElementById('cadNome').value.trim();
-            const phone = document.getElementById('cadPhone').value.trim();
-            const pass = document.getElementById('cadPass').value.trim();
-            if(!nome || !phone || !pass) return alert("Por favor, preencha todos os campos!");
-            
-            const btn = document.getElementById('btnCadastrar');
-            btn.innerText = "Aguarde..."; btn.disabled = true;
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ acao: "cadastrar", nome: nome, telefone: phone, senha: pass })
-            })
-            .then(r => r.json()).then(d => {
-                if(d.sucesso) {
-                    alert("Cadastro realizado com sucesso! Faça login para continuar.");
-                    document.getElementById('cadNome').value = ""; document.getElementById('cadPhone').value = ""; document.getElementById('cadPass').value = "";
-                    mostrarLogin();
-                } else alert(d.erro || "Erro ao realizar o cadastro. Tente novamente.");
-            }).catch(e => alert("Erro de comunicação com o servidor."))
-            .finally(() => { btn.innerText = "CADASTRAR"; btn.disabled = false; });
-        }
-
-        function fazerLogin() {
-            const p = document.getElementById('loginPhone').value.trim(); const s = document.getElementById('loginPass').value.trim();
-            if(!p || !s) return alert("Preencha o telefone e a senha!");
-            const btn = document.getElementById('btnLogin');
-            btn.innerText = "Aguarde..."; btn.disabled = true;
-
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "login", telefone: p, senha: s }) })
-            .then(r => r.json()).then(d => {
-                if(d.sucesso) { localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); location.reload(); } 
-                else alert(d.erro || "Erro ou utilizador não encontrado!");
-            }).catch(e => alert("Erro de comunicação com o servidor."))
-            .finally(() => { btn.innerText = "ENTRAR"; btn.disabled = false; });
-        }
-
-        function enviarCodigoRecuperacao() {
-            const phone = document.getElementById('recPhone').value.trim();
-            if(!phone) return alert("Preencha o telefone!");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) })
-            .then(r => r.json()).then(d => {
-                if(d.sucesso) {
-                    document.getElementById('etapa1-rec').style.display = 'none'; document.getElementById('etapa2-rec').style.display = 'block';
-                    alert("Código de segurança enviado para o seu WhatsApp!");
-                } else alert(d.erro || "Ocorreu um erro!");
-            }).catch(e => alert("Erro de comunicação com o servidor."));
-        }
-
-        function confirmarNovaSenha() {
-            const phone = document.getElementById('recPhone').value.trim(); const codigo = document.getElementById('recCodigo').value.trim(); const novaSenha = document.getElementById('recNovaSenha').value.trim();
-            if(!codigo || !novaSenha) return alert("Preencha o código recebido e a nova senha!");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) })
-            .then(r => r.json()).then(d => {
-                if(d.sucesso) { alert("Senha alterada com sucesso! Já pode fazer login."); mostrarLogin(); } 
-                else alert(d.erro || "Código inválido!");
-            }).catch(e => alert("Erro de comunicação com o servidor."));
-        }
-
-        function renderizarFidelidade() {
-            if(!usuarioLogado) return;
-            const pts = usuarioLogado.pontos || 0; const grid = document.getElementById('stampGrid'); grid.innerHTML = '';
-            for(let i=1; i<=10; i++) {
-                if(i <= pts) grid.innerHTML += `<div class="stamp-box stamped">🎾</div>`;
-                else grid.innerHTML += `<div class="stamp-box">${i}</div>`;
-            }
-            const btn = document.getElementById('btnResgatar');
-            if(pts >= 10) btn.style.display = 'block'; else btn.style.display = 'none';
-        }
-
-        function resgatarPremio() { window.open(`https://wa.me/${whatsappNumber}?text=Olá! Completei meu cartão fidelidade na Arena Vitale e gostaria de agendar a minha hora grátis.`, '_blank'); }
-
         function carregarConfigAdmin() {
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => {
-                if(data.sucesso) { configAgenda.liberada = data.liberada; configAgenda.inicio = data.dataInicio; configAgenda.fim = data.dataFim; }
-            }).catch(e => console.log("Erro ao carregar configurações."));
+                if(data.sucesso) {
+                    configAgenda.liberada = data.liberada;
+                    configAgenda.inicio = data.dataInicio;
+                    configAgenda.fim = data.dataFim;
+                }
+            }).catch(e => console.log("Erro ao carregar configurações da agenda."));
         }
 
         async function carregarRanking() {
-            const widget = document.getElementById('rankingWidget'); const list = document.getElementById('rankingList');
+            const widget = document.getElementById('rankingWidget');
+            const list = document.getElementById('rankingList');
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_ranking" }) })
             .then(r => r.json()).then(data => {
-                if(data.oculto) { widget.style.display = 'none'; return; }
+                if(data.oculto) {
+                    widget.style.display = 'none';
+                    return;
+                }
                 widget.style.display = 'block';
                 if(data.sucesso && data.ranking && data.ranking.length > 0) {
+                    // Impede duplicados: Soma as horas caso a mesma pessoa apareça mais de uma vez
                     let agregados = {};
                     data.ranking.forEach(r => {
                         let nomeLimpo = r.nome.trim();
                         if(!agregados[nomeLimpo]) agregados[nomeLimpo] = 0;
                         agregados[nomeLimpo] += parseInt(r.horas) || 0;
                     });
-                    let rankingOrdenado = Object.keys(agregados).map(k => ({nome: k, horas: agregados[k]})).sort((a,b) => b.horas - a.horas).slice(0, 5); 
+                    
+                    let rankingOrdenado = Object.keys(agregados)
+                        .map(k => ({nome: k, horas: agregados[k]}))
+                        .sort((a,b) => b.horas - a.horas)
+                        .slice(0, 5); 
+                    
                     list.innerHTML = '';
                     rankingOrdenado.forEach((r, i) => list.innerHTML += `<li>${i+1}º ${r.nome} <span>${r.horas}h</span></li>`);
                 } else { list.innerHTML = '<li>Sem registos ainda.</li>'; }
@@ -485,116 +430,131 @@
             document.getElementById('navLinks').classList.remove('active'); 
         }
 
+        // --- SISTEMA DE BLOQUEIO / INTELIGÊNCIA NA NAVEGAÇÃO DOS DIAS ---
         function mudarDia(delta) { 
-            let novaData = new Date(dataVisualizada); novaData.setDate(novaData.getDate() + delta);
-            let hoje = new Date(); hoje.setHours(0,0,0,0);
-            if (novaData < hoje) return; 
+            let novaData = new Date(dataVisualizada);
+            novaData.setDate(novaData.getDate() + delta);
             
-            if (delta > 0) {
-                if (!configAgenda.liberada) return alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
-                
-                let dataLimite = new Date();
-                if (dataLimite.getHours() >= 23) {
-                    dataLimite.setDate(dataLimite.getDate() + 7);
-                } else {
-                    dataLimite.setDate(dataLimite.getDate() + 6);
-                }
-                dataLimite.setHours(23,59,59,999);
+            let hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            
+            // 1. Não deixa voltar para dias que já passaram
+            if (novaData < hoje) return; 
 
-                if (novaData > dataLimite) {
-                    return alert("Horário não liberado! A agenda abre dias novos automaticamente sempre às 23:00.");
+            if (delta > 0) {
+                // 2. Trava Principal do Administrador
+                if (!configAgenda.liberada) {
+                    alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
+                    return;
+                }
+                
+                // 3. Trava de Data Final estipulada no Painel Admin
+                if (configAgenda.fim) {
+                    let partes = configAgenda.fim.split('-'); // "YYYY-MM-DD"
+                    let dataLimite = new Date(partes[0], partes[1] - 1, partes[2]);
+                    dataLimite.setHours(23,59,59,999);
+                    
+                    if (novaData > dataLimite) {
+                        alert(`Agenda bloqueada! Os horários estão liberados apenas até o dia ${dataLimite.toLocaleDateString('pt-BR')}. Aguarde a liberação de novas datas.`);
+                        return;
+                    }
                 }
             }
-            dataVisualizada = novaData; carregarDadosDoDia(); 
-        }
 
-        function mudarQuadra(id, btn) { quadraSelecionada = id; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
-        
-        function setDuracao(h, btn) { 
-            duracaoSelecionada = h; 
-            document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); 
-            btn.classList.add('active'); 
+            dataVisualizada = novaData; 
             carregarDadosDoDia(); 
         }
 
-        function usarPersonalizado(val) {
-            let v = parseInt(val);
-            if(v > 0) {
-                duracaoSelecionada = v;
-                document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-                carregarDadosDoDia();
-            }
-        }
+        function mudarQuadra(id, btn) { quadraSelecionada = id; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
+        function setDuracao(h, btn) { duracaoSelecionada = h; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
 
         async function carregarDadosDoDia() {
             document.getElementById('dateDisplay').innerText = dataVisualizada.toLocaleDateString('pt-BR');
             document.getElementById('loading').style.display = 'block';
-            const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">A carregar...</option>';
+            const select = document.getElementById('selectHora');
+            select.innerHTML = '<option value="">A carregar...</option>';
             try {
-                const res = await fetch(SHEET_URL + '&t=' + Date.now()); const csv = await res.text();
+                const res = await fetch(SHEET_URL + '&t=' + Date.now());
+                const csv = await res.text();
+                
                 const rows = csv.split('\n').map(r => {
                     let p = []; let inQ = false; let val = "";
                     for(let c of r){
                         if(c==='"') inQ = !inQ;
                         else if(c===',' && !inQ) { p.push(val); val=""; }
                         else val+=c;
-                    } p.push(val); return p;
+                    }
+                    p.push(val); return p;
                 });
-                horariosOcupadosDoDia = {}; const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
+
+                horariosOcupadosDoDia = {}; 
+                const col = (quadraSelecionada === 2 ? 9 : 1) + (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1);
                 
+                // EXTRAÇÃO PRIVADA: Apenas grava o "status" e ignora o nome das pessoas
                 rows.forEach((r, i) => { 
                     if(i>0 && r[col]) {
                         let texto = r[col].replace(/[\r\n"]/g, '').trim();
                         if (texto !== "") {
-                            let status = "❌ Ocupado"; 
-                            if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) status = "⛔ Interditado";
-                            else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) status = "✅ Confirmado";
-                            else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) status = "⏳ Pendente";
+                            let status = "❌ Ocupado"; // Padrão
+                            
+                            if (texto.includes("⛔") || texto.toLowerCase().includes("interditado")) {
+                                status = "⛔ Interditado";
+                            } else if (texto.includes("✅") || texto.toLowerCase().includes("confirmado")) {
+                                status = "✅ Confirmado";
+                            } else if (texto.includes("⏳") || texto.toLowerCase().includes("pendente")) {
+                                status = "⏳ Aguardando Confirmação";
+                            }
                             
                             horariosOcupadosDoDia[parseInt(r[0])] = status; 
                         }
                     }
                 });
                 atualizarMenuHorarios();
-            } catch(e) { console.log(e); } finally { document.getElementById('loading').style.display = 'none'; }
+            } catch(e) { 
+                console.log(e); 
+            } finally { 
+                document.getElementById('loading').style.display = 'none'; 
+            }
         }
 
+        // --- AGRUPAMENTO INTELIGENTE DE HORÁRIOS ---
         function atualizarMenuHorarios() {
             const select = document.getElementById('selectHora');
             select.innerHTML = '<option value="">Escolha o horário</option>';
             
             let dataHoje = new Date();
-            let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && dataVisualizada.getMonth() === dataHoje.getMonth() && dataVisualizada.getFullYear() === dataHoje.getFullYear());
+            let isHoje = (dataVisualizada.getDate() === dataHoje.getDate() && 
+                          dataVisualizada.getMonth() === dataHoje.getMonth() && 
+                          dataVisualizada.getFullYear() === dataHoje.getFullYear());
             let horaAtual = dataHoje.getHours();
-            
-            const formatH = h => h.toString().padStart(2, '0');
 
             let i = 5;
             while (i <= 22) {
-                if (isHoje && i <= horaAtual) { i++; continue; }
+                // Esconde as horas passadas (se for hoje e a hora já tiver passado)
+                if (isHoje && i <= horaAtual) {
+                    i++;
+                    continue; 
+                }
 
-                if (horariosOcupadosDoDia[i]) {
+                if(horariosOcupadosDoDia[i]) {
                     let startHour = i;
                     let statusTxt = horariosOcupadosDoDia[i];
+
+                    // Procura até que hora este bloco se estende (agrupamento)
                     let endHour = startHour;
-                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) { endHour++; }
-                    let displayEndHour = endHour + 1;
-                    
-                    select.innerHTML += `<option disabled>Início ${formatH(startHour)}:00 Encerra ${formatH(displayEndHour)}:00 - ${statusTxt}</option>`;
-                    i = endHour + 1;
-                } else {
-                    let espacoSuficiente = true;
-                    for(let j=0; j<duracaoSelecionada; j++) {
-                        if ((i + j) > 22 || horariosOcupadosDoDia[i + j]) {
-                            espacoSuficiente = false;
-                            break;
-                        }
+                    while (endHour + 1 <= 22 && horariosOcupadosDoDia[endHour + 1] === statusTxt) {
+                        endHour++;
                     }
 
-                    if (espacoSuficiente) {
-                        let endHour = i + duracaoSelecionada;
-                        select.innerHTML += `<option value="${i}">✅ Início ${formatH(i)}:00 Encerra ${formatH(endHour)}:00 - Livre</option>`;
-                    }
+                    // Calcula a hora final correta (ex: 14h-15h finaliza às 15:00 ou 16:00 dependendo da duração)
+                    let displayEndHour = endHour + 1;
+                    
+                    select.innerHTML += `<option disabled>${startHour}:00 às ${displayEndHour}:00 - ${statusTxt}</option>`;
+
+                    // Avança o contador para ignorar os blocos que já foram agrupados
+                    i = endHour + 1;
+                } else {
+                    select.innerHTML += `<option value="${i}">✅ ${i}:00 - Livre</option>`;
                     i++;
                 }
             }
@@ -602,7 +562,9 @@
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = 'block'; atualizarPrecoDisplay(); }
         function atualizarPrecoDisplay() {
-            const h = parseInt(document.getElementById('selectHora').value); const pag = document.getElementById('selectPagamento').value; let total = 0;
+            const h = parseInt(document.getElementById('selectHora').value);
+            const pag = document.getElementById('selectPagamento').value;
+            let total = 0;
             for(let i=0; i<duracaoSelecionada; i++) {
                 let hora = h + i;
                 if(hora >= 7 && hora <= 16) total += 35; else total += (pag === 'cartao' ? 50 : 45);
@@ -610,25 +572,25 @@
             document.getElementById('priceDisplay').innerText = `Total: R$ ${total},00`;
         }
 
-        function prepararAgendamento() { 
-            document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; 
-            document.getElementById('cadTelefoneCompleto').value = usuarioLogado.phone; // AQUI INCLUI O TELEFONE COMO NO PRINT
-            document.getElementById('checkTermos').checked = false; 
-            document.getElementById('modalCadastro').style.display = 'flex'; 
+        function prepararAgendamento() {
+            document.getElementById('cadNomeCompleto').value = usuarioLogado.nome;
+            document.getElementById('modalCadastro').style.display = 'flex';
         }
-        
-        function enviarAgendamento() {
-            if(!document.getElementById('checkTermos').checked) {
-                return alert("Por favor, confirme que leu e aceita as regras da Arena marcando a caixinha antes de prosseguir.");
-            }
 
+        function enviarAgendamento() {
             const h = parseInt(document.getElementById('selectHora').value);
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', diaIndex: (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1) }) 
-            })
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', diaIndex: (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1) }) })
             .then(() => {
-                window.location.href = `https://wa.me/${whatsappNumber}?text=Reserva: ${usuarioLogado.nome} das ${h}:00 às ${h + duracaoSelecionada}:00`;
+                alert("Pedido enviado! Redirecionando para o WhatsApp...");
+                window.location.href = `https://wa.me/${whatsappNumber}?text=Reserva: ${usuarioLogado.nome} às ${h}:00`;
+            });
+        }
+
+        function fazerLogin() {
+            const p = document.getElementById('loginPhone').value; const s = document.getElementById('loginPass').value;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "login", telefone: p, senha: s }) })
+            .then(r => r.json()).then(d => {
+                if(d.sucesso) { localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); location.reload(); } else alert("Erro!");
             });
         }
 
@@ -636,6 +598,8 @@
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString(); }
         setInterval(atualizarRelogio, 1000);
+        function zerarPlacar() { document.getElementById('scoreA').innerText = 0; document.getElementById('scoreB').innerText = 0; }
+        function addPonto(t) { let e = document.getElementById('score' + t); e.innerText = parseInt(e.innerText) + 1; }
         function fazerLogout() { localStorage.clear(); location.reload(); }
         function atualizarPagina() { location.reload(); }
         
