@@ -123,17 +123,6 @@
         footer { margin-top: 50px; padding: 20px; background-color: rgba(0,0,0,0.8); font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none; position: relative; z-index: 10;}
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; text-shadow: 1px 1px 2px black;}
         
-        .scoreboard-container { background: var(--card-color); padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 2px solid var(--primary); position: relative; backdrop-filter: blur(10px); }
-        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .team-score { flex: 1; text-align: center; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px; border: 1px solid #444; }
-        .team-score input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
-        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
-        .btn-point { background: #333; color: var(--primary); border: 2px solid var(--primary); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-        .btn-point:hover { background: var(--primary); color: black; }
-        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
-        .reset-btn { margin-top: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; backdrop-filter: blur(10px); }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
@@ -221,7 +210,6 @@
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
-                <li><a onclick="navegarPara('tela-placar')">Marcar Placar</a></li>
                 <li><a onclick="fazerLogout()" style="color:red;">SAIR</a></li>
             </ul>
         </div>
@@ -306,17 +294,6 @@
             <p>Complete 10 jogos e ganhe 1 hora grátis!</p>
             <div class="stamp-grid" id="stampGrid"></div>
             <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar Prémio</button>
-        </div>
-    </div>
-
-    <div id="tela-placar" class="secao-conteudo">
-        <h2 class="section-title">Marcar Placar ⚡</h2>
-        <div class="scoreboard-container">
-            <div class="score-box">
-                <div class="team-score"><input type="text" value="Dupla A"><div class="points-display" id="scoreA" onclick="addPonto('A')">0</div></div>
-                <div class="team-score"><input type="text" value="Dupla B"><div class="points-display" id="scoreB" onclick="addPonto('B')">0</div></div>
-            </div>
-            <button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar</button>
         </div>
     </div>
 
@@ -489,11 +466,20 @@
             let novaData = new Date(dataVisualizada); novaData.setDate(novaData.getDate() + delta);
             let hoje = new Date(); hoje.setHours(0,0,0,0);
             if (novaData < hoje) return; 
+            
             if (delta > 0) {
                 if (!configAgenda.liberada) return alert("A agenda encontra-se bloqueada temporariamente pelo Administrador.");
-                if (configAgenda.fim) {
-                    let partes = configAgenda.fim.split('-'); let dataLimite = new Date(partes[0], partes[1] - 1, partes[2]); dataLimite.setHours(23,59,59,999);
-                    if (novaData > dataLimite) return alert(`Agenda bloqueada! Os horários estão liberados apenas até o dia ${dataLimite.toLocaleDateString('pt-BR')}. Aguarde a liberação de novas datas.`);
+                
+                let dataLimite = new Date();
+                if (dataLimite.getHours() >= 23) {
+                    dataLimite.setDate(dataLimite.getDate() + 7);
+                } else {
+                    dataLimite.setDate(dataLimite.getDate() + 6);
+                }
+                dataLimite.setHours(23,59,59,999);
+
+                if (novaData > dataLimite) {
+                    return alert("Horário não liberado! A agenda abre dias novos automaticamente sempre às 23:00.");
                 }
             }
             dataVisualizada = novaData; carregarDadosDoDia(); 
@@ -565,7 +551,6 @@
                 if (isHoje && i <= horaAtual) { i++; continue; }
 
                 if (horariosOcupadosDoDia[i]) {
-                    // Ocupado: agrupa para ficar limpo a visualização de bloqueio
                     let startHour = i;
                     let statusTxt = horariosOcupadosDoDia[i];
                     let endHour = startHour;
@@ -575,7 +560,6 @@
                     select.innerHTML += `<option disabled>Início ${formatH(startHour)}:00 Encerra ${formatH(displayEndHour)}:00 - ${statusTxt}</option>`;
                     i = endHour + 1;
                 } else {
-                    // É livre: verifica se há espaço suficiente para a duração selecionada
                     let espacoSuficiente = true;
                     for(let j=0; j<duracaoSelecionada; j++) {
                         if ((i + j) > 22 || horariosOcupadosDoDia[i + j]) {
@@ -621,8 +605,6 @@
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString(); }
         setInterval(atualizarRelogio, 1000);
-        function zerarPlacar() { document.getElementById('scoreA').innerText = 0; document.getElementById('scoreB').innerText = 0; }
-        function addPonto(t) { let e = document.getElementById('score' + t); e.innerText = parseInt(e.innerText) + 1; }
         function fazerLogout() { localStorage.clear(); location.reload(); }
         function atualizarPagina() { location.reload(); }
         
