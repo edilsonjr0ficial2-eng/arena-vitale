@@ -369,7 +369,7 @@
             }
         }
 
-        // ======= AS FUNÇÕES QUE TINHAM SIDO APAGADAS POR ENGANO ======= 
+        // ======= FUNÇÕES DE AUTENTICAÇÃO COM CABEÇALHOS DE SEGURANÇA (HEADERS) ======= 
         function realizarCadastro() {
             const nome = document.getElementById('cadNome').value.trim();
             const phone = document.getElementById('cadPhone').value.trim();
@@ -386,19 +386,24 @@
 
             fetch(SCRIPT_URL, {
                 method: "POST",
+                headers: {"Content-Type": "text/plain;charset=utf-8"},
                 body: JSON.stringify({ acao: "cadastrar", nome: nome, telefone: phone, senha: pass })
             })
             .then(r => r.json())
             .then(d => {
                 if(d.sucesso) {
                     alert("Cadastro realizado com sucesso! Faça login para continuar.");
+                    document.getElementById('cadNome').value = "";
+                    document.getElementById('cadPhone').value = "";
+                    document.getElementById('cadPass').value = "";
                     mostrarLogin();
                 } else {
                     alert(d.erro || "Erro ao realizar o cadastro. Tente novamente.");
                 }
             })
             .catch(e => {
-                alert("Erro de conexão.");
+                alert("Erro de comunicação com o servidor. Verifique a internet ou tente novamente.");
+                console.error(e);
             })
             .finally(() => {
                 btn.innerText = "CADASTRAR";
@@ -406,17 +411,56 @@
             });
         }
 
+        function fazerLogin() {
+            const p = document.getElementById('loginPhone').value.trim(); 
+            const s = document.getElementById('loginPass').value.trim();
+            
+            if(!p || !s) {
+                alert("Preencha o telefone e a senha!");
+                return;
+            }
+
+            const btn = document.getElementById('btnLogin');
+            btn.innerText = "Aguarde...";
+            btn.disabled = true;
+
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: {"Content-Type": "text/plain;charset=utf-8"},
+                body: JSON.stringify({ acao: "login", telefone: p, senha: s }) 
+            })
+            .then(r => r.json())
+            .then(d => {
+                if(d.sucesso) { 
+                    localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); 
+                    location.reload(); 
+                } else {
+                    alert(d.erro || "Erro ou utilizador não encontrado!");
+                }
+            })
+            .catch(e => alert("Erro de comunicação com o servidor."))
+            .finally(() => {
+                btn.innerText = "ENTRAR";
+                btn.disabled = false;
+            });
+        }
+
         function enviarCodigoRecuperacao() {
             const phone = document.getElementById('recPhone').value.trim();
             if(!phone) return alert("Preencha o telefone!");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) })
+            
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: {"Content-Type": "text/plain;charset=utf-8"},
+                body: JSON.stringify({ acao: "recuperar_senha", telefone: phone }) 
+            })
             .then(r => r.json()).then(d => {
                 if(d.sucesso) {
                     document.getElementById('etapa1-rec').style.display = 'none';
                     document.getElementById('etapa2-rec').style.display = 'block';
                     alert("Código de segurança enviado para o seu WhatsApp!");
                 } else alert(d.erro || "Ocorreu um erro!");
-            });
+            }).catch(e => alert("Erro de comunicação com o servidor."));
         }
 
         function confirmarNovaSenha() {
@@ -424,14 +468,21 @@
             const codigo = document.getElementById('recCodigo').value.trim();
             const novaSenha = document.getElementById('recNovaSenha').value.trim();
             if(!codigo || !novaSenha) return alert("Preencha o código recebido e a nova senha!");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) })
+            
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: {"Content-Type": "text/plain;charset=utf-8"},
+                body: JSON.stringify({ acao: "confirmar_nova_senha", telefone: phone, codigo: codigo, senha: novaSenha }) 
+            })
             .then(r => r.json()).then(d => {
                 if(d.sucesso) {
                     alert("Senha alterada com sucesso! Já pode fazer login.");
                     mostrarLogin();
                 } else alert(d.erro || "Código inválido!");
-            });
+            }).catch(e => alert("Erro de comunicação com o servidor."));
         }
+
+        // ===============================================================
 
         function renderizarFidelidade() {
             if(!usuarioLogado) return;
@@ -456,10 +507,9 @@
         function resgatarPremio() {
             window.open(`https://wa.me/${whatsappNumber}?text=Olá! Completei meu cartão fidelidade na Arena Vitale e gostaria de agendar a minha hora grátis.`, '_blank');
         }
-        // ===============================================================
 
         function carregarConfigAdmin() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) })
+            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "buscar_config_admin" }) })
             .then(r => r.json()).then(data => {
                 if(data.sucesso) {
                     configAgenda.liberada = data.liberada;
@@ -472,7 +522,7 @@
         async function carregarRanking() {
             const widget = document.getElementById('rankingWidget');
             const list = document.getElementById('rankingList');
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_ranking" }) })
+            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "buscar_ranking" }) })
             .then(r => r.json()).then(data => {
                 if(data.oculto) {
                     widget.style.display = 'none';
@@ -652,18 +702,14 @@
 
         function enviarAgendamento() {
             const h = parseInt(document.getElementById('selectHora').value);
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', diaIndex: (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1) }) })
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                headers: {"Content-Type": "text/plain;charset=utf-8"},
+                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, hora: h, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', diaIndex: (dataVisualizada.getDay() === 0 ? 6 : dataVisualizada.getDay() - 1) }) 
+            })
             .then(() => {
                 alert("Pedido enviado! Redirecionando para o WhatsApp...");
                 window.location.href = `https://wa.me/${whatsappNumber}?text=Reserva: ${usuarioLogado.nome} às ${h}:00`;
-            });
-        }
-
-        function fazerLogin() {
-            const p = document.getElementById('loginPhone').value; const s = document.getElementById('loginPass').value;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "login", telefone: p, senha: s }) })
-            .then(r => r.json()).then(d => {
-                if(d.sucesso) { localStorage.setItem('usuarioArenaVitale', JSON.stringify(d)); location.reload(); } else alert("Erro ou utilizador não encontrado!");
             });
         }
 
