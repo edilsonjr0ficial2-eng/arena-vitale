@@ -126,11 +126,14 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; backdrop-filter: blur(10px); }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-        .terms-box { background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #ccc; line-height: 1.6; }
-        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
+        .terms-box { background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.85rem; color: #ccc; line-height: 1.6; text-align: center; }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; justify-content: center;}
+        .checkbox-container input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;}
         .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-cancel { background: rgba(255,255,255,0.1); color: white; border: 1px solid #555; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
-        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
+        .btn-cancel { background: transparent; color: white; border: 1px solid #555; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; transition: 0.3s; font-weight: bold;}
+        .btn-cancel:hover { background: rgba(255,255,255,0.1); }
+        .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; transition: 0.3s;}
+        .btn-confirm:hover { transform: scale(1.02); background: var(--hover); }
 
         /* CORREÇÃO DO LAYOUT PARA TELEMÓVEL (MOBILE) */
         @media (max-width: 768px) {
@@ -310,9 +313,15 @@
         <div class="modal-content">
             <h3>Confirmar Reserva</h3>
             <input type="text" id="cadNomeCompleto" disabled class="auth-input" style="background:rgba(0,0,0,0.5)">
-            <div class="terms-box">⚠️ Cancelamentos até 3h antes sem custo. Menos de 3h: taxa de 50%.</div>
-            <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Aceito os termos.</label></div>
-            <div class="modal-buttons"><button class="btn-cancel" onclick="fecharModal()">Sair</button><button class="btn-confirm" onclick="enviarAgendamento()">Confirmar</button></div>
+            <div class="terms-box">⚠️ Cancelamento grátis até 3h antes do seu horário. Caso contrário, será cobrado 50% do valor da quadra.</div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="checkTermos">
+                <label for="checkTermos">Li e aceito as regras da Arena.</label>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="fecharModal()">Voltar</button>
+                <button class="btn-confirm" onclick="enviarAgendamento()">Confirmar Agendamento</button>
+            </div>
         </div>
     </div>
 
@@ -587,9 +596,18 @@
             document.getElementById('priceDisplay').innerText = `Total: R$ ${total},00`;
         }
 
-        function prepararAgendamento() { document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; document.getElementById('modalCadastro').style.display = 'flex'; }
+        function prepararAgendamento() { 
+            document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; 
+            document.getElementById('checkTermos').checked = false; // Garante que a caixinha começa desmarcada
+            document.getElementById('modalCadastro').style.display = 'flex'; 
+        }
         
         function enviarAgendamento() {
+            // TRAVA DE SEGURANÇA: Obriga o cliente a marcar a caixa dos termos!
+            if(!document.getElementById('checkTermos').checked) {
+                return alert("Por favor, confirme que leu e aceita as regras da Arena marcando a caixinha antes de prosseguir.");
+            }
+
             const h = parseInt(document.getElementById('selectHora').value);
             fetch(SCRIPT_URL, { 
                 method: "POST", 
