@@ -93,9 +93,6 @@
         footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none;}
         footer p { margin: 5px 0; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .gallery-item { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid transparent; transition: 0.3s; filter: grayscale(30%); }
-        .gallery-item:hover { filter: grayscale(0%); border-color: var(--primary); transform: scale(1.02); }
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
         .partner-link { text-decoration: none; display: inline-block; }
         .partner-logo { max-width: 140px; max-height: 80px; filter: grayscale(100%) brightness(1.2); opacity: 0.6; transition: all 0.3s ease; cursor: pointer; }
@@ -110,28 +107,12 @@
         .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .btn-cancel { background: #333; color: white; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; }
         .btn-confirm { background: var(--primary); color: black; border: none; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold; }
-        .scoreboard-container { background: var(--card-color); padding: 20px; border-radius: 20px; max-width: 600px; margin: auto; border: 2px solid var(--primary); position: relative; }
-        .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .score-box { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .team-score { flex: 1; text-align: center; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; }
-        .team-score input { width: 100%; background: transparent; border: none; color: var(--primary); text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
-        .points-display { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; cursor: pointer; user-select: none; }
-        .btn-point { background: #333; color: var(--primary); border: 2px solid var(--primary); width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
-        .btn-point:hover { background: var(--primary); color: black; }
-        .games-display { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
-        .games-count { font-size: 1.5rem; color: white; font-weight: bold; }
-        .reset-btn { margin-top: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
-        .reset-btn:hover { background: var(--primary); color: black; }
         .faq-item { background: #222; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #444; }
         .faq-item summary { padding: 15px; cursor: pointer; font-weight: bold; color: white; list-style: none; display: flex; justify-content: space-between; align-items: center; }
         .faq-item summary:hover { background: #333; }
         .faq-item summary::after { content: '+'; color: var(--primary); font-size: 1.5rem; font-weight: bold; }
         .faq-item[open] summary::after { content: '-'; }
         .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: auto; }
-        .card { background-color: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; transition: 0.3s; }
-        .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.1); }
-        .card h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
 
         @media (max-width: 600px) { 
             .hero h1 { font-size: 3rem; } 
@@ -191,11 +172,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="navegarPara('tela-agendamento')">Agendar</a></li>
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
-                <li><a onclick="navegarPara('tela-modalidades')">Nossas Modalidades</a></li>
-                <li><a onclick="navegarPara('tela-arena')">Conheça Nossa Arena</a></li>
-                <li><a onclick="navegarPara('tela-areia')">Nossa Areia</a></li>
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
-                <li><a onclick="navegarPara('tela-placar')">Marcar Placar</a></li>
                 <li><a onclick="navegarPara('tela-parceiros')">Nossos Parceiros</a></li>
                 <li><a onclick="fazerLogout()" style="color:red;">SAIR</a></li>
             </ul>
@@ -312,12 +289,10 @@
         </div>
     </div>
 
-    <div id="tela-modalidades" class="secao-conteudo"><h2 class="section-title">Nossas Modalidades</h2><div class="grid-cards"><div class="card"><h3>🎾 Beach Tennis</h3><p>Quadras oficiais com areia tratada.</p></div><div class="card"><h3>🏐 Vôlei de Praia</h3><p>Espaço perfeito para o set disputado.</p></div><div class="card"><h3>⚽ Futevôlei</h3><p>Treine com amigos.</p></div></div></div>
-    <div id="tela-arena" class="secao-conteudo"><h2 class="section-title">Conheça Nossa Arena</h2><div class="gallery-grid"><img src="fachada.jpeg" alt="Arena Vitale" class="gallery-item"><img src="quadra2.jpeg" alt="Quadra de Beach Tennis" class="gallery-item"><img src="geral2.jpeg" alt="Lounge" class="gallery-item"><img src="foto4.jpg" alt="Iluminação Noturna" class="gallery-item"></div></div>
-    <div id="tela-areia" class="secao-conteudo"><h2 class="section-title">Nossa Areia</h2><div style="max-width: 800px; margin: auto; background: var(--card-color); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: left; line-height: 1.6;"><img src="quadra2.jpeg" alt="Areia de Alta Qualidade" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 25px; filter: brightness(0.8);"><p>A quadra de Beach Tennis utiliza areia de alta qualidade, cuidadosamente selecionada para garantir segurança, conforto e melhor desempenho desportivo.</p><br><p>Com granulometria ideal, essa areia proporciona o equilíbrio perfeito entre estabilidade do solo e absorção de impacto, favorecendo movimentos rápidos, precisos e seguros.</p><br><p style="text-align: center; font-weight: bold; color: var(--primary); font-size: 1.2rem; margin-top: 10px;">Aproveite o jogo com mais qualidade! 🎾</p></div></div>
     <div id="tela-local" class="secao-conteudo"><h2 class="section-title">Onde Estamos</h2><p style="font-size: 1.1rem; margin-bottom: 20px;">Av. Cel Antônio Cordeiro, N°2261<br>Tabuleiro do Catavento, Russas - Ceará</p><div class="map-responsive"><iframe src="https://maps.google.com/maps?q=Arena%20Vitale%20Russas%20Ceara&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="450" style="border:0; border-radius: 15px;" allowfullscreen="" loading="lazy"></iframe></div><br><br><a href="https://www.google.com/maps/search/?api=1&query=Arena+Vitale+Russas" target="_blank" class="map-btn">🗺️ Abrir no Google Maps</a></div>
-    <div id="tela-placar" class="secao-conteudo"><h2 class="section-title">Marcar Placar ⚡</h2><div class="scoreboard-container"><div class="mode-switch"><button class="btn-duration active" onclick="mudarModo('beach')" id="btnBeach">Beach Tennis</button><button class="btn-duration" onclick="mudarModo('volei')" id="btnVolei">Vôlei / Fute</button></div><div class="score-box"><div class="team-score"><input type="text" value="Dupla A"><div class="points-display" id="scoreA" onclick="addPonto('A')">0</div><button class="btn-point" onclick="addPonto('A')">+</button><div class="games-display">Games: <span class="games-count" id="gameA">0</span></div></div><div style="font-size: 1.5rem; font-weight: bold; color: #555;">X</div><div class="team-score"><input type="text" value="Dupla B"><div class="points-display" id="scoreB" onclick="addPonto('B')">0</div><button class="btn-point" onclick="addPonto('B')">+</button><div class="games-display">Games: <span class="games-count" id="gameB">0</span></div></div></div><button class="reset-btn" onclick="zerarPlacar()">🔄 Zerar Placar</button></div><p style="margin-top:10px; color:#777; font-size:0.8rem;">Toque no número para adicionar ponto.</p></div>
+    
     <div id="tela-parceiros" class="secao-conteudo"><h2 class="section-title">Nossos Parceiros</h2><div class="partners-container"><a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a><a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a><a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a><a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a></div></div>
+    
     <div id="tela-faq" class="secao-conteudo section-dark"><h2 class="section-title">Dúvidas Frequentes</h2><div style="max-width: 600px; margin: auto; text-align: left;"><details class="faq-item"><summary>Preciso de levar a minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details><details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details><details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details><details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details><details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017 e horários promocionais.</p></details></div></div>
 
     <footer id="footerPrincipal"><p>Desenvolvido por Edilson Renovato</p><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
@@ -511,8 +486,6 @@
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
                 if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { total += valorPromo; usouPromoFlag = true; } 
-                
-                // AQUI ESTÁ A LÓGICA DE VALORES ATUALIZADA
                 else if (hAtual >= 5 && hAtual <= 16) { total += 35; } 
                 else { total += (pagamento === 'cartao') ? 50 : 45; }
             } return total;
@@ -528,11 +501,21 @@
         function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
+        // AQUI ESTÁ A LÓGICA DE LIBERAÇÃO DE AGENDA ATUALIZADA
         function mudarDia(delta) { 
             let dataAlvo = new Date(dataVisualizada); dataAlvo.setDate(dataAlvo.getDate() + delta); dataAlvo.setHours(0,0,0,0);
             let hojeStr = new Date(); hojeStr.setHours(0,0,0,0);
             
             if (dataAlvo < hojeStr) return; 
+            
+            // LÓGICA DE LIBERAÇÃO DE AGENDA (ATÉ 6 DIAS, OU 7 DIAS APÓS AS 23H)
+            let limiteDias = new Date().getHours() >= 23 ? 7 : 6;
+            let dataLimite = new Date(); dataLimite.setHours(0,0,0,0);
+            dataLimite.setDate(dataLimite.getDate() + limiteDias);
+            
+            if (dataAlvo > dataLimite) {
+                return alert("📅 A agenda é liberada dia após dia!\n\nHoje o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h.");
+            }
             
             if (agendaStatusGeral === "NAO") return alert("🔒 A agenda está temporariamente bloqueada pela administração.");
 
@@ -666,7 +649,6 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // MENSAGEM DO WHATSAPP ATUALIZADA - SEM O TELEFONE
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
@@ -699,12 +681,6 @@
             })
             .catch(e => { alert("Erro de ligação."); btn.disabled = false; });
         }
-
-        let pA = 0, pB = 0; let gA = 0, gB = 0; const beachPoints = [0, 15, 30, 40]; let modoJogo = 'beach';
-        function mudarModo(modo) { modoJogo = modo; document.getElementById('btnBeach').classList.remove('active'); document.getElementById('btnVolei').classList.remove('active'); if(modo === 'beach') document.getElementById('btnBeach').classList.add('active'); else document.getElementById('btnVolei').classList.add('active'); zerarPlacar(); }
-        function addPonto(time) { if(modoJogo === 'beach') { if(time === 'A') { if(pA < 3) pA++; else { gA++; pA = 0; pB = 0; } } else { if(pB < 3) pB++; else { gB++; pA = 0; pB = 0; } } atualizarTelaBeach(); } else { if(time === 'A') gA++; else gB++; document.getElementById('scoreA').innerText = gA; document.getElementById('scoreB').innerText = gB; document.getElementById('gameA').innerText = "-"; document.getElementById('gameB').innerText = "-"; } }
-        function atualizarTelaBeach() { document.getElementById('scoreA').innerText = beachPoints[pA]; document.getElementById('scoreB').innerText = beachPoints[pB]; document.getElementById('gameA').innerText = gA; document.getElementById('gameB').innerText = gB; }
-        function zerarPlacar() { pA = 0; pB = 0; gA = 0; gB = 0; if(modoJogo === 'beach') atualizarTelaBeach(); else { document.getElementById('scoreA').innerText = 0; document.getElementById('scoreB').innerText = 0; } }
     </script>
 </body>
 </html>
