@@ -511,7 +511,10 @@
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
                 if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { total += valorPromo; usouPromoFlag = true; } 
-                else if (hAtual >= 7 && hAtual <= 16) { total += 35; } else { total += (pagamento === 'cartao') ? 50 : 45; }
+                
+                // AQUI ESTÁ A LÓGICA DE VALORES ATUALIZADA
+                else if (hAtual >= 5 && hAtual <= 16) { total += 35; } 
+                else { total += (pagamento === 'cartao') ? 50 : 45; }
             } return total;
         }
 
@@ -575,7 +578,6 @@
             let isHoje = (dataVisualizada.getDate() === hoje.getDate() && dataVisualizada.getMonth() === hoje.getMonth() && dataVisualizada.getFullYear() === hoje.getFullYear());
             let horaAtual = hoje.getHours();
 
-            // AQUI É A CORREÇÃO: O MENU COMEÇA SEMPRE ÀS 05:00
             let h = 5; 
             let blocosNecessarios = Math.ceil(duracaoSelecionada);
             let limiteH = 22 - blocosNecessarios + 1;
@@ -664,7 +666,7 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // AQUI É A CORREÇÃO DA MENSAGEM DO WHATSAPP (EXATAMENTE COMO VOCÊ PEDIU)
+        // MENSAGEM DO WHATSAPP ATUALIZADA - SEM O TELEFONE
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
@@ -682,7 +684,6 @@
                 
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
                 msg += "👤 Nome: " + usuarioLogado.nome + "\n";
-                msg += "📱 Telefone: " + usuarioLogado.phone + "\n";
                 msg += "🏟️ Quadra: " + nomeQuadra + "\n";
                 msg += "🏆 Modalidade: " + mod + "\n";
                 msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
