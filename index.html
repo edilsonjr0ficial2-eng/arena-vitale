@@ -309,8 +309,7 @@
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
-        // INICIALIZA A DATA VISUALIZADA
-        // SE PASSOU DAS 23H, O SITE JÁ CONSIDERA QUE "HOJE" É AMANHÃ
+        // INICIALIZA A DATA VISUALIZADA SINCRONIZADA COM A PLANILHA (VIRA O DIA ÀS 23H)
         let dataVisualizada = new Date();
         if (dataVisualizada.getHours() >= 23) {
             dataVisualizada.setDate(dataVisualizada.getDate() + 1);
@@ -507,7 +506,7 @@
         function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
-        // REGRAS DE LIBERAÇÃO DA AGENDA: APÓS AS 23H, LIBERA A SEXTA DA SEMANA SEGUINTE.
+        // --- LÓGICA DE NAVEGAÇÃO E LIMITE DA AGENDA (REFINADA) ---
         function mudarDia(delta) { 
             let dataAlvo = new Date(dataVisualizada); 
             dataAlvo.setDate(dataAlvo.getDate() + delta); 
@@ -516,22 +515,27 @@
             let dataAtual = new Date();
             let horaAtual = dataAtual.getHours();
             
-            let hojeSistema = new Date(); 
-            hojeSistema.setHours(0,0,0,0);
+            let hojeReal = new Date(); 
+            hojeReal.setHours(0,0,0,0);
             
-            // Se já passou das 23h, o "hoje" real para o sistema de agendamento já é amanhã
+            // Regra básica: nunca navegar para o passado real
+            if (dataAlvo < hojeReal) return; 
+            
+            // Cálculo do Limite de avanço:
+            // Se são 13h de Sexta, hojeReal é Sexta. Sábado(1), Dom(2), Seg(3), Ter(4), Qua(5), Qui(6).
+            // A Quinta-feira é o 6º dia à frente. Para garantir que ela seja incluída, o limite deve ser >= 6.
+            let dataLimite = new Date(hojeReal);
             if (horaAtual >= 23) {
-                hojeSistema.setDate(hojeSistema.getDate() + 1);
+                // Às 23h, libertamos o 7º dia (a próxima semana fecha o ciclo)
+                dataLimite.setDate(dataLimite.getDate() + 7);
+            } else {
+                // Durante o dia, permitimos navegar até 6 dias à frente (Quinta, se hoje for Sexta)
+                dataLimite.setDate(dataLimite.getDate() + 6);
             }
             
-            if (dataAlvo < hojeSistema) return; 
-            
-            // O Limite é sempre 6 dias a partir do "hojeSistema"
-            // Antes das 23h de uma Sexta: Permite ir até Quinta (+6 dias)
-            // Depois das 23h de uma Sexta: hojeSistema vira Sábado, permite ir até Sexta da semana seguinte (+6 dias a partir de Sábado = +7 dias no total)
-            let dataLimite = new Date(hojeSistema);
-            dataLimite.setDate(dataLimite.getDate() + 6);
-            
+            // Ajuste de segurança para a comparação não falhar por minutos
+            dataLimite.setHours(23, 59, 59, 999);
+
             if (dataAlvo > dataLimite) {
                 return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h.");
             }
@@ -548,7 +552,9 @@
                 if (dataAlvo > dFim) return alert(`🔒 A agenda está liberada apenas até o dia ${p[2]}/${p[1]}/${p[0]}.`);
             }
 
-            dataVisualizada = dataAlvo; document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia();
+            dataVisualizada = dataAlvo; 
+            document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; 
+            carregarDadosDoDia();
         }
 
         function formatarDataHeader(date) { let diaSemanaJS = date.getDay(); let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex }; }
