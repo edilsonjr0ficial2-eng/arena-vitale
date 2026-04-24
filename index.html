@@ -81,7 +81,6 @@
         .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
         .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
         
-        /* CORREÇÃO DO BOTÃO WHATSAPP NO IPHONE */
         .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
         .wa-float i { color: white; font-size: 35px; }
         .wa-float:hover { transform: scale(1.1); }
@@ -310,6 +309,14 @@
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
+        // INICIALIZA A DATA VISUALIZADA
+        // SE PASSOU DAS 23H, O SITE JÁ CONSIDERA QUE "HOJE" É AMANHÃ
+        let dataVisualizada = new Date();
+        if (dataVisualizada.getHours() >= 23) {
+            dataVisualizada.setDate(dataVisualizada.getDate() + 1);
+        }
+        dataVisualizada.setHours(0,0,0,0);
+
         window.onload = function() {
             if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function(registrations) { for (let registration of registrations) { registration.unregister(); } }); }
 
@@ -375,7 +382,6 @@
             } else if (senhaAdmin !== null && senhaAdmin !== "") { alert("❌ Senha incorreta! O resgate não foi realizado."); }
         }
 
-        // --- SISTEMA DE RECUPERAÇÃO DE SENHA ---
         let codigoRecuperacao = ""; let telefoneRecuperacao = "";
         function enviarCodigoRecuperacao() {
             telefoneRecuperacao = document.getElementById('recPhone').value.replace(/\D/g, "");
@@ -445,7 +451,7 @@
 
         let duracaoSelecionada = 1; let quadraSelecionada = 1; let nomeQuadra = "Quadra Chicashoes";
         let horariosOcupadosDoDia = []; let tempHora = 0, tempFim = "", tempInfoDia = "", tempValor = 0;
-        const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']; const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; let dataVisualizada = new Date(); 
+        const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']; const horas = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; 
 
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function atualizarRelogio() { document.getElementById('relogioFlutuante').innerText = new Date().toLocaleTimeString('pt-BR'); } setInterval(atualizarRelogio, 1000);
@@ -501,20 +507,33 @@
         function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
-        // AQUI ESTÁ A LÓGICA DE LIBERAÇÃO DE AGENDA ATUALIZADA
+        // REGRAS DE LIBERAÇÃO DA AGENDA: APÓS AS 23H, LIBERA A SEXTA DA SEMANA SEGUINTE.
         function mudarDia(delta) { 
-            let dataAlvo = new Date(dataVisualizada); dataAlvo.setDate(dataAlvo.getDate() + delta); dataAlvo.setHours(0,0,0,0);
-            let hojeStr = new Date(); hojeStr.setHours(0,0,0,0);
+            let dataAlvo = new Date(dataVisualizada); 
+            dataAlvo.setDate(dataAlvo.getDate() + delta); 
+            dataAlvo.setHours(0,0,0,0);
             
-            if (dataAlvo < hojeStr) return; 
+            let dataAtual = new Date();
+            let horaAtual = dataAtual.getHours();
             
-            // LÓGICA DE LIBERAÇÃO DE AGENDA (ATÉ 6 DIAS, OU 7 DIAS APÓS AS 23H)
-            let limiteDias = new Date().getHours() >= 23 ? 7 : 6;
-            let dataLimite = new Date(); dataLimite.setHours(0,0,0,0);
-            dataLimite.setDate(dataLimite.getDate() + limiteDias);
+            let hojeSistema = new Date(); 
+            hojeSistema.setHours(0,0,0,0);
+            
+            // Se já passou das 23h, o "hoje" real para o sistema de agendamento já é amanhã
+            if (horaAtual >= 23) {
+                hojeSistema.setDate(hojeSistema.getDate() + 1);
+            }
+            
+            if (dataAlvo < hojeSistema) return; 
+            
+            // O Limite é sempre 6 dias a partir do "hojeSistema"
+            // Antes das 23h de uma Sexta: Permite ir até Quinta (+6 dias)
+            // Depois das 23h de uma Sexta: hojeSistema vira Sábado, permite ir até Sexta da semana seguinte (+6 dias a partir de Sábado = +7 dias no total)
+            let dataLimite = new Date(hojeSistema);
+            dataLimite.setDate(dataLimite.getDate() + 6);
             
             if (dataAlvo > dataLimite) {
-                return alert("📅 A agenda é liberada dia após dia!\n\nHoje o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h.");
+                return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h.");
             }
             
             if (agendaStatusGeral === "NAO") return alert("🔒 A agenda está temporariamente bloqueada pela administração.");
