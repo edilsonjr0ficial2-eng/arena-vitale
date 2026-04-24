@@ -128,7 +128,7 @@
 
     <div class="stats-bar">
         <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
-        <div class="stat-item">Faturação do Dia: <span id="statFaturamento">R$ 0,00</span></div>
+        <div class="stat-item">Faturamento do Dia: <span id="statFaturamento">R$ 0,00</span></div>
     </div>
 
     <div class="controls">
@@ -136,7 +136,7 @@
         <div class="date-display" id="dateDisplay">...</div>
         <button class="nav-btn" onclick="mudarDia(1)">❯</button>
         <button class="nav-btn" id="btnRecarregar" onclick="carregarAgenda()" style="margin-left:10px;">↻</button>
-        <span id="autoRefreshStatus" style="font-size: 0.75rem; color: var(--success); margin-left: 10px;">A monitorizar...</span>
+        <span id="autoRefreshStatus" style="font-size: 0.75rem; color: var(--success); margin-left: 10px;">Monitorando...</span>
     </div>
 
     <div class="grid-container">
@@ -146,7 +146,7 @@
 
     <div id="modalGerenciarAdmins" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Gerir Administradores</h3>
+            <h3 style="color:var(--primary); font-size:1.1rem;">Gerenciar Administradores</h3>
             <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
                 <input type="text" id="novoAdmUser" placeholder="Novo Usuário" style="flex:1; min-width: 120px;">
                 <input type="text" id="novoAdmPass" placeholder="Senha" style="flex:1; min-width: 120px;">
@@ -194,7 +194,7 @@
                 <button class="tool-btn" style="background:var(--primary); color:black; padding:8px;" onclick="renderizarTabelaClientes()">Filtrar</button>
             </div>
             <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
-                <div id="loadingClientes" style="color:var(--primary); font-size:0.85rem;">A carregar dados...</div>
+                <div id="loadingClientes" style="color:var(--primary); font-size:0.85rem;">Carregando dados...</div>
                 <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaClientes">
                     <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Nome & Contato</th><th style="padding: 6px;">Último Jogo</th><th style="padding: 6px; text-align:center;">Raquetes</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
                     <tbody id="listaClientesBody"></tbody>
@@ -207,7 +207,7 @@
     <div id="modalEstatisticas" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 800px; width: 95%;">
             <h3 style="color:var(--primary); font-size: 1.5rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
-            <div id="statsContent"><p style="color: var(--primary); font-size:0.85rem;">A processar dados...</p></div>
+            <div id="statsContent"><p style="color: var(--primary); font-size:0.85rem;">Processando dados...</p></div>
             <button class="close-btn" style="margin-top: 15px;" onclick="fecharDashboard()">Fechar</button>
         </div>
     </div>
@@ -226,7 +226,7 @@
     </div>
 
     <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:400px;"><h3 style="color:var(--danger); font-size:1.1rem;">Lista Negra</h3><div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">A carregar...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
+        <div class="modal-box" style="max-width:400px;"><h3 style="color:var(--danger); font-size:1.1rem;">Lista Negra</h3><div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
     </div>
 
     <div id="modalInterdicao" class="modal-bg" style="display:none;">
@@ -269,7 +269,7 @@
         function tentarLogin() {
             let u = document.getElementById('userInput').value.trim();
             let p = document.getElementById('passInput').value.trim();
-            if(!u || !p) return alert("Preencha utilizador e senha!");
+            if(!u || !p) return alert("Preencha usuário e senha!");
             let btn = document.getElementById('btnLogin'); btn.innerText = "Aguarde...";
             fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "login_admin", usuario: u, senha: p }) })
             .then(r=>r.json()).then(data => {
@@ -282,7 +282,7 @@
         function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
 
         function alternarRanking() {
-            if(confirm("Tem a certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
+            if(confirm("Tem certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
                 fetch(SCRIPT_URL, {
                     method: "POST",
                     body: JSON.stringify({ acao: "toggle_ranking" })
@@ -301,8 +301,8 @@
         }
 
         function aplicarMoldeNaAgenda() {
-            if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsto vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem a certeza que deseja aplicar o molde agora?")) {
-                document.getElementById('btnRecarregar').innerText = "A limpar...";
+            if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsso vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem certeza que deseja aplicar o molde agora?")) {
+                document.getElementById('btnRecarregar').innerText = "Limpando...";
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "executar_limpeza" }) })
                 .then(r => r.json()).then(data => {
                     if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); location.reload(); }
@@ -313,19 +313,19 @@
 
         function abrirModalAdmins() {
             document.getElementById('modalGerenciarAdmins').style.display = 'flex';
-            document.getElementById('listaAdminsConteudo').innerHTML = "A carregar...";
+            document.getElementById('listaAdminsConteudo').innerHTML = "Carregando...";
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_admins" }) }).then(r=>r.json()).then(d => {
                 if(d.sucesso) {
                     let html = "";
                     d.lista.forEach(a => { html += `<div class="interdicao-item" style="justify-content:space-between"><span>${a.usuario}</span><button class="btn-icon btn-del" onclick="excluirAdm('${a.usuario}')">🗑️</button></div>`; });
-                    document.getElementById('listaAdminsConteudo').innerHTML = html || "<p>Nenhum admin secundário registado.</p>";
+                    document.getElementById('listaAdminsConteudo').innerHTML = html || "<p>Nenhum admin secundário cadastrado.</p>";
                 }
             });
         }
 
         function salvarNovoAdmin() {
             let u = document.getElementById('novoAdmUser').value.trim(); let p = document.getElementById('novoAdmPass').value.trim();
-            if(!u || !p) return alert("Preencha utilizador e senha.");
+            if(!u || !p) return alert("Preencha usuário e senha.");
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_admin", usuario: u, senha: p }) }).then(r=>r.json()).then(d=>{ if(d.sucesso) { document.getElementById('novoAdmUser').value=''; document.getElementById('novoAdmPass').value=''; abrirModalAdmins(); } });
         }
 
@@ -361,7 +361,7 @@
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json()).then(data => {
                 if(data.sucesso && data.promo) {
                     document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
-                    if (data.promo.limite) { document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Quem usou: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registado."; } } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
+                    if (data.promo.limite) { document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Quem usou: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registrado."; } } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
                     let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
                 }
             });
@@ -373,17 +373,17 @@
                 if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } 
             });
         }
-        function desativarPromocao() {
-            if(confirm("Desativar a promoção?")) { 
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: "", fim: "", valor: "", horarios: "", limite: "" }) }).then(r => r.json()).then(data => { 
-                    if(data.sucesso) { location.reload(); } 
-                }); 
-            }
-        }
 
         function abrirGerenciadorClientes() {
             document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
+            // Busca apenas se a lista estiver vazia
+            if(clientesCadastrados.length === 0) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
+                    if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } 
+                }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
+            } else {
+                renderizarTabelaClientes();
+            }
         }
 
         function parseDataBR(dataStr) { 
@@ -405,12 +405,17 @@
             let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); 
             let hoje = new Date(); hoje.setHours(0,0,0,0);
             
-            // 1. Filtrar e extrair os dados para uma lista temporária
             let clientesLista = [];
-            for(let i = 1; i < clientesCadastrados.length; i++) { 
-                let row = clientesCadastrados[i]; 
-                let nome = row[1] || ""; let telefone = row[2] || ""; 
-                let ultimoAgendamentoStr = row[5] || ""; let pontos = parseInt(row[6]) || 0;     
+            
+            // Loop correto baseado no array retornado pelo motor
+            for(let i = 0; i < clientesCadastrados.length; i++) { 
+                let clienteData = clientesCadastrados[i]; 
+                
+                // O motor AppScript devolve: {nome: "Fulano", telefone: "123", pontos: 10, ultimoAgendamento: "..."}
+                let nome = clienteData.nome || ""; 
+                let telefone = clienteData.telefone || ""; 
+                let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; 
+                let pontos = parseInt(clienteData.pontos) || 0;     
                 
                 if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
                 
@@ -425,7 +430,7 @@
                 clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
             }
 
-            // 2. ORDENAÇÃO INTELIGENTE (Nunca jogou no topo, depois as datas mais antigas)
+            // Ordenação (Nunca jogou no topo, depois as datas mais antigas)
             clientesLista.sort((a, b) => {
                 if (!a.dataUltimo && b.dataUltimo) return -1;
                 if (a.dataUltimo && !b.dataUltimo) return 1;
@@ -433,10 +438,10 @@
                 return a.dataUltimo.getTime() - b.dataUltimo.getTime();
             });
 
-            // 3. Renderizar a tabela final com os dados ordenados
+            // Renderização
             clientesLista.forEach(cliente => {
                 let displayData = "Nunca";
-                if (cliente.ultimoAgendamentoStr) {
+                if (cliente.ultimoAgendamentoStr && cliente.ultimoAgendamentoStr !== "Nunca") {
                     let strD = cliente.ultimoAgendamentoStr.toString();
                     if(strD.includes('T')) {
                         let dO = new Date(strD);
@@ -450,6 +455,8 @@
                 let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
                 let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`;
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
+                
+                // Agora o nome será injetado corretamente na coluna
                 tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnDel}</td>`; 
                 tbody.appendChild(tr);
             });
@@ -460,7 +467,7 @@
         function excluirCliente(telefone, nome) {
             if(confirm(`⚠️ ATENÇÃO: Deseja excluir o cliente ${nome} permanentemente?`)) {
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c[2] != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
+                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c.telefone != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
                 });
             }
         }
@@ -468,13 +475,18 @@
         function salvarPontosAdmin(event, telefone) {
             let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value); if(isNaN(novosPontos)) return alert("Valor inválido.");
             let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, novosPontos: novosPontos }) }).then(r => r.json()).then(data => {
-                if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c[2] == telefone); if(cliente) cliente[6] = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, pontos: novosPontos }) }).then(r => r.json()).then(data => {
+                if(data.sucesso) { 
+                    btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; 
+                    setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); 
+                    let cliente = clientesCadastrados.find(c => c.telefone == telefone); 
+                    if(cliente) cliente.pontos = novosPontos; 
+                } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
         function abrirEstatisticas() {
-            document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">A analisar os dados do servidor...</p>';
+            document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">Analisando os dados do banco...</p>';
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json()).then(data => {
                 if(data.sucesso) {
                     let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
@@ -504,20 +516,20 @@
                             <div id="listaVisitantes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
                         </div>
                         <div class="dash-card">
-                            <h4>Clientes Registados</h4>
+                            <h4>Clientes Registrados</h4>
                             <div class="value">👥 ${s.totalClientes}</div>
                             <div style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">+${qtdNovosHoje} hoje</div>
                             <button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--success); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Cadastros Hoje</button>
                             <div id="listaNovosClientes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div>
                         </div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturação da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
+                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturamento da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.2rem;">🎾 ${preferida}</div></div>
                         <div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.1rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div>
                     </div>`;
                     html += `<div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 6px; border: 1px solid var(--primary);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h4 style="color:#aaa; font-size:0.8rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4><select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:4px 8px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;"><option value="diario">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select></div><canvas id="graficoAcessos" height="120"></canvas></div>`;
                     document.getElementById('statsContent').innerHTML = html; setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
-                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas da Base de Dados.</p>'; }
-            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na ligação com o Google.</p>'; });
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas do Banco de Dados.</p>'; }
+            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na conexão com o Google.</p>'; });
         }
 
         function atualizarGraficoAcessos() {
@@ -543,9 +555,9 @@
             modoGradeFixa = !modoGradeFixa; const btn = document.getElementById('btnToggleModo');
             if(modoGradeFixa) {
                 btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
-                document.getElementById('listaQ1').innerHTML = "A carregar molde..."; document.getElementById('listaQ2').innerHTML = "A carregar molde...";
+                document.getElementById('listaQ1').innerHTML = "Carregando molde..."; document.getElementById('listaQ2').innerHTML = "Carregando molde...";
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro."); alternarModoGradeFixa(); } });
-            } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "A monitorizar..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
+            } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "Monitorando..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
         }
 
         function atualizarTelaGradeFixa() {
@@ -694,7 +706,7 @@
             fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) });
         }
 
-        function abrirWhatsApp(n, h) { let num = prompt(`Número:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
+        function abrirWhatsApp(n, h) { let num = prompt(`Número do Cliente:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
         
         function confirmarAgendamento(h, q, n) { 
@@ -723,13 +735,13 @@
                 if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
             }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
         }
-        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>A remover...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
+        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
 
         function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
         function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
-        function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "A sortear..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
+        function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
     </script>
 </body>
 </html>
