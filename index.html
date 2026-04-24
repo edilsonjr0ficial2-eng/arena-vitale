@@ -77,7 +77,6 @@
         .stamp-box { background: #222; border: 2px dashed #555; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #555; font-weight: 900; margin: auto; transition: 0.3s; }
         .stamp-box.stamped { background: var(--primary); border-color: var(--primary); color: black; box-shadow: 0 0 15px rgba(255,215,0,0.5); transform: scale(1.1); animation: popIn 0.4s ease; }
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
-        .fidelidade-nota { margin-top: 25px; font-size: 0.85rem; color: #888; border-top: 1px solid #333; padding-top: 15px;}
         .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
         .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
         
@@ -197,15 +196,20 @@
         <h2 class="section-title">Programa de Fidelidade ⭐</h2>
         <div class="fidelidade-box">
             <h3 style="color: var(--primary); margin-bottom: 10px;">Cartão VIP Arena Vitale</h3>
-            <p>Jogue connosco, acumule carimbos e ganhe prémios!</p>
-            <strong style="font-size: 1.2rem;">Complete 10 jogos e ganhe <span style="color: var(--primary);">1 hora grátis</span>!</strong>
+            <p>Jogue conosco, acumule raquetes e ganhe tempo na quadra!</p>
             
             <div class="stamp-grid" id="stampGrid"></div>
             
             <button id="btnResgatar" class="btn-resgate" onclick="resgatarPremio()">🎁 Resgatar 1 Hora Grátis</button>
 
-            <div class="fidelidade-nota">
-                * Ganha 1 carimbo automático de cada vez que reserva uma quadra pelo site. Apresente este ecrã na receção para resgatar.
+            <div style="margin-top: 30px; text-align: left; background: #1a1a1a; padding: 20px; border-radius: 10px; border-left: 4px solid var(--primary);">
+                <h4 style="color: var(--primary); margin-bottom: 15px; font-size: 1.1rem;"><i class="fas fa-info-circle"></i> Como funciona e Regras</h4>
+                <ul style="color: #ccc; font-size: 0.95rem; line-height: 1.6; padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 8px;">Cada <strong>1 hora agendada</strong> e jogada garante <strong>1 raquete</strong> (carimbo).</li>
+                    <li style="margin-bottom: 8px;">Ao acumular <strong>10 raquetes</strong>, você ganha <strong>1 hora grátis</strong>.</li>
+                    <li style="margin-bottom: 8px;"><strong>Regra de Uso:</strong> Para usufruir da hora grátis, é obrigatório realizar um agendamento de <strong>no mínimo 2 horas</strong> (você paga 1h e a outra sai de graça).</li>
+                    <li>Apresente esta tela na recepção da Arena Vitale para que um funcionário valide o seu resgate.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -280,7 +284,7 @@
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
                 • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>.<br><br>
-                • <strong>O utilizador que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
+                • <strong>O usuário que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
                 • O não comparecimento sem aviso prévio resultará na <strong>cobrança da taxa de 50%</strong>.
             </div>
             <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos e valores.</label></div>
@@ -292,7 +296,7 @@
     
     <div id="tela-parceiros" class="secao-conteudo"><h2 class="section-title">Nossos Parceiros</h2><div class="partners-container"><a href="https://www.instagram.com/chicashoes_/" target="_blank" class="partner-link"><img src="quadra-chicashoes.jpg" alt="Chicashoes" class="partner-logo"></a><a href="https://www.instagram.com/padariadohelder/" target="_blank" class="partner-link"><img src="quadra-panificadora.jpg" alt="Panificadora" class="partner-logo"></a><a href="https://www.instagram.com/vitale_blend/" target="_blank" class="partner-link"><img src="vitale.jpg" alt="Arena Vitale" class="partner-logo"></a><a href="https://instagram.com/seuparceiroaqui" target="_blank" class="partner-link"><img src="foto4.jpg" alt="Parceiro 4" class="partner-logo"></a></div></div>
     
-    <div id="tela-faq" class="secao-conteudo section-dark"><h2 class="section-title">Dúvidas Frequentes</h2><div style="max-width: 600px; margin: auto; text-align: left;"><details class="faq-item"><summary>Preciso de levar a minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details><details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details><details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details><details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details><details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017 e horários promocionais.</p></details></div></div>
+    <div id="tela-faq" class="secao-conteudo section-dark"><h2 class="section-title">Dúvidas Frequentes</h2><div style="max-width: 600px; margin: auto; text-align: left;"><details class="faq-item"><summary>Preciso levar a minha própria raquete?</summary><p>Não necessariamente! A Arena Vitale disponibiliza raquetes <strong>gratuitamente</strong>.</p></details><details class="faq-item"><summary>Qual a antecedência para cancelar?</summary><p>Até <strong>3 horas</strong> antes sem custo.</p></details><details class="faq-item"><summary>Formas de pagamento?</summary><p>Espécie, Pix e Cartão.</p></details><details class="faq-item"><summary>Funciona na chuva?</summary><p>Sim! Arena coberta.</p></details><details class="faq-item"><summary>Diferença de valor?</summary><p>Conforme Lei nº 13.455/2017 e horários promocionais.</p></details></div></div>
 
     <footer id="footerPrincipal"><p>Desenvolvido por Edilson Renovato</p><p>© 2026 Arena Vitale. Todos os direitos reservados.</p></footer>
     
@@ -309,7 +313,7 @@
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
-        // INICIALIZA A DATA VISUALIZADA SINCRONIZADA COM A PLANILHA (VIRA O DIA ÀS 23H)
+        // INICIALIZA A DATA VISUALIZADA
         let dataVisualizada = new Date();
         if (dataVisualizada.getHours() >= 23) {
             dataVisualizada.setDate(dataVisualizada.getDate() + 1);
@@ -372,12 +376,12 @@
         function resgatarPremio() {
             let senhaAdmin = prompt("⚠️ APENAS PARA FUNCIONÁRIOS DA RECEPÇÃO ⚠️\n\nDigite a senha para liberar 1 Hora Grátis:");
             if (senhaAdmin === "1234") { 
-                const btn = document.getElementById('btnResgatar'); btn.innerText = "A processar..."; btn.disabled = true;
+                const btn = document.getElementById('btnResgatar'); btn.innerText = "Processando..."; btn.disabled = true;
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "resgatar_pontos", telefone: usuarioLogado.phone }) })
                 .then(res => res.json()).then(data => {
                     btn.innerText = "🎁 Resgatar 1 Hora Grátis"; btn.disabled = false;
-                    if(data.sucesso) { alert("🎉 Resgate confirmado na Base de Dados! 1 Hora Grátis liberada para o cliente."); buscarPontosNoServidor(); } else { alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes."); }
-                }).catch(e => { btn.innerText = "🎁 Resgatar 1 Hora Grátis"; btn.disabled = false; alert("Erro de ligação com a Base de Dados."); });
+                    if(data.sucesso) { alert("🎉 Resgate confirmado no Banco de Dados! 1 Hora Grátis liberada para o cliente."); buscarPontosNoServidor(); } else { alert("❌ Ocorreu um erro ao resgatar ou os pontos são insuficientes."); }
+                }).catch(e => { btn.innerText = "🎁 Resgatar 1 Hora Grátis"; btn.disabled = false; alert("Erro de conexão com o Banco de Dados."); });
             } else if (senhaAdmin !== null && senhaAdmin !== "") { alert("❌ Senha incorreta! O resgate não foi realizado."); }
         }
 
@@ -386,7 +390,7 @@
             telefoneRecuperacao = document.getElementById('recPhone').value.replace(/\D/g, "");
             if(telefoneRecuperacao.length !== 11) return alert("Digite o número correto com DDD (11 dígitos).");
             
-            const btn = document.querySelector('#etapa1-rec button'); btn.innerText = "A aguardar..."; btn.disabled = true;
+            const btn = document.querySelector('#etapa1-rec button'); btn.innerText = "Aguardando..."; btn.disabled = true;
             
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: telefoneRecuperacao }) })
             .then(r => r.json()).then(data => {
@@ -407,7 +411,7 @@
             if(cod !== codigoRecuperacao) return alert("Código incorreto!");
             if(!nova || nova.length < 4) return alert("A nova senha deve ter no mínimo 4 caracteres.");
             
-            const btn = document.querySelector('#etapa2-rec button'); btn.innerText = "A salvar..."; btn.disabled = true;
+            const btn = document.querySelector('#etapa2-rec button'); btn.innerText = "Salvando..."; btn.disabled = true;
             
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_nova_senha", telefone: telefoneRecuperacao, senha: nova }) })
             .then(r => r.json()).then(data => {
@@ -506,7 +510,6 @@
         function setDuracao(horas, btn) { duracaoSelecionada = horas; document.getElementById('customInput').value = ""; document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); carregarDadosDoDia(); }
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
-        // --- LÓGICA DE NAVEGAÇÃO E LIMITE DA AGENDA (REFINADA) ---
         function mudarDia(delta) { 
             let dataAlvo = new Date(dataVisualizada); 
             dataAlvo.setDate(dataAlvo.getDate() + delta); 
@@ -518,22 +521,15 @@
             let hojeReal = new Date(); 
             hojeReal.setHours(0,0,0,0);
             
-            // Regra básica: nunca navegar para o passado real
             if (dataAlvo < hojeReal) return; 
             
-            // Cálculo do Limite de avanço:
-            // Se são 13h de Sexta, hojeReal é Sexta. Sábado(1), Dom(2), Seg(3), Ter(4), Qua(5), Qui(6).
-            // A Quinta-feira é o 6º dia à frente. Para garantir que ela seja incluída, o limite deve ser >= 6.
             let dataLimite = new Date(hojeReal);
             if (horaAtual >= 23) {
-                // Às 23h, libertamos o 7º dia (a próxima semana fecha o ciclo)
                 dataLimite.setDate(dataLimite.getDate() + 7);
             } else {
-                // Durante o dia, permitimos navegar até 6 dias à frente (Quinta, se hoje for Sexta)
                 dataLimite.setDate(dataLimite.getDate() + 6);
             }
             
-            // Ajuste de segurança para a comparação não falhar por minutos
             dataLimite.setHours(23, 59, 59, 999);
 
             if (dataAlvo > dataLimite) {
@@ -676,7 +672,7 @@
 
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
-            const btn = document.querySelector('.btn-confirm'); btn.innerText = "A agendar..."; btn.disabled = true;
+            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
             
             fetch(SCRIPT_URL, { 
                 method: "POST", 
@@ -704,7 +700,7 @@
                 
                 setTimeout(() => { location.reload(); }, 1500);
             })
-            .catch(e => { alert("Erro de ligação."); btn.disabled = false; });
+            .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
         }
     </script>
 </body>
