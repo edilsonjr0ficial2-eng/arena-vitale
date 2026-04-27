@@ -222,11 +222,25 @@
     </div>
 
     <div id="modalAddBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box"><h3 style="color:var(--danger); font-size:1.1rem;">Bloquear Cliente</h3><input type="text" id="blNome" placeholder="Nome"><input type="tel" id="blTel" placeholder="Telefone"><button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button><button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button></div>
+        <div class="modal-box">
+            <h3 style="color:var(--danger); font-size:1.1rem;">Bloquear Cliente</h3>
+            <input type="text" id="blNome" placeholder="Nome">
+            <input type="tel" id="blTel" placeholder="Telefone">
+            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
+        </div>
     </div>
 
     <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:400px;"><h3 style="color:var(--danger); font-size:1.1rem;">Lista Negra</h3><div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div><div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div><button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button></div>
+        <div class="modal-box" style="max-width:400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--danger); font-size:1.1rem; margin:0;">Lista Negra</h3>
+                <button class="tool-btn" style="border-color:var(--danger); color:var(--danger);" onclick="abrirModalAddBloqueio()">➕ Bloquear</button>
+            </div>
+            <div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div>
+            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
+        </div>
     </div>
 
     <div id="modalInterdicao" class="modal-bg" style="display:none;">
@@ -411,7 +425,6 @@
             for(let i = 0; i < clientesCadastrados.length; i++) { 
                 let clienteData = clientesCadastrados[i]; 
                 
-                // O motor AppScript devolve: {nome: "Fulano", telefone: "123", pontos: 10, ultimoAgendamento: "..."}
                 let nome = clienteData.nome || ""; 
                 let telefone = clienteData.telefone || ""; 
                 let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; 
@@ -454,10 +467,12 @@
 
                 let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
                 let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`;
+                let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
+
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
                 
-                // Agora o nome será injetado corretamente na coluna
-                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnDel}</td>`; 
+                // Agora o botão de block foi inserido antes do botão de apagar
+                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; 
                 tbody.appendChild(tr);
             });
             
@@ -725,8 +740,39 @@
             navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
         }
 
-        function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
-        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }); document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; } }
+        function abrirModalAddBloqueio() { 
+            document.getElementById('modalAddBlacklist').style.display = 'flex'; 
+        }
+
+        function abrirModalAddBloqueioPreenchido(nome, tel) {
+            document.getElementById('modalGerenciarClientes').style.display = 'none';
+            document.getElementById('blNome').value = nome;
+            document.getElementById('blTel').value = tel;
+            abrirModalAddBloqueio();
+        }
+
+        function adicionarBloqueio() { 
+            const n = document.getElementById('blNome').value; 
+            const t = document.getElementById('blTel').value; 
+            if(!n) return alert("Indique um nome."); 
+            if(confirm(`Bloquear ${n}?`)) { 
+                let btn = document.querySelector('#modalAddBlacklist .primary-btn');
+                let txt = btn.innerText; 
+                btn.innerText = "Aguarde..."; 
+                btn.disabled = true;
+
+                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) })
+                .then(() => {
+                    btn.innerText = txt; 
+                    btn.disabled = false;
+                    document.getElementById('blNome').value=""; 
+                    document.getElementById('blTel').value=""; 
+                    document.getElementById('modalAddBlacklist').style.display='none';
+                    alert(`Cliente ${n} adicionado à Lista Negra com sucesso!`);
+                });
+            } 
+        }
+
         function abrirGerenciarBlacklist() {
             document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
@@ -735,10 +781,57 @@
                 if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
             }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
         }
-        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
+        
+        function removerDaBlacklist(nome) { 
+            if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { 
+                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; 
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); 
+            } 
+        }
 
-        function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
-        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }); document.getElementById('modalInterdicao').style.display='none'; setTimeout(carregarAgenda, 2000); } }
+        function abrirModalInterdicao() { 
+            document.getElementById('modalInterdicao').style.display = 'flex'; 
+            let html = ""; 
+            horas.forEach(h => { 
+                html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; 
+            }); 
+            document.getElementById('listaInterdicao').innerHTML = html; 
+        }
+        
+        function confirmarInterdicao() { 
+            let sel = []; 
+            document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { 
+                sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); 
+            }); 
+            
+            if(sel.length === 0) return alert("Selecione pelo menos um horário."); 
+            
+            if(confirm(`Interditar ${sel.length} horários?`)) { 
+                let btn = document.querySelector('#modalInterdicao .primary-btn');
+                let txtOriginal = btn.innerText;
+                btn.innerText = "Bloqueando...";
+                btn.disabled = true;
+
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    mode: "no-cors", 
+                    body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) 
+                })
+                .then(() => {
+                    document.getElementById('modalInterdicao').style.display = 'none'; 
+                    btn.innerText = txtOriginal;
+                    btn.disabled = false;
+                    document.getElementById('btnRecarregar').innerText = "Atualizando...";
+                    setTimeout(carregarAgenda, 2000); 
+                })
+                .catch(e => {
+                    document.getElementById('modalInterdicao').style.display = 'none'; 
+                    btn.innerText = txtOriginal;
+                    btn.disabled = false;
+                    setTimeout(carregarAgenda, 2000);
+                });
+            } 
+        }
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
