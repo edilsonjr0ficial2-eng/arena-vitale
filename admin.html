@@ -116,6 +116,9 @@
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
             <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
+            
+            <button class="tool-btn" onclick="abrirControleMensalidades()" style="border-color: var(--success); color: var(--success);">🎓 Aulas / Mensalidade</button>
+
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
@@ -185,6 +188,39 @@
         </div>
     </div>
 
+    <div id="modalMensalidades" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="color:var(--primary); font-size:1.2rem; margin:0;">Controle de Mensalidades 🎾</h3>
+                <button class="tool-btn" style="background:var(--success); color:black;" onclick="abrirModalAddAluno()">➕ Novo Aluno</button>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <input type="text" id="pesquisaMensalidade" placeholder="🔍 Buscar aluno pelo nome ou telefone..." style="flex: 1; margin:0;" oninput="renderizarTabelaMensalidades()">
+            </div>
+            <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
+                <div id="loadingMensalidades" style="color:var(--primary); font-size:0.85rem;">Carregando alunos...</div>
+                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaMensalidades">
+                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Aluno</th><th style="padding: 6px;">Vencimento</th><th style="padding: 6px; text-align:center;">Status</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
+                    <tbody id="listaMensalidadesBody"></tbody>
+                </table>
+            </div>
+            <button class="close-btn" onclick="document.getElementById('modalMensalidades').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalAddAluno" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width: 400px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Dados do Aluno (Beach Tennis)</h3>
+            <input type="text" id="alunoNome" placeholder="Nome do Aluno">
+            <input type="tel" id="alunoTel" placeholder="Telefone (Apenas números)">
+            <div style="text-align: left; margin-top:5px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Dia do Vencimento:</label>
+                <input type="number" id="alunoVencimento" min="1" max="31" placeholder="Ex: 10">
+            </div>
+            <button class="primary-btn" onclick="salvarAluno()">💾 SALVAR ALUNO</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddAluno').style.display='none'">Cancelar</button>
+        </div>
+    </div>
     <div id="modalGerenciarClientes" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 900px; width: 95%;">
             <h3 style="color:var(--primary); font-size:1.2rem;">Gestão de Clientes</h3>
@@ -262,6 +298,9 @@
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
         let chartAcessosInstancia = null; let dadosAcessosGlobais = [];
         let promocaoAtual = null;
+
+        // NOVO: Variável para as mensalidades
+        let listaMensalidades = [];
 
         window.onload = function() {
             let user = localStorage.getItem('adminUser');
@@ -390,7 +429,6 @@
 
         function abrirGerenciadorClientes() {
             document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
-            // Busca apenas se a lista estiver vazia
             if(clientesCadastrados.length === 0) {
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
                     if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } 
@@ -421,7 +459,6 @@
             
             let clientesLista = [];
             
-            // Loop correto baseado no array retornado pelo motor
             for(let i = 0; i < clientesCadastrados.length; i++) { 
                 let clienteData = clientesCadastrados[i]; 
                 
@@ -443,7 +480,6 @@
                 clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
             }
 
-            // Ordenação (Nunca jogou no topo, depois as datas mais antigas)
             clientesLista.sort((a, b) => {
                 if (!a.dataUltimo && b.dataUltimo) return -1;
                 if (a.dataUltimo && !b.dataUltimo) return 1;
@@ -451,7 +487,6 @@
                 return a.dataUltimo.getTime() - b.dataUltimo.getTime();
             });
 
-            // Renderização
             clientesLista.forEach(cliente => {
                 let displayData = "Nunca";
                 if (cliente.ultimoAgendamentoStr && cliente.ultimoAgendamentoStr !== "Nunca") {
@@ -470,8 +505,6 @@
                 let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
 
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
-                
-                // Agora o botão de block foi inserido antes do botão de apagar
                 tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; 
                 tbody.appendChild(tr);
             });
@@ -835,6 +868,147 @@
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
+
+
+        /* ==========================================
+           MÓDULO DE GESTÃO DE MENSALIDADES (BEACH TENNIS)
+           ========================================== */
+        
+        function abrirControleMensalidades() {
+            document.getElementById('modalMensalidades').style.display = 'flex';
+            document.getElementById('loadingMensalidades').style.display = 'block';
+            document.getElementById('tabelaMensalidades').style.display = 'none';
+            
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_mensalidades" }) })
+            .then(r => r.json()).then(data => {
+                if(data.sucesso) {
+                    listaMensalidades = data.lista || [];
+                    renderizarTabelaMensalidades();
+                } else {
+                    document.getElementById('loadingMensalidades').innerText = "Erro ao carregar dados. Verifique o Motor.";
+                }
+            }).catch(e => {
+                document.getElementById('loadingMensalidades').innerText = "Erro de conexão com a planilha.";
+            });
+        }
+
+        function renderizarTabelaMensalidades() {
+            document.getElementById('loadingMensalidades').style.display = 'none';
+            document.getElementById('tabelaMensalidades').style.display = 'table';
+            const tbody = document.getElementById('listaMensalidadesBody');
+            tbody.innerHTML = '';
+            
+            let termo = document.getElementById('pesquisaMensalidade').value.toLowerCase().trim();
+            
+            let hoje = new Date();
+            let mesAtual = hoje.getMonth() + 1;
+            let anoAtual = hoje.getFullYear();
+            let diaAtual = hoje.getDate();
+            let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`;
+
+            listaMensalidades.forEach(aluno => {
+                if (termo && !aluno.nome.toLowerCase().includes(termo) && !aluno.telefone.includes(termo)) return;
+                
+                let statusHTML = "";
+                let estaEmDia = false;
+                
+                // Formato esperado do backend: "04/2026"
+                if(aluno.ultimoMesPago === mesAnoString) {
+                    estaEmDia = true;
+                    statusHTML = `<span style="color:var(--success); font-weight:bold;">✅ Pago</span>`;
+                } else {
+                    if(diaAtual > parseInt(aluno.vencimento)) {
+                        statusHTML = `<span style="color:var(--danger); font-weight:bold;">❌ Atrasado</span>`;
+                    } else {
+                        statusHTML = `<span style="color:var(--pending); font-weight:bold;">⏳ Pendente</span>`;
+                    }
+                }
+
+                let btnPagar = estaEmDia ? `` : `<button class="tool-btn" style="background:var(--success); color:black; padding:4px 8px; font-size:0.75rem; margin-right: 5px;" onclick="registrarPagamentoMensalidade('${aluno.telefone}')">💲 Baixa</button>`;
+                
+                let btnWa = `<button class="btn-icon btn-wa" style="margin-right: 5px;" onclick="window.open('https://wa.me/55${aluno.telefone}?text=${encodeURIComponent(`Olá ${aluno.nome}, tudo bem? Passando para falar sobre suas aulas de Beach Tennis!`)}', '_blank')">📞</button>`;
+                let btnDel = `<button class="btn-icon btn-del" onclick="excluirAlunoMensalidade('${aluno.telefone}', '${aluno.nome}')">🗑️</button>`;
+
+                let tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #333";
+                tr.innerHTML = `
+                    <td style="padding: 6px 4px;"><b>${aluno.nome}</b><br><small style="color:#aaa">${aluno.telefone}</small></td>
+                    <td style="padding: 6px 4px; color:#aaa;">Dia ${aluno.vencimento}</td>
+                    <td style="padding: 6px 4px; text-align:center;">${statusHTML}</td>
+                    <td style="padding: 6px 4px; text-align:center; white-space: nowrap;">
+                        <div style="display:flex; justify-content:center; align-items:center;">${btnWa} ${btnPagar} ${btnDel}</div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum aluno encontrado.</td></tr>';
+        }
+
+        function abrirModalAddAluno() {
+            document.getElementById('alunoNome').value = "";
+            document.getElementById('alunoTel').value = "";
+            document.getElementById('alunoVencimento').value = "";
+            document.getElementById('modalAddAluno').style.display = 'flex';
+        }
+
+        function salvarAluno() {
+            let n = document.getElementById('alunoNome').value.trim();
+            let t = document.getElementById('alunoTel').value.replace(/\D/g, ""); // Apenas números
+            let v = document.getElementById('alunoVencimento').value;
+            
+            if(!n || !t || !v) return alert("Preencha todos os campos!");
+            
+            let btn = document.querySelector('#modalAddAluno .primary-btn');
+            let txtOriginal = btn.innerText;
+            btn.innerText = "Salvando..."; btn.disabled = true;
+
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "salvar_mensalidade", nome: n, telefone: t, vencimento: v }) 
+            }).then(r=>r.json()).then(data => {
+                if(data.sucesso) {
+                    document.getElementById('modalAddAluno').style.display = 'none';
+                    abrirControleMensalidades(); // Recarrega a lista
+                } else {
+                    alert("Erro do servidor: " + (data.erro || "Desconhecido"));
+                }
+                btn.innerText = txtOriginal; btn.disabled = false;
+            }).catch(e => { alert("Erro de conexão ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; });
+        }
+
+        function registrarPagamentoMensalidade(telefone) {
+            let hoje = new Date();
+            let mesAtual = hoje.getMonth() + 1;
+            let anoAtual = hoje.getFullYear();
+            let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`;
+
+            if(confirm(`Confirmar o pagamento da mensalidade referente a ${mesAnoString}?`)) {
+                document.getElementById('loadingMensalidades').style.display = 'block';
+                document.getElementById('tabelaMensalidades').style.display = 'none';
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ acao: "pagar_mensalidade", telefone: telefone, mesRef: mesAnoString }) 
+                }).then(r=>r.json()).then(data => {
+                    if(data.sucesso) abrirControleMensalidades();
+                    else alert("Erro ao registrar pagamento.");
+                }).catch(e => alert("Erro de Conexão."));
+            }
+        }
+
+        function excluirAlunoMensalidade(telefone, nome) {
+            if(confirm(`Deseja remover ${nome} da lista de mensalidades de Beach Tennis?`)) {
+                document.getElementById('loadingMensalidades').style.display = 'block';
+                document.getElementById('tabelaMensalidades').style.display = 'none';
+                fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ acao: "excluir_mensalidade", telefone: telefone }) 
+                }).then(r=>r.json()).then(data => {
+                    if(data.sucesso) abrirControleMensalidades();
+                    else alert("Erro ao excluir aluno.");
+                }).catch(e => alert("Erro de Conexão."));
+            }
+        }
     </script>
 </body>
 </html>
