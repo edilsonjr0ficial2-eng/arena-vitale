@@ -18,14 +18,14 @@
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-top: 80px; }
         .secao-conteudo { display: none; min-height: 80vh; padding: 40px 20px; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .navbar { position: fixed; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary); z-index: 2000; padding: 10px 0; backdrop-filter: blur(5px); display: none; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.95); border-bottom: 2px solid var(--primary); z-index: 2000; padding: 10px 0; backdrop-filter: blur(5px); }
         .nav-container { max-width: 1300px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         .nav-logo-img { max-height: 50px; width: auto; display: block; cursor: pointer; }
         .nav-links { list-style: none; display: flex; gap: 15px; align-items: center;} 
         .nav-links a { text-decoration: none; color: white; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; cursor: pointer; white-space: nowrap; }
         .nav-links a:hover { color: var(--primary); }
         .hamburger { display: none; font-size: 1.8rem; color: var(--primary); cursor: pointer; }
-        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg'); background-size: cover; background-position: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 3000; }
+        .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('quadra1.jpeg'); background-size: cover; background-position: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 3000; display: none; }
         .auth-box { background: rgba(17, 17, 17, 0.95); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 100%; max-width: 400px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); }
         .auth-logo { max-width: 150px; margin-bottom: 20px; }
         .auth-title { color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-transform: uppercase; }
@@ -36,8 +36,8 @@
         .auth-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
         .auth-link { color: #ccc; font-size: 0.9rem; cursor: pointer; text-decoration: underline; margin-top: 10px; display: block; }
         .auth-link:hover { color: var(--primary); }
-        .floating-clock { position: fixed; top: 95px; right: 20px; background-color: rgba(0, 0, 0, 0.8); border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 1rem; font-weight: 900; z-index: 1000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); display: none; }
-        .btn-refresh-float { position: fixed; top: 140px; right: 20px; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); color: var(--primary); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; z-index: 1000; transition: 0.5s; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); display: none; }
+        .floating-clock { position: fixed; top: 95px; right: 20px; background-color: rgba(0, 0, 0, 0.8); border: 2px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 50px; font-size: 1rem; font-weight: 900; z-index: 1000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); display: block; }
+        .btn-refresh-float { position: fixed; top: 140px; right: 20px; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); color: var(--primary); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; z-index: 1000; transition: 0.5s; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
         .btn-refresh-float:hover { transform: rotate(360deg); background: var(--primary); color: black; }
         #tela-inicial { display: none; height: 90vh; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; overflow: hidden; position: relative; }
         #tela-inicial::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), url('quadra1.jpeg'); background-size: cover; background-position: center; filter: blur(6px) brightness(0.6); transform: scale(1.1); z-index: 1; }
@@ -80,15 +80,15 @@
         .btn-resgate { background: #25D366; color: white; width: 100%; padding: 15px; border-radius: 50px; font-weight: 900; border: none; font-size: 1.1rem; margin-top: 20px; cursor: pointer; display: none; transition: 0.3s; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); text-transform: uppercase; }
         .btn-resgate:hover { background: #1ebe57; transform: scale(1.02); }
         
-        .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: flex; text-decoration: none; }
         .wa-float i { color: white; font-size: 35px; }
         .wa-float:hover { transform: scale(1.1); }
         
-        .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: none; text-decoration: none; }
+        .ig-float { position: fixed; bottom: 100px; right: 30px; background: var(--instagram); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 100; transition: 0.3s; display: flex; text-decoration: none; }
         .ig-float i { color: white; font-size: 30px; }
         .ig-float:hover { transform: scale(1.1); }
         
-        footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: none;}
+        footer { margin-top: 50px; padding: 20px; background-color: black; font-size: 0.9rem; color: #777; border-top: 1px solid #222; text-align: center; display: block;}
         footer p { margin: 5px 0; }
         .loading-msg { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: none; font-weight: bold; }
         .partners-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; padding: 20px; }
@@ -98,6 +98,11 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
+        
+        /* Ajuste dos inputs dentro do Modal de Cadastro */
+        .modal-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #555; margin-top: 5px; background: #222; color: white; font-size: 1rem; }
+        .modal-input:disabled { background: #333; color: #aaa; border-color: #444; cursor: not-allowed; }
+        
         .terms-box { background: #111; padding: 15px; border: 1px solid var(--primary); border-radius: 8px; margin: 15px 0; font-size: 0.8rem; color: #ccc; line-height: 1.6; }
         .terms-box strong { color: var(--primary); }
         .checkbox-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 0.9rem; }
@@ -112,9 +117,21 @@
         .faq-item[open] summary::after { content: '-'; }
         .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
 
-        @media (max-width: 600px) { 
-            .hero h1 { font-size: 3rem; } 
-        }
+        /* Estilos para o Passo a Passo do Agendamento */
+        .passo-agenda { display: none; animation: fadeIn 0.4s ease; }
+        .passo-agenda.ativo { display: block; }
+        .botoes-navegacao { display: flex; justify-content: space-between; margin-top: 25px; gap: 15px; }
+        .btn-nav { flex: 1; padding: 12px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; }
+        .btn-voltar { background: #333; color: white; }
+        .btn-voltar:hover { background: #444; }
+        .btn-proximo { background: var(--primary); color: black; }
+        .btn-proximo:hover { background: var(--hover); }
+        
+        .progresso-container { display: flex; justify-content: space-between; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        .ponto-progresso { width: 30px; height: 30px; border-radius: 50%; background: #222; color: #777; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
+        .ponto-progresso.ativo { background: var(--primary); color: black; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+
+        @media (max-width: 600px) { .hero h1 { font-size: 3rem; } }
         @media (max-width: 1100px) { 
             .nav-links { position: absolute; top: 100%; left: 0; width: 100%; background-color: #111; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; border-bottom: 1px solid var(--primary); display: none; }
             .nav-links a { font-size: 1rem; } 
@@ -134,6 +151,7 @@
             <button id="btnLogin" class="auth-btn" onclick="fazerLogin()">ENTRAR</button>
             <div class="auth-link" onclick="mostrarCadastro()">Não tem conta? Cadastre-se</div>
             <div class="auth-link" onclick="mostrarRecuperar()">Esqueci minha senha</div>
+            <div class="auth-link" onclick="fecharTelaLogin()" style="margin-top: 25px; color: white; text-decoration: none;">🏠 Voltar ao Início</div>
         </div>
 
         <div id="box-cadastro" class="auth-box" style="display:none;">
@@ -172,7 +190,8 @@
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
                 <li><a onclick="navegarPara('tela-parceiros')">Nossos Parceiros</a></li>
-                <li><a onclick="fazerLogout()" style="color:red;">SAIR</a></li>
+                <!-- Menu dinâmico de Login/Sair gerado pelo JS -->
+                <li id="navAuthItem"></li>
             </ul>
         </div>
     </header>
@@ -217,29 +236,51 @@
     <div id="tela-agendamento" class="secao-conteudo">
         <h2 class="section-title">Agendamento</h2>
         <div class="agenda-box">
-            <p class="duration-title" style="color:white; font-weight:bold;">1. Escolha a Quadra:</p>
-            <div class="court-selector">
-                <button class="btn-court active" onclick="mudarQuadra(1, this)"><span>Quadra Chicashoes</span></button>
-                <button class="btn-court" onclick="mudarQuadra(2, this)"><span>Quadra Padaria do Helder</span></button>
+            <!-- Barra de Progresso Visual -->
+            <div class="progresso-container">
+                <div class="ponto-progresso ativo" id="dot-1">1</div>
+                <div class="ponto-progresso" id="dot-2">2</div>
+                <div class="ponto-progresso" id="dot-3">3</div>
+                <div class="ponto-progresso" id="dot-4">4</div>
             </div>
-            
-            <div class="day-navigation">
-                <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
-                <div class="current-date-display" id="dateDisplay">A carregar...</div>
-                <button class="nav-btn" onclick="mudarDia(1)">❯</button>
+
+            <!-- PASSO 1: QUADRA -->
+            <div id="passo-1" class="passo-agenda ativo">
+                <p class="duration-title" style="color:white; font-weight:bold; margin-bottom: 15px;">Escolha a Quadra:</p>
+                <div class="court-selector">
+                    <button class="btn-court active" onclick="mudarQuadra(1, this)"><span>Quadra Chicashoes</span></button>
+                    <button class="btn-court" onclick="mudarQuadra(2, this)"><span>Quadra Padaria do Helder</span></button>
+                </div>
+                <div class="botoes-navegacao">
+                    <button class="btn-nav btn-proximo" style="flex: 2;" onclick="mudarPasso(2)">Continuar ❯</button>
+                </div>
             </div>
-            
-            <div class="time-selector-container" style="margin-top: 0; margin-bottom: 20px;">
-                <p class="duration-title" style="color:white; font-weight:bold;">2. Modalidade:</p>
+
+            <!-- PASSO 2: DIA E MODALIDADE -->
+            <div id="passo-2" class="passo-agenda">
+                <p class="duration-title" style="color:white; font-weight:bold; margin-bottom: 15px;">Escolha o Dia:</p>
+                <div class="day-navigation">
+                    <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
+                    <div class="current-date-display" id="dateDisplay">A carregar...</div>
+                    <button class="nav-btn" onclick="mudarDia(1)">❯</button>
+                </div>
+                
+                <p class="duration-title" style="color:white; font-weight:bold; margin-top: 20px;">Modalidade:</p>
                 <select id="selectModalidade" class="time-select" style="margin-top: 10px;">
                     <option value="Beach Tennis" selected>🎾 Beach Tennis</option>
                     <option value="Futevôlei">⚽ Futevôlei</option>
                     <option value="Vôlei de Praia">🏐 Vôlei de Praia</option>
                 </select>
+                
+                <div class="botoes-navegacao">
+                    <button class="btn-nav btn-voltar" onclick="mudarPasso(1)">❮ Voltar</button>
+                    <button class="btn-nav btn-proximo" onclick="mudarPasso(3)">Continuar ❯</button>
+                </div>
             </div>
 
-            <div class="duration-selector">
-                <p class="duration-title" style="color:white; font-weight:bold;">3. Tempo de jogo:</p>
+            <!-- PASSO 3: TEMPO DE JOGO E PAGAMENTO -->
+            <div id="passo-3" class="passo-agenda">
+                <p class="duration-title" style="color:white; font-weight:bold; margin-bottom: 15px;">Tempo de jogo:</p>
                 <div style="display:flex; justify-content:center; flex-wrap:wrap;">
                     <button class="btn-duration active" onclick="setDuracao(1, this)">1h</button>
                     <button class="btn-duration" onclick="setDuracao(2, this)">2h</button>
@@ -250,18 +291,22 @@
                     <input type="number" id="customInput" class="custom-input" placeholder="0" max="16" oninput="usarPersonalizado(this.value)">
                     <span style="color:#777;">h</span>
                 </div>
-            </div>
-            
-            <div class="time-selector-container">
-                <p class="duration-title" style="color:white; font-weight:bold;">4. Forma de Pagamento:</p>
+
+                <p class="duration-title" style="color:white; font-weight:bold; margin-top: 20px;">Forma de Pagamento:</p>
                 <select id="selectPagamento" class="time-select" onchange="atualizarPrecoDisplay()">
                     <option value="dinheiro" selected>Espécie / Pix</option>
                     <option value="cartao">Cartão (Crédito/Débito)</option>
                 </select>
+
+                <div class="botoes-navegacao">
+                    <button class="btn-nav btn-voltar" onclick="mudarPasso(2)">❮ Voltar</button>
+                    <button class="btn-nav btn-proximo" onclick="mudarPasso(4)">Escolher Horário ❯</button>
+                </div>
             </div>
-            
-            <div class="time-selector-container">
-                <p class="duration-title" style="color:white; font-weight:bold;">5. Selecione um horário disponível:</p>
+
+            <!-- PASSO 4: SELECIONAR HORÁRIO E FINALIZAR -->
+            <div id="passo-4" class="passo-agenda">
+                <p class="duration-title" style="color:white; font-weight:bold; margin-bottom: 15px;">Selecione um horário disponível:</p>
                 
                 <div id="avisoPromocao" class="promo-alert">🏷️ Promoção Ativa Neste Dia!</div>
                 
@@ -270,6 +315,11 @@
                     <option value="">Aguarde, a carregar agenda...</option>
                 </select>
                 <div id="priceDisplay" class="price-display" style="margin-top: 15px;">Valor: Selecione o horário</div>
+                
+                <div class="botoes-navegacao">
+                    <button class="btn-nav btn-voltar" onclick="mudarPasso(3)">❮ Voltar</button>
+                </div>
+
                 <button id="btnAgendar" class="btn-agendar-final" onclick="prepararAgendamento()">✅ CONFIRMAR HORÁRIO</button>
             </div>
         </div>
@@ -278,8 +328,21 @@
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-content">
             <h3>🎾 Confirmar Reserva</h3>
-            <div class="form-group"><label>Nome e Sobrenome:</label><input type="text" id="cadNomeCompleto" disabled style="background:#333; color:#aaa; width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #555; margin-top: 5px;"></div>
-            <div class="form-group" style="margin-top: 10px;"><label>Telefone (WhatsApp):</label><input type="tel" id="cadTelefone" disabled style="background:#333; color:#aaa; width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #555; margin-top: 5px;"></div>
+            <div class="form-group">
+                <label>Nome e Sobrenome:</label>
+                <input type="text" id="cadNomeCompleto" class="modal-input">
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <label>Telefone (WhatsApp):</label>
+                <input type="tel" id="cadTelefone" class="modal-input">
+            </div>
+            
+            <!-- Campo de Senha que só aparece para quem não está logado -->
+            <div class="form-group" id="containerSenhaModal" style="display:none; margin-top: 10px;">
+                <label style="color: var(--primary);">Crie uma Senha (para acessos futuros):</label>
+                <input type="password" id="cadSenhaModal" class="modal-input" placeholder="Mínimo 4 caracteres">
+            </div>
+            
             <div class="terms-box">
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
@@ -313,11 +376,8 @@
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
-        // INICIALIZA A DATA VISUALIZADA
         let dataVisualizada = new Date();
-        if (dataVisualizada.getHours() >= 23) {
-            dataVisualizada.setDate(dataVisualizada.getDate() + 1);
-        }
+        if (dataVisualizada.getHours() >= 23) { dataVisualizada.setDate(dataVisualizada.getDate() + 1); }
         dataVisualizada.setHours(0,0,0,0);
 
         window.onload = function() {
@@ -333,21 +393,23 @@
                 }
             });
 
+            atualizarRelogio(); document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
+            carregarDadosDoDia(); carregarClima();
+
+            // Verificação de usuário salvo
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
-                
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso", nome: usuarioLogado.nome, telefone: usuarioLogado.phone }) }).catch(e => console.log(e));
-
-                document.getElementById('tela-auth').style.display = 'none'; document.querySelector('.navbar').style.display = 'block'; document.getElementById('relogioFlutuante').style.display = 'block'; document.querySelector('.btn-refresh-float').style.display = 'flex'; document.querySelector('.wa-float').style.display = 'flex'; document.querySelector('.ig-float').style.display = 'flex'; document.querySelector('footer').style.display = 'block';
-                atualizarRelogio(); document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
-                carregarDadosDoDia(); carregarClima(); buscarPontosNoServidor(); 
-                const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
-                if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) navegarPara(telaSalvaSessao); else navegarPara('tela-inicial');
+                buscarPontosNoServidor(); 
+                document.getElementById('navAuthItem').innerHTML = '<a onclick="fazerLogout()" style="color:red;">SAIR</a>';
             } else { 
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "registrar_acesso" }) }).catch(e => console.log(e));
-                navegarPara('tela-inicial'); 
+                document.getElementById('navAuthItem').innerHTML = '<a onclick="abrirTelaLogin()" style="color:var(--primary);">ENTRAR / CADASTRAR</a>';
             }
+
+            const telaSalvaSessao = sessionStorage.getItem('ultimaTelaArena');
+            if (telaSalvaSessao && document.getElementById(telaSalvaSessao)) navegarPara(telaSalvaSessao); else navegarPara('tela-inicial');
         }
         
         async function carregarClima() {
@@ -359,7 +421,11 @@
         }
 
         function buscarPontosNoServidor() {
-            if(!usuarioLogado) return;
+            const grid = document.getElementById('stampGrid');
+            if(!usuarioLogado) {
+                if(grid) grid.innerHTML = '<p style="grid-column: span 5; color: #aaa; text-align:center;">Faça login ou seu primeiro agendamento para acumular raquetes.</p>';
+                return;
+            }
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_pontos", telefone: usuarioLogado.phone }) })
             .then(res => res.json()).then(data => { if(data.sucesso) { localStorage.setItem('pontosVitale', data.pontos); renderizarFidelidade(); } }).catch(e => console.log(e));
         }
@@ -405,22 +471,17 @@
         }
 
         function confirmarNovaSenha() {
-            const cod = document.getElementById('recCodigo').value;
-            const nova = document.getElementById('recNovaSenha').value;
-            
+            const cod = document.getElementById('recCodigo').value; const nova = document.getElementById('recNovaSenha').value;
             if(cod !== codigoRecuperacao) return alert("Código incorreto!");
             if(!nova || nova.length < 4) return alert("A nova senha deve ter no mínimo 4 caracteres.");
-            
             const btn = document.querySelector('#etapa2-rec button'); btn.innerText = "Salvando..."; btn.disabled = true;
-            
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_nova_senha", telefone: telefoneRecuperacao, senha: nova }) })
-            .then(r => r.json()).then(data => {
-                btn.innerText = "ALTERAR SENHA"; btn.disabled = false;
-                if(data.sucesso) { alert("Senha alterada com sucesso! Agora faça login com a nova senha."); mostrarLogin(); } 
-                else { alert("Erro ao salvar: " + data.erro); }
-            }).catch(e => { btn.innerText = "ALTERAR SENHA"; btn.disabled = false; alert("Erro de conexão."); });
+            .then(r => r.json()).then(data => { btn.innerText = "ALTERAR SENHA"; btn.disabled = false; if(data.sucesso) { alert("Senha alterada com sucesso! Faça login."); mostrarLogin(); } else { alert("Erro ao salvar: " + data.erro); } }).catch(e => { btn.innerText = "ALTERAR SENHA"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
+        function abrirTelaLogin() { document.getElementById('tela-auth').style.display = 'flex'; }
+        function fecharTelaLogin() { document.getElementById('tela-auth').style.display = 'none'; }
+        
         function mostrarCadastro() { document.getElementById('box-login').style.display='none'; document.getElementById('box-cadastro').style.display='block'; }
         function mostrarLogin() { document.getElementById('box-cadastro').style.display='none'; document.getElementById('box-recuperar').style.display='none'; document.getElementById('box-login').style.display='block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display='none'; document.getElementById('box-recuperar').style.display='block'; }
@@ -446,7 +507,7 @@
             document.querySelectorAll('#tela-inicial, .secao-conteudo').forEach(tela => tela.style.display = 'none');
             const telaAlvo = document.getElementById(idTela); if (idTela === 'tela-inicial') telaAlvo.style.display = 'flex'; else telaAlvo.style.display = 'block';
             document.getElementById('navLinks').classList.remove('active'); window.scrollTo(0, 0); sessionStorage.setItem('ultimaTelaArena', idTela);
-            if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); }
+            if(idTela === 'tela-agendamento') { document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia(); mudarPasso(1); }
             if(idTela === 'tela-fidelidade') buscarPontosNoServidor(); 
         }
 
@@ -471,23 +532,14 @@
                 let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
                 
                 if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
-                    let jaUsou = false;
-                    let listaTelefones = promocaoAtual.telefones ? promocaoAtual.telefones.toString() : "";
-                    let meuTelefone = (usuarioLogado && usuarioLogado.phone) ? usuarioLogado.phone.toString() : "";
-                    
+                    let jaUsou = false; let listaTelefones = promocaoAtual.telefones ? promocaoAtual.telefones.toString() : ""; let meuTelefone = (usuarioLogado && usuarioLogado.phone) ? usuarioLogado.phone.toString() : "";
                     if (meuTelefone && listaTelefones.includes(meuTelefone)) { jaUsou = true; }
 
                     if (jaUsou) {
-                        if(avisoPromo) {
-                            avisoPromo.innerHTML = "🏷️ Você já utilizou a promoção! (Limite de 1 por cliente)";
-                            avisoPromo.style.display = 'block'; avisoPromo.style.color = "#aaa"; avisoPromo.style.borderColor = "#aaa"; avisoPromo.style.background = "#222";
-                        }
+                        if(avisoPromo) { avisoPromo.innerHTML = "🏷️ Você já utilizou a promoção! (Limite de 1 por cliente)"; avisoPromo.style.display = 'block'; avisoPromo.style.color = "#aaa"; avisoPromo.style.borderColor = "#aaa"; avisoPromo.style.background = "#222"; }
                     } else {
                         promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0; horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
-                        if(avisoPromo) {
-                            avisoPromo.innerHTML = "🏷️ Promoção Ativa Neste Dia!";
-                            avisoPromo.style.display = 'block'; avisoPromo.style.color = "var(--primary)"; avisoPromo.style.borderColor = "var(--primary)"; avisoPromo.style.background = "rgba(255, 215, 0, 0.1)";
-                        }
+                        if(avisoPromo) { avisoPromo.innerHTML = "🏷️ Promoção Ativa Neste Dia!"; avisoPromo.style.display = 'block'; avisoPromo.style.color = "var(--primary)"; avisoPromo.style.borderColor = "var(--primary)"; avisoPromo.style.background = "rgba(255, 215, 0, 0.1)"; }
                     }
                 }
             }
@@ -511,46 +563,23 @@
         function usarPersonalizado(valor) { if(valor) { let v = parseFloat(valor); if(v > 16) { alert("Máximo 16h."); v = 16; document.getElementById('customInput').value = 16; } else if(v > 0) { duracaoSelecionada = v; } document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); carregarDadosDoDia(); } }
         
         function mudarDia(delta) { 
-            let dataAlvo = new Date(dataVisualizada); 
-            dataAlvo.setDate(dataAlvo.getDate() + delta); 
-            dataAlvo.setHours(0,0,0,0);
-            
-            let dataAtual = new Date();
-            let horaAtual = dataAtual.getHours();
-            
-            let hojeReal = new Date(); 
-            hojeReal.setHours(0,0,0,0);
+            let dataAlvo = new Date(dataVisualizada); dataAlvo.setDate(dataAlvo.getDate() + delta); dataAlvo.setHours(0,0,0,0);
+            let dataAtual = new Date(); let horaAtual = dataAtual.getHours();
+            let hojeReal = new Date(); hojeReal.setHours(0,0,0,0);
             
             if (dataAlvo < hojeReal) return; 
             
             let dataLimite = new Date(hojeReal);
-            if (horaAtual >= 23) {
-                dataLimite.setDate(dataLimite.getDate() + 7);
-            } else {
-                dataLimite.setDate(dataLimite.getDate() + 6);
-            }
-            
+            if (horaAtual >= 23) { dataLimite.setDate(dataLimite.getDate() + 7); } else { dataLimite.setDate(dataLimite.getDate() + 6); }
             dataLimite.setHours(23, 59, 59, 999);
 
-            if (dataAlvo > dataLimite) {
-                return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h.");
-            }
-            
+            if (dataAlvo > dataLimite) { return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h."); }
             if (agendaStatusGeral === "NAO") return alert("🔒 A agenda está temporariamente bloqueada pela administração.");
 
-            if (agendaDataInicio) {
-                let p = agendaDataInicio.split('-'); let dIni = new Date(p[0], p[1]-1, p[2]); dIni.setHours(0,0,0,0);
-                if (dataAlvo < dIni) { if (delta > 0) alert(`🔒 A agenda está liberada apenas a partir do dia ${p[2]}/${p[1]}/${p[0]}.`); return; }
-            }
+            if (agendaDataInicio) { let p = agendaDataInicio.split('-'); let dIni = new Date(p[0], p[1]-1, p[2]); dIni.setHours(0,0,0,0); if (dataAlvo < dIni) { if (delta > 0) alert(`🔒 A agenda está liberada apenas a partir do dia ${p[2]}/${p[1]}/${p[0]}.`); return; } }
+            if (agendaDataFim) { let p = agendaDataFim.split('-'); let dFim = new Date(p[0], p[1]-1, p[2]); dFim.setHours(0,0,0,0); if (dataAlvo > dFim) return alert(`🔒 A agenda está liberada apenas até o dia ${p[2]}/${p[1]}/${p[0]}.`); }
 
-            if (agendaDataFim) {
-                let p = agendaDataFim.split('-'); let dFim = new Date(p[0], p[1]-1, p[2]); dFim.setHours(0,0,0,0);
-                if (dataAlvo > dFim) return alert(`🔒 A agenda está liberada apenas até o dia ${p[2]}/${p[1]}/${p[0]}.`);
-            }
-
-            dataVisualizada = dataAlvo; 
-            document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; 
-            carregarDadosDoDia();
+            dataVisualizada = dataAlvo; document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto; carregarDadosDoDia();
         }
 
         function formatarDataHeader(date) { let diaSemanaJS = date.getDay(); let diaIndex = diaSemanaJS === 0 ? 6 : diaSemanaJS - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} (${dia}/${mes})`, index: diaIndex }; }
@@ -562,131 +591,122 @@
                 const rows = data.split('\n').map(row => row.split(',')); let colOffset = (quadraSelecionada === 2) ? 8 : 0; horariosOcupadosDoDia = [];
                 rows.forEach((row, rowIndex) => {
                     if (rowIndex === 0) return; const hLinha = parseInt(row[0]);
-                    if (!isNaN(hLinha)) { 
-                        let diaPlan = formatarDataHeader(dataVisualizada).index + 1; 
-                        let colReal = diaPlan + colOffset; 
-                        let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; 
-                        val = val.split('||')[0].trim();
-                        if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); 
-                    }
+                    if (!isNaN(hLinha)) { let diaPlan = formatarDataHeader(dataVisualizada).index + 1; let colReal = diaPlan + colOffset; let val = row[colReal] ? row[colReal].replace(/[\r\n"]/g, '').trim() : ""; val = val.split('||')[0].trim(); if (val.length > 0) horariosOcupadosDoDia.push({ hora: hLinha, nome: val }); }
                 });
                 atualizarMenuHorarios(); atualizarPrecoDisplay();
             } catch (error) { horariosOcupadosDoDia = []; atualizarMenuHorarios(); } finally { loading.style.display = 'none'; }
         }
 
         function atualizarMenuHorarios() {
-            const select = document.getElementById('selectHora'); 
-            select.innerHTML = '<option value="">Selecione o horário...</option>';
-            
-            let hoje = new Date();
-            let isHoje = (dataVisualizada.getDate() === hoje.getDate() && dataVisualizada.getMonth() === hoje.getMonth() && dataVisualizada.getFullYear() === hoje.getFullYear());
-            let horaAtual = hoje.getHours();
-
-            let h = 5; 
-            let blocosNecessarios = Math.ceil(duracaoSelecionada);
-            let limiteH = 22 - blocosNecessarios + 1;
+            const select = document.getElementById('selectHora'); select.innerHTML = '<option value="">Selecione o horário...</option>';
+            let hoje = new Date(); let isHoje = (dataVisualizada.getDate() === hoje.getDate() && dataVisualizada.getMonth() === hoje.getMonth() && dataVisualizada.getFullYear() === hoje.getFullYear()); let horaAtual = hoje.getHours();
+            let h = 5; let blocosNecessarios = Math.ceil(duracaoSelecionada); let limiteH = 22 - blocosNecessarios + 1;
 
             while (h <= 22) {
-                if (isHoje && h <= horaAtual) { 
-                    h++; 
-                    continue; 
-                }
-
+                if (isHoje && h <= horaAtual) { h++; continue; }
                 let ocupacaoAtual = horariosOcupadosDoDia.find(item => item.hora === h);
 
                 if (ocupacaoAtual) {
-                    let nomeOcupante = ocupacaoAtual.nome;
-                    let horaFimOcupacao = h + 1;
-                    while (horaFimOcupacao <= 22) {
-                        let proxOcupacao = horariosOcupadosDoDia.find(item => item.hora === horaFimOcupacao);
-                        if (proxOcupacao && proxOcupacao.nome === nomeOcupante) {
-                            horaFimOcupacao++;
-                        } else { break; }
-                    }
+                    let nomeOcupante = ocupacaoAtual.nome; let horaFimOcupacao = h + 1;
+                    while (horaFimOcupacao <= 22) { let proxOcupacao = horariosOcupadosDoDia.find(item => item.hora === horaFimOcupacao); if (proxOcupacao && proxOcupacao.nome === nomeOcupante) { horaFimOcupacao++; } else { break; } }
                     
-                    let option = document.createElement('option');
-                    
-                    let displayTexto = "INDISPONÍVEL";
-                    let nl = nomeOcupante.toLowerCase().trim();
-                    if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { 
-                        displayTexto = "INDISPONÍVEL"; 
-                    } else if (nomeOcupante.includes("⏳")) { 
-                        displayTexto = "Agendamento Pendente"; 
-                    } else { 
-                        displayTexto = "Agendamento Confirmado"; 
-                    }
+                    let option = document.createElement('option'); let displayTexto = "INDISPONÍVEL"; let nl = nomeOcupante.toLowerCase().trim();
+                    if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { displayTexto = "INDISPONÍVEL"; } else if (nomeOcupante.includes("⏳")) { displayTexto = "Agendamento Pendente"; } else { displayTexto = "Agendamento Confirmado"; }
 
-                    option.text = `Início: ${h}:00 | Encerra: ${horaFimOcupacao}:00 - ⛔ ${displayTexto}`;
-                    option.value = h;
-                    option.disabled = true;
-                    select.appendChild(option);
-
-                    h = horaFimOcupacao; 
+                    option.text = `Início: ${h}:00 | Encerra: ${horaFimOcupacao}:00 - ⛔ ${displayTexto}`; option.value = h; option.disabled = true; select.appendChild(option); h = horaFimOcupacao; 
                 } else {
-                    let option = document.createElement('option');
-                    option.value = h;
-
+                    let option = document.createElement('option'); option.value = h;
                     if (h > limiteH) {
-                        option.text = `Início: ${h}:00 | Encerra: ${h + 1}:00 - ⚠️ Tempo insuficiente`;
-                        option.disabled = true;
-                        select.appendChild(option);
+                        option.text = `Início: ${h}:00 | Encerra: ${h + 1}:00 - ⚠️ Tempo insuficiente`; option.disabled = true; select.appendChild(option);
                     } else {
                         let temConflito = false;
-                        for (let i = 1; i < blocosNecessarios; i++) {
-                            let horaVerificada = h + i;
-                            if (horariosOcupadosDoDia.find(item => item.hora === horaVerificada)) {
-                                temConflito = true;
-                                break;
-                            }
-                        }
-
-                        if (temConflito) {
-                            option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ⚠️ Conflito de horário`;
-                            option.disabled = true;
-                            select.appendChild(option);
-                        } else {
-                            option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ✅ Livre`;
-                            select.appendChild(option);
-                        }
+                        for (let i = 1; i < blocosNecessarios; i++) { let horaVerificada = h + i; if (horariosOcupadosDoDia.find(item => item.hora === horaVerificada)) { temConflito = true; break; } }
+                        if (temConflito) { option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ⚠️ Conflito de horário`; option.disabled = true; select.appendChild(option); } else { option.text = `Início: ${h}:00 | Encerra: ${h + blocosNecessarios}:00 - ✅ Livre`; select.appendChild(option); }
                     }
-                    
                     h++;
                 }
             }
-
-            if (select.options.length === 1) { 
-                select.options[0].text = "Sem horários livres no momento."; 
-            }
+            if (select.options.length === 1) { select.options[0].text = "Sem horários livres no momento."; }
         }
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
+        // MODIFICADA PARA LIDAR COM USUÁRIO NÃO LOGADO NO MODAL
         function prepararAgendamento() { 
-            if(usuarioLogado) { document.getElementById('cadNomeCompleto').value = usuarioLogado.nome; document.getElementById('cadTelefone').value = usuarioLogado.phone; }
-            const h = parseInt(document.getElementById('selectHora').value); const pag = document.getElementById('selectPagamento').value; let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
+            const h = parseInt(document.getElementById('selectHora').value); 
+            const pag = document.getElementById('selectPagamento').value; 
+            let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
+            
+            const inputNome = document.getElementById('cadNomeCompleto');
+            const inputTel = document.getElementById('cadTelefone');
+            const containerSenha = document.getElementById('containerSenhaModal');
+            const inputSenha = document.getElementById('cadSenhaModal');
+
+            if(usuarioLogado) { 
+                inputNome.value = usuarioLogado.nome; 
+                inputTel.value = usuarioLogado.phone; 
+                inputNome.disabled = true;
+                inputTel.disabled = true;
+                containerSenha.style.display = 'none';
+            } else {
+                inputNome.value = ""; 
+                inputTel.value = ""; 
+                inputSenha.value = "";
+                inputNome.disabled = false;
+                inputTel.disabled = false;
+                inputNome.placeholder = "Seu Nome e Sobrenome";
+                inputTel.placeholder = "DDD + Número de Celular";
+                containerSenha.style.display = 'block';
+            }
+            
             abrirModal(h, (h + Math.ceil(duracaoSelecionada)) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
         }
         
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
+        // MODIFICADA PARA ENVIAR CADASTRO SE NECESSÁRIO ANTES DE AGENDAR
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
+            
+            let nomeFinal = "";
+            let telefoneFinal = "";
+
+            if (!usuarioLogado) {
+                nomeFinal = document.getElementById('cadNomeCompleto').value;
+                telefoneFinal = document.getElementById('cadTelefone').value.replace(/\D/g, "");
+                let senhaDigitada = document.getElementById('cadSenhaModal').value;
+
+                if (!nomeFinal || telefoneFinal.length !== 11 || !senhaDigitada) {
+                    return alert("⚠️ Por favor, preencha seu Nome, seu Telefone correto (11 dígitos) e crie uma senha.");
+                }
+
+                // Salva o cliente provisoriamente no app para os próximos fluxos funcionarem
+                usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
+                localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
+                
+                // Dispara o salvamento do cliente no banco de dados
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) });
+            } else {
+                nomeFinal = usuarioLogado.nome;
+                telefoneFinal = usuarioLogado.phone;
+            }
+
             const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
             
             fetch(SCRIPT_URL, { 
                 method: "POST", 
-                body: JSON.stringify({ acao: "agendar", nome: usuarioLogado.nome, telefone: usuarioLogado.phone, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
+                body: JSON.stringify({ acao: "agendar", nome: nomeFinal, telefone: telefoneFinal, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
             })
             .then(res => res.text())
             .then(txt => {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: usuarioLogado.phone }) });
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: telefoneFinal }) });
                 
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
                 let mod = document.getElementById('selectModalidade').options[document.getElementById('selectModalidade').selectedIndex].text;
                 
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
-                msg += "👤 Nome: " + usuarioLogado.nome + "\n";
+                msg += "👤 Nome: " + nomeFinal + "\n";
                 msg += "🏟️ Quadra: " + nomeQuadra + "\n";
                 msg += "🏆 Modalidade: " + mod + "\n";
                 msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
@@ -701,6 +721,15 @@
                 setTimeout(() => { location.reload(); }, 1500);
             })
             .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
+        }
+
+        function mudarPasso(passoDestino) {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('passo-' + i).classList.remove('ativo');
+                if(i <= passoDestino) document.getElementById('dot-' + i).classList.add('ativo'); else document.getElementById('dot-' + i).classList.remove('ativo');
+            }
+            document.getElementById('passo-' + passoDestino).classList.add('ativo');
+            if (passoDestino === 4) carregarDadosDoDia(); 
         }
     </script>
 </body>
