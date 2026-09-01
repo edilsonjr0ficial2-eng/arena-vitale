@@ -115,10 +115,12 @@
             <button class="tool-btn" onclick="aplicarMoldeNaAgenda()" style="border-color: var(--success); color: var(--success);" title="Copia o Molde para a Agenda da Semana">🔄 Sincronizar Molde</button>
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
-            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
             
+            <!-- NOVO BOTÃO DE VALORES -->
+            <button class="tool-btn" onclick="abrirModalPrecos()" style="border-color: #ffaa00; color: #ffaa00;">💲 Valores</button>
+            
+            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
             <button class="tool-btn" onclick="abrirControleMensalidades()" style="border-color: var(--success); color: var(--success);">🎓 Aulas / Mensalidade</button>
-
             <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
             <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
@@ -185,6 +187,26 @@
             <div style="text-align: left; margin-top: 10px;"><label style="font-size: 0.75rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 120px;"></div></div>
             <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button>
             <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
+        </div>
+    </div>
+    
+    <!-- NOVO MODAL DE PREÇOS -->
+    <div id="modalPrecos" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width: 350px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Ajustar Valores 💲</h3>
+            
+            <div style="text-align: left; margin-top: 15px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Valor Dia (5h às 18h):</label>
+                <input type="number" id="inputPrecoDia" value="35">
+            </div>
+            
+            <div style="text-align: left; margin-top: 10px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Valor Noite (19h às 22h):</label>
+                <input type="number" id="inputPrecoNoite" value="40">
+            </div>
+            
+            <button class="primary-btn" style="margin-top:15px;" onclick="salvarPrecos()">💾 SALVAR VALORES</button>
+            <button class="close-btn" onclick="document.getElementById('modalPrecos').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -298,9 +320,11 @@
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
         let chartAcessosInstancia = null; let dadosAcessosGlobais = [];
         let promocaoAtual = null;
-
-        // NOVO: Variável para as mensalidades
         let listaMensalidades = [];
+        
+        // VARIÁVEIS GLOBAIS DE PREÇO
+        let precoDiaGlobal = 35; 
+        let precoNoiteGlobal = 40;
 
         window.onload = function() {
             let user = localStorage.getItem('adminUser');
@@ -310,9 +334,19 @@
                 if(localStorage.getItem('adminMaster') === 'true') document.getElementById('btnGerirAdmins').style.display = 'flex';
                 carregarConfigAdmin(); 
                 
+                // Busca Promoção e depois busca os Preços no Google
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
                     if(d.sucesso && d.promo) promocaoAtual = d.promo;
-                    carregarAgenda(); 
+                    
+                    // Agora busca os preços
+                    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_precos" }) })
+                    .then(r2 => r2.json()).then(d2 => {
+                        if(d2.sucesso) {
+                            precoDiaGlobal = parseFloat(d2.precoDia);
+                            precoNoiteGlobal = parseFloat(d2.precoNoite);
+                        }
+                        carregarAgenda(); 
+                    }).catch(() => carregarAgenda());
                 }).catch(()=>carregarAgenda());
                 
                 setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
@@ -657,7 +691,8 @@
                     let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; 
                     let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
                     
-                    let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 7 && h <= 16 ? 35 : 45);
+                    // NOVA REGRA DE VALORES COM AS VARIÁVEIS GLOBAIS DA NUVEM
+                    let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 5 && h <= 18 ? precoDiaGlobal : precoNoiteGlobal);
 
                     if(n1) {
                         ocupados++; 
@@ -869,10 +904,7 @@
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
 
-
-        /* ==========================================
-           MÓDULO DE GESTÃO DE MENSALIDADES (BEACH TENNIS)
-           ========================================== */
+        // --- MÓDULO DE GESTÃO DE MENSALIDADES ---
         
         function abrirControleMensalidades() {
             document.getElementById('modalMensalidades').style.display = 'flex';
@@ -912,7 +944,6 @@
                 let statusHTML = "";
                 let estaEmDia = false;
                 
-                // Formato esperado do backend: "04/2026"
                 if(aluno.ultimoMesPago === mesAnoString) {
                     estaEmDia = true;
                     statusHTML = `<span style="color:var(--success); font-weight:bold;">✅ Pago</span>`;
@@ -954,7 +985,7 @@
 
         function salvarAluno() {
             let n = document.getElementById('alunoNome').value.trim();
-            let t = document.getElementById('alunoTel').value.replace(/\D/g, ""); // Apenas números
+            let t = document.getElementById('alunoTel').value.replace(/\D/g, ""); 
             let v = document.getElementById('alunoVencimento').value;
             
             if(!n || !t || !v) return alert("Preencha todos os campos!");
@@ -969,7 +1000,7 @@
             }).then(r=>r.json()).then(data => {
                 if(data.sucesso) {
                     document.getElementById('modalAddAluno').style.display = 'none';
-                    abrirControleMensalidades(); // Recarrega a lista
+                    abrirControleMensalidades(); 
                 } else {
                     alert("Erro do servidor: " + (data.erro || "Desconhecido"));
                 }
@@ -1008,6 +1039,46 @@
                     else alert("Erro ao excluir aluno.");
                 }).catch(e => alert("Erro de Conexão."));
             }
+        }
+
+        // --- NOVAS FUNÇÕES PARA O MODAL DE PREÇOS ---
+        function abrirModalPrecos() {
+            document.getElementById('modalPrecos').style.display = 'flex';
+            document.getElementById('inputPrecoDia').value = precoDiaGlobal;
+            document.getElementById('inputPrecoNoite').value = precoNoiteGlobal;
+        }
+
+        function salvarPrecos() {
+            let pDia = document.getElementById('inputPrecoDia').value;
+            let pNoite = document.getElementById('inputPrecoNoite').value;
+            
+            if(!pDia || !pNoite) return alert("Preencha os dois valores!");
+            
+            let btn = document.querySelector('#modalPrecos .primary-btn');
+            let txtOriginal = btn.innerText;
+            btn.innerText = "Salvando na Nuvem..."; btn.disabled = true;
+            
+            // Envia para o Google Apps Script
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "salvar_precos", precoDia: pDia, precoNoite: pNoite }) 
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.innerText = txtOriginal; btn.disabled = false;
+                if(data.sucesso) {
+                    precoDiaGlobal = parseFloat(pDia);
+                    precoNoiteGlobal = parseFloat(pNoite);
+                    document.getElementById('modalPrecos').style.display = 'none';
+                    carregarAgenda(); // Atualiza a tela com os novos valores
+                    alert("Valores atualizados em todos os painéis!");
+                } else {
+                    alert("Erro ao salvar no servidor.");
+                }
+            }).catch(e => { 
+                alert("Erro de conexão."); 
+                btn.innerText = txtOriginal; btn.disabled = false;
+            });
         }
     </script>
 </body>
