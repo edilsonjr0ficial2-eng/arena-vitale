@@ -116,8 +116,9 @@
             <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
             <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
             
-            <!-- NOVO BOTÃO DE VALORES -->
             <button class="tool-btn" onclick="abrirModalPrecos()" style="border-color: #ffaa00; color: #ffaa00;">💲 Valores</button>
+            <!-- NOVO BOTÃO DE CUPONS -->
+            <button class="tool-btn" onclick="abrirModalCupons()" style="border-color: #ff4d4d; color: #ff4d4d;">🎟️ Cupons</button>
             
             <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
             <button class="tool-btn" onclick="abrirControleMensalidades()" style="border-color: var(--success); color: var(--success);">🎓 Aulas / Mensalidade</button>
@@ -190,7 +191,6 @@
         </div>
     </div>
     
-    <!-- NOVO MODAL DE PREÇOS -->
     <div id="modalPrecos" class="modal-bg" style="display:none; z-index: 4000;">
         <div class="modal-box" style="max-width: 350px;">
             <h3 style="color:var(--primary); font-size:1.1rem;">Ajustar Valores 💲</h3>
@@ -207,6 +207,22 @@
             
             <button class="primary-btn" style="margin-top:15px;" onclick="salvarPrecos()">💾 SALVAR VALORES</button>
             <button class="close-btn" onclick="document.getElementById('modalPrecos').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL DE CUPONS -->
+    <div id="modalCupons" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width:400px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Gerenciar Cupons 🎟️</h3>
+            <p style="font-size:0.75rem; color:#aaa; margin-top:5px;">Crie cupons para os clientes terem descontos (R$).</p>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input type="text" id="novoCupomNome" placeholder="Nome (Ex: VIP10)" style="flex:2; text-transform: uppercase;">
+                <input type="number" id="novoCupomValor" placeholder="Desconto (R$)" style="flex:1;">
+            </div>
+            <button class="primary-btn" onclick="salvarCupom()">➕ CRIAR CUPOM</button>
+            <div id="loadingCupons" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div>
+            <div class="interdicao-grid" id="listaCuponsConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px; max-height:200px;"></div>
+            <button class="close-btn" onclick="document.getElementById('modalCupons').style.display='none'">Fechar</button>
         </div>
     </div>
 
@@ -243,6 +259,7 @@
             <button class="close-btn" onclick="document.getElementById('modalAddAluno').style.display='none'">Cancelar</button>
         </div>
     </div>
+    
     <div id="modalGerenciarClientes" class="modal-bg" style="display:none;">
         <div class="modal-box" style="max-width: 900px; width: 95%;">
             <h3 style="color:var(--primary); font-size:1.2rem;">Gestão de Clientes</h3>
@@ -370,18 +387,11 @@
 
         function alternarRanking() {
             if(confirm("Tem certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ acao: "toggle_ranking" })
-                })
-                .then(r => r.json())
-                .then(data => {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "toggle_ranking" }) })
+                .then(r => r.json()).then(data => {
                     if(data.sucesso) {
-                        if(data.statusAtual === "SIM") {
-                            alert("✅ O Ranking agora está VISÍVEL para os clientes.");
-                        } else {
-                            alert("🚫 O Ranking agora está OCULTO no site.");
-                        }
+                        if(data.statusAtual === "SIM") { alert("✅ O Ranking agora está VISÍVEL para os clientes."); }
+                        else { alert("🚫 O Ranking agora está OCULTO no site."); }
                     }
                 }).catch(e => alert("Erro de conexão."));
             }
@@ -490,12 +500,10 @@
             let diasFiltro = parseInt(document.getElementById('filtroDias').value); 
             let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); 
             let hoje = new Date(); hoje.setHours(0,0,0,0);
-            
             let clientesLista = [];
             
             for(let i = 0; i < clientesCadastrados.length; i++) { 
                 let clienteData = clientesCadastrados[i]; 
-                
                 let nome = clienteData.nome || ""; 
                 let telefone = clienteData.telefone || ""; 
                 let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; 
@@ -510,7 +518,6 @@
                     let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     if (diasInativo <= diasFiltro) continue;
                 }
-                
                 clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
             }
 
@@ -1080,6 +1087,48 @@
                 btn.innerText = txtOriginal; btn.disabled = false;
             });
         }
+
+        // --- SISTEMA DE CUPONS ---
+        function abrirModalCupons() {
+            document.getElementById('modalCupons').style.display = 'flex';
+            carregarCupons();
+        }
+        function carregarCupons() {
+            document.getElementById('loadingCupons').style.display = 'block';
+            document.getElementById('listaCuponsConteudo').innerHTML = '';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_cupons" }) })
+            .then(r=>r.json()).then(data => {
+                document.getElementById('loadingCupons').style.display = 'none';
+                let html = "";
+                if(data.sucesso && data.lista && data.lista.length > 0) {
+                    data.lista.forEach(c => {
+                        html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;">
+                            <span style="font-size: 0.95rem; color: var(--primary);"><b>${c.nome}</b> <br><small style="color:#aaa">Desconto: R$ ${c.desconto},00</small></span>
+                            <button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="excluirCupom('${c.nome}')">🗑️</button>
+                        </div>`;
+                    });
+                } else { html = "<p style='color:#ccc;'>Nenhum cupom ativo.</p>"; }
+                document.getElementById('listaCuponsConteudo').innerHTML = html;
+            });
+        }
+        function salvarCupom() {
+            let nome = document.getElementById('novoCupomNome').value.toUpperCase().trim();
+            let valor = document.getElementById('novoCupomValor').value;
+            if(!nome || !valor) return alert("Preencha o nome e o valor de desconto!");
+            let btn = document.querySelector('#modalCupons .primary-btn'); btn.innerText = "Salvando..."; btn.disabled = true;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cupom", cupom: nome, desconto: valor }) })
+            .then(r=>r.json()).then(data=>{
+                btn.innerText = "➕ CRIAR CUPOM"; btn.disabled = false;
+                if(data.sucesso) { document.getElementById('novoCupomNome').value=''; document.getElementById('novoCupomValor').value=''; carregarCupons(); }
+            });
+        }
+        function excluirCupom(nome) {
+            if(confirm(`Excluir o cupom ${nome}?`)) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cupom", cupom: nome }) })
+                .then(()=>carregarCupons());
+            }
+        }
     </script>
 </body>
 </html>
+esse foi o do painel que vc mandou por ultimo, e ai eu ja substitui, ta ok agora ?
