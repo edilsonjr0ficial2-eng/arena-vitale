@@ -359,7 +359,12 @@
                 • O não comparecimento sem aviso prévio resultará na <strong>cobrança da taxa de 50%</strong>.
             </div>
             <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos.</label></div>
-            <div class="modal-buttons"><button class="btn-cancel" onclick="fecharModal()">Cancelar</button><button class="btn-confirm" onclick="enviarAgendamento()">Ir para WhatsApp</button></div>
+            
+            <!-- ALTERAÇÃO FEITA AQUI (ID único no botão) -->
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button id="btnFinalizarAgendamento" class="btn-confirm" onclick="enviarAgendamento()">Ir para WhatsApp</button>
+            </div>
         </div>
     </div>
 
@@ -747,7 +752,10 @@
                 telefoneFinal = usuarioLogado.phone;
             }
 
-            const btn = document.querySelector('.btn-confirm'); btn.innerText = "Agendando..."; btn.disabled = true;
+            // ALTERAÇÃO: Usa o novo ID para não travar o botão do cupom
+            const btn = document.getElementById('btnFinalizarAgendamento'); 
+            btn.innerText = "Aguarde..."; 
+            btn.disabled = true;
             
             fetch(SCRIPT_URL, { 
                 method: "POST", 
@@ -780,7 +788,7 @@
                 
                 setTimeout(() => { location.reload(); }, 1500);
             })
-            .catch(e => { alert("Erro de conexão."); btn.disabled = false; });
+            .catch(e => { alert("Erro de conexão."); btn.disabled = false; btn.innerText = "Ir para WhatsApp"; });
         }
 
         function mudarPasso(passoDestino) {
