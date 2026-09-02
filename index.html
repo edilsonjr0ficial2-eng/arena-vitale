@@ -99,7 +99,6 @@
         .modal-content { background: var(--card-color); padding: 25px; border-radius: 15px; width: 95%; max-width: 450px; text-align: left; border: 2px solid var(--primary); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { color: var(--primary); margin-bottom: 15px; text-align: center; }
         
-        /* Ajuste dos inputs dentro do Modal de Cadastro */
         .modal-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #555; margin-top: 5px; background: #222; color: white; font-size: 1rem; }
         .modal-input:disabled { background: #333; color: #aaa; border-color: #444; cursor: not-allowed; }
         
@@ -117,7 +116,6 @@
         .faq-item[open] summary::after { content: '-'; }
         .faq-item p { padding: 15px; color: #ccc; border-top: 1px solid #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0; background: #1a1a1a; }
 
-        /* Estilos para o Passo a Passo do Agendamento */
         .passo-agenda { display: none; animation: fadeIn 0.4s ease; }
         .passo-agenda.ativo { display: block; }
         .botoes-navegacao { display: flex; justify-content: space-between; margin-top: 25px; gap: 15px; }
@@ -373,6 +371,10 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const whatsappNumber = "5588988229008";
 
+        // VARIÁVEIS GLOBAIS DE PREÇO (Iniciam com um padrão, mas serão atualizadas pelo Google)
+        let precoDiaGlobal = 35;
+        let precoNoiteGlobal = 40;
+
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
 
@@ -383,6 +385,7 @@
         window.onload = function() {
             if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function(registrations) { for (let registration of registrations) { registration.unregister(); } }); }
 
+            // BUSCA A PROMOÇÃO E DEPOIS BUSCA OS PREÇOS SALVOS NA NUVEM
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) })
             .then(r => r.json()).then(data => { 
                 if(data.sucesso) {
@@ -391,7 +394,17 @@
                     agendaDataInicio = data.agendaInicio || "";
                     agendaDataFim = data.agendaFim || "";
                 }
-            });
+                
+                // Agora puxamos os preços atualizados
+                fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_precos" }) })
+                .then(r2 => r2.json()).then(d2 => {
+                    if(d2.sucesso) {
+                        precoDiaGlobal = parseFloat(d2.precoDia);
+                        precoNoiteGlobal = parseFloat(d2.precoNoite);
+                    }
+                }).catch(e => console.log(e));
+
+            }).catch(e => console.log(e));
 
             atualizarRelogio(); document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
             carregarDadosDoDia(); carregarClima();
@@ -547,16 +560,16 @@
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
                 
-                // NOVA LÓGICA DE PREÇOS (Sem diferença de método de pagamento)
+                // NOVA LÓGICA DE PREÇOS (Puxando as variáveis do Google)
                 if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { 
                     total += valorPromo; 
                     usouPromoFlag = true; 
                 } 
                 else if (hAtual >= 5 && hAtual <= 18) { 
-                    total += 35; // Das 5h até as 18h
+                    total += precoDiaGlobal; // Valor Dia
                 } 
                 else { 
-                    total += 40; // Das 19h em diante
+                    total += precoNoiteGlobal; // Valor Noite
                 }
             } return total;
         }
@@ -640,7 +653,6 @@
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
-        // MODIFICADA PARA LIDAR COM USUÁRIO NÃO LOGADO NO MODAL
         function prepararAgendamento() { 
             const h = parseInt(document.getElementById('selectHora').value); 
             const pag = document.getElementById('selectPagamento').value; 
@@ -674,7 +686,6 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // MODIFICADA PARA ENVIAR CADASTRO SE NECESSÁRIO ANTES DE AGENDAR
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
@@ -690,11 +701,9 @@
                     return alert("⚠️ Por favor, preencha seu Nome, seu Telefone correto (11 dígitos) e crie uma senha.");
                 }
 
-                // Salva o cliente provisoriamente no app para os próximos fluxos funcionarem
                 usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
                 localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                 
-                // Dispara o salvamento do cliente no banco de dados
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) });
             } else {
                 nomeFinal = usuarioLogado.nome;
