@@ -1,1085 +1,705 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin | Arena Vitale</title>
-    <link rel="icon" href="logo2.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Arena Vitale</title>
+    <link rel="icon" href="logo2.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 10px 20px; transition: 0.3s; }
-        
-        .header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .top-row { display: flex; justify-content: space-between; align-items: center; }
-        .logo-img { max-height: 45px; width: auto; display: block; }
-        
-        .toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tool-btn { padding: 6px 10px; border-radius: 4px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: 0.2s; }
-        .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        .btn-logout { background: var(--danger); border: none; color: white; }
-        
-        .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 8px 15px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; font-size: 0.8rem; justify-content: space-around; }
-        .stat-item span { color: var(--primary); font-weight: 900; font-size: 1rem; }
-        
-        .controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; background: var(--card); padding: 6px; border-radius: 8px; }
-        .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.1rem; cursor: pointer; padding: 2px 15px; border-radius: 4px; }
-        .date-display { font-size: 1rem; font-weight: bold; text-transform: uppercase; }
-        
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 1200px; margin: auto; }
-        .column { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
-        .col-header { background: var(--primary); color: #000; padding: 6px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; }
-        
-        .slot { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 1px solid #333; font-size: 0.8rem; }
-        .time-label { font-weight: bold; color: #777; width: 45px; }
-        .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .slot-content.booked { color: var(--primary); font-weight: bold; }
-        .slot-content.pending { color: var(--pending); font-style: italic; }
-        
-        .actions { display: flex; gap: 4px; }
-        .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
-        .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
-        .btn-del { color: var(--danger); } .btn-del:hover { transform: scale(1.2); }
-        .btn-wa { color: var(--success); } .btn-wa:hover { transform: scale(1.2); }
-        .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
-        .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
-        
-        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .modal-box { background: var(--card); padding: 20px; border-radius: 8px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
-        
-        .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; max-height: 300px; overflow-y: auto; text-align: left; }
-        .interdicao-item { background: #333; padding: 6px; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
-        
-        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .dash-card { background: #1a1a1a; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--primary); }
-        .dash-card h4 { color: #aaa; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; }
-        .dash-card .value { font-size: 1.4rem; font-weight: 900; color: white; }
-        
-        input, select { width: 100%; padding: 8px; margin: 6px 0; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-size: 0.85rem;}
-        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 0.85rem; color: #ccc; }
-        button.primary-btn { padding: 10px 15px; font-size: 0.9rem; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px;}
-        button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 5px; width: 100%; font-size: 0.9rem;}
-        
-        #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 10px 20px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size:0.9rem;}
-        #toastNotification.show { bottom: 20px; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    <style>
+        :root { --bg: #111; --card: #222; --primary: #FFD700; --text: #fff; --danger: #ff4d4d; --success: #4dff88; --pending: #ffaa00; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 10px 20px; transition: 0.3s; }
+        
+        .header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; }
+        .logo-img { max-height: 45px; width: auto; display: block; }
+        
+        .toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tool-btn { padding: 6px 10px; border-radius: 4px; border: 1px solid #555; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; font-weight: bold; transition: 0.2s; }
+        .tool-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-modo-fixo.ativo { background: var(--primary); color: black; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .btn-logout { background: var(--danger); border: none; color: white; }
+        
+        .stats-bar { display: flex; gap: 20px; background: var(--card); padding: 8px 15px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #333; font-size: 0.8rem; justify-content: space-around; }
+        .stat-item span { color: var(--primary); font-weight: 900; font-size: 1rem; }
+        
+        .controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; background: var(--card); padding: 6px; border-radius: 8px; }
+        .nav-btn { background: none; border: 1px solid #555; color: var(--primary); font-size: 1.1rem; cursor: pointer; padding: 2px 15px; border-radius: 4px; }
+        .date-display { font-size: 1rem; font-weight: bold; text-transform: uppercase; }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 1200px; margin: auto; }
+        .column { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+        .col-header { background: var(--primary); color: #000; padding: 6px; text-align: center; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; }
+        
+        .slot { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-bottom: 1px solid #333; font-size: 0.8rem; }
+        .time-label { font-weight: bold; color: #777; width: 45px; }
+        .slot-content { flex: 1; text-align: left; padding-left: 5px; font-weight: 500; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .slot-content.booked { color: var(--primary); font-weight: bold; }
+        .slot-content.pending { color: var(--pending); font-style: italic; }
+        
+        .actions { display: flex; gap: 4px; }
+        .btn-icon { border: none; background: none; cursor: pointer; font-size: 1rem; transition: 0.2s; padding: 2px; }
+        .btn-add { color: #555; } .btn-add:hover { color: var(--success); }
+        .btn-del { color: var(--danger); } .btn-del:hover { transform: scale(1.2); }
+        .btn-wa { color: var(--success); } .btn-wa:hover { transform: scale(1.2); }
+        .btn-pay { color: #ccc; opacity: 0.3; } .btn-pay.paid { color: var(--success); opacity: 1; }
+        .btn-confirm { color: var(--pending); animation: pulse 2s infinite; }
+        
+        .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .modal-box { background: var(--card); padding: 20px; border-radius: 8px; border: 2px solid var(--primary); width: 90%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
+        
+        .interdicao-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; max-height: 300px; overflow-y: auto; text-align: left; }
+        .interdicao-item { background: #333; padding: 6px; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+        
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .dash-card { background: #1a1a1a; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--primary); }
+        .dash-card h4 { color: #aaa; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; }
+        .dash-card .value { font-size: 1.4rem; font-weight: 900; color: white; }
+        
+        input, select { width: 100%; padding: 8px; margin: 6px 0; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-size: 0.85rem;}
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 0.85rem; color: #ccc; }
+        button.primary-btn { padding: 10px 15px; font-size: 0.9rem; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px;}
+        button.close-btn { background: #333; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 5px; width: 100%; font-size: 0.9rem;}
+        
+        #toastNotification { position: fixed; bottom: -100px; right: 20px; background: var(--success); color: black; padding: 10px 20px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 4000; transition: 0.5s; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size:0.9rem;}
+        #toastNotification.show { bottom: 20px; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .top-row { flex-direction: column; gap: 10px; }
-            .toolbar { justify-content: center; gap: 6px; }
-            .tool-btn { flex: 1 1 calc(50% - 6px); justify-content: center; padding: 10px 8px; font-size: 0.8rem; }
-            .stats-bar { flex-direction: column; text-align: center; gap: 8px; padding: 8px; }
-            .grid-container { grid-template-columns: 1fr; gap: 15px; } 
-            .slot { padding: 10px 8px; } 
-            .slot-content { font-size: 0.85rem; white-space: normal; overflow: visible; word-break: break-word; } 
-            .btn-icon { font-size: 1.2rem; padding: 6px; } 
-        }
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .top-row { flex-direction: column; gap: 10px; }
+            .toolbar { justify-content: center; gap: 6px; }
+            .tool-btn { flex: 1 1 calc(50% - 6px); justify-content: center; padding: 10px 8px; font-size: 0.8rem; }
+            .stats-bar { flex-direction: column; text-align: center; gap: 8px; padding: 8px; }
+            .grid-container { grid-template-columns: 1fr; gap: 15px; } 
+            .slot { padding: 10px 8px; } 
+            .slot-content { font-size: 0.85rem; white-space: normal; overflow: visible; word-break: break-word; } 
+            .btn-icon { font-size: 1.2rem; padding: 6px; } 
+        }
 
-        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; margin-bottom:20px; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; font-weight:bold; font-size:1.2rem; margin-bottom:10px; text-align:center;} }
-        #printHeader { display: none; }
-    </style>
+        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; margin-bottom:20px; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; font-weight:bold; font-size:1.2rem; margin-bottom:10px; text-align:center;} }
+        #printHeader { display: none; }
+    </style>
 </head>
 <body>
 
-    <div id="loginOverlay" class="modal-bg">
-        <div class="login-box">
-            <img src="logo2.png" alt="Arena Vitale" class="logo-img" style="margin: 0 auto 10px auto;">
-            <input type="text" id="userInput" placeholder="Usuário Admin">
-            <input type="password" id="passInput" placeholder="Senha">
-            <button class="primary-btn" id="btnLogin" onclick="tentarLogin()">ACESSAR</button>
-        </div>
-    </div>
-
-    <div id="toastNotification" onclick="fecharToast()">🔔 <span>Nova Solicitação Pendente!</span></div>
-    <div id="printHeader">AGENDA DO DIA <span id="printDate"></span></div>
-
-    <div class="header">
-        <div class="top-row">
-            <img src="logo2.png" alt="Arena Vitale" class="logo-img">
-            <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px;">
-                <span id="nomeLogadoDisplay" style="color: var(--primary); font-weight: bold; font-size: 0.85rem;"></span>
-                <button class="tool-btn btn-logout" onclick="fazerLogout()">Sair 🚪</button>
-            </div>
-        </div>
-        
-        <div class="toolbar">
-            <button class="tool-btn" id="btnGerirAdmins" onclick="abrirModalAdmins()" style="display:none; border-color:var(--primary); color:var(--primary);">🔐 Contas</button>
-            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">...</button>
-            <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa</button>
-            <button class="tool-btn" onclick="aplicarMoldeNaAgenda()" style="border-color: var(--success); color: var(--success);" title="Copia o Molde para a Agenda da Semana">🔄 Sincronizar Molde</button>
-            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
-            <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
-            
-            <!-- NOVO BOTÃO DE VALORES -->
-            <button class="tool-btn" onclick="abrirModalPrecos()" style="border-color: #ffaa00; color: #ffaa00;">💲 Valores</button>
-            
-            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
-            <button class="tool-btn" onclick="abrirControleMensalidades()" style="border-color: var(--success); color: var(--success);">🎓 Aulas / Mensalidade</button>
-            <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
-            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
-            <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
-            <button class="tool-btn" onclick="alternarRanking()" style="border-color: var(--primary); color: var(--primary);">👁️ Ranking</button>
-            <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar</button>
-            <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-    </div>
-
-    <div class="stats-bar">
-        <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
-        <div class="stat-item">Faturamento do Dia: <span id="statFaturamento">R$ 0,00</span></div>
-    </div>
-
-    <div class="controls">
-        <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
-        <div class="date-display" id="dateDisplay">...</div>
-        <button class="nav-btn" onclick="mudarDia(1)">❯</button>
-        <button class="nav-btn" id="btnRecarregar" onclick="carregarAgenda()" style="margin-left:10px;">↻</button>
-        <span id="autoRefreshStatus" style="font-size: 0.75rem; color: var(--success); margin-left: 10px;">Monitorando...</span>
-    </div>
-
-    <div class="grid-container">
-        <div class="column"><div class="col-header">🎾 Quadra Chicashoes</div><div id="listaQ1"></div></div>
-        <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
-    </div>
-
-    <div id="modalGerenciarAdmins" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:500px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Gerenciar Administradores</h3>
-            <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-                <input type="text" id="novoAdmUser" placeholder="Novo Usuário" style="flex:1; min-width: 120px;">
-                <input type="text" id="novoAdmPass" placeholder="Senha" style="flex:1; min-width: 120px;">
-            </div>
-            <button class="primary-btn" onclick="salvarNovoAdmin()">➕ Adicionar Admin</button>
-            <div class="interdicao-grid" id="listaAdminsConteudo" style="margin-top: 10px;"></div>
-            <button class="close-btn" onclick="document.getElementById('modalGerenciarAdmins').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalCadeado" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width: 400px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Controle da Agenda 🔒</h3>
-            <div style="margin-top: 10px; text-align: left;">
-                <label style="color:#aaa; font-size:0.8rem;">Status Geral:</label>
-                <select id="cadStatus"><option value="SIM">🔓 Liberada</option><option value="NAO">🔒 Bloqueada</option></select>
-            </div>
-            <div style="display: flex; flex-direction:column; gap: 8px; margin-top: 10px;">
-                <div style="text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Data de Início:</label><input type="date" id="cadInicio"></div>
-                <div style="text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Data Fim:</label><input type="date" id="cadFim"></div>
-            </div>
-            <button class="primary-btn" style="margin-top:15px;" onclick="salvarCadeado()">💾 SALVAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalPromocao" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width: 500px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Configurar Promoção 🏷️</h3>
-            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap:wrap;"><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Fim:</label><input type="date" id="promoFim"></div></div>
-            <div style="display: flex; gap: 10px; margin-top: 5px; flex-wrap:wrap;"><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Limite Pessoas:</label><input type="number" id="promoLimite" placeholder="Ilimitado"></div></div>
-            <div id="promoUsosDisplay" style="text-align: left; margin-top: 5px; font-size: 0.8rem; color: var(--success); display: none; background: #1a1a1a; padding: 8px; border-radius: 4px;">✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.75rem; word-break: break-all; margin-top:3px;" id="promoListaTelefones"></div></div>
-            <div style="text-align: left; margin-top: 10px;"><label style="font-size: 0.75rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 120px;"></div></div>
-            <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
-        </div>
-    </div>
-    
-    <!-- NOVO MODAL DE PREÇOS -->
-    <div id="modalPrecos" class="modal-bg" style="display:none; z-index: 4000;">
-        <div class="modal-box" style="max-width: 350px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Ajustar Valores 💲</h3>
-            
-            <div style="text-align: left; margin-top: 15px;">
-                <label style="font-size: 0.75rem; color: #aaa;">Valor Dia (5h às 18h):</label>
-                <input type="number" id="inputPrecoDia" value="35">
-            </div>
-            
-            <div style="text-align: left; margin-top: 10px;">
-                <label style="font-size: 0.75rem; color: #aaa;">Valor Noite (19h às 22h):</label>
-                <input type="number" id="inputPrecoNoite" value="40">
-            </div>
-            
-            <button class="primary-btn" style="margin-top:15px;" onclick="salvarPrecos()">💾 SALVAR VALORES</button>
-            <button class="close-btn" onclick="document.getElementById('modalPrecos').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalMensalidades" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width: 800px; width: 95%;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="color:var(--primary); font-size:1.2rem; margin:0;">Controle de Mensalidades 🎾</h3>
-                <button class="tool-btn" style="background:var(--success); color:black;" onclick="abrirModalAddAluno()">➕ Novo Aluno</button>
-            </div>
-            <div style="display:flex; gap:8px; margin-bottom:10px;">
-                <input type="text" id="pesquisaMensalidade" placeholder="🔍 Buscar aluno pelo nome ou telefone..." style="flex: 1; margin:0;" oninput="renderizarTabelaMensalidades()">
-            </div>
-            <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
-                <div id="loadingMensalidades" style="color:var(--primary); font-size:0.85rem;">Carregando alunos...</div>
-                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaMensalidades">
-                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Aluno</th><th style="padding: 6px;">Vencimento</th><th style="padding: 6px; text-align:center;">Status</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
-                    <tbody id="listaMensalidadesBody"></tbody>
-                </table>
-            </div>
-            <button class="close-btn" onclick="document.getElementById('modalMensalidades').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalAddAluno" class="modal-bg" style="display:none; z-index: 4000;">
-        <div class="modal-box" style="max-width: 400px;">
-            <h3 style="color:var(--primary); font-size:1.1rem;">Dados do Aluno (Beach Tennis)</h3>
-            <input type="text" id="alunoNome" placeholder="Nome do Aluno">
-            <input type="tel" id="alunoTel" placeholder="Telefone (Apenas números)">
-            <div style="text-align: left; margin-top:5px;">
-                <label style="font-size: 0.75rem; color: #aaa;">Dia do Vencimento:</label>
-                <input type="number" id="alunoVencimento" min="1" max="31" placeholder="Ex: 10">
-            </div>
-            <button class="primary-btn" onclick="salvarAluno()">💾 SALVAR ALUNO</button>
-            <button class="close-btn" onclick="document.getElementById('modalAddAluno').style.display='none'">Cancelar</button>
-        </div>
-    </div>
-    <div id="modalGerenciarClientes" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width: 900px; width: 95%;">
-            <h3 style="color:var(--primary); font-size:1.2rem;">Gestão de Clientes</h3>
-            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center; flex-wrap:wrap;">
-                <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 150px; margin:0;" oninput="renderizarTabelaClientes()">
-                <input type="number" id="filtroDias" placeholder="Inativo + dias" style="width: 110px; margin:0;">
-                <button class="tool-btn" style="background:var(--primary); color:black; padding:8px;" onclick="renderizarTabelaClientes()">Filtrar</button>
-            </div>
-            <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
-                <div id="loadingClientes" style="color:var(--primary); font-size:0.85rem;">Carregando dados...</div>
-                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaClientes">
-                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Nome & Contato</th><th style="padding: 6px;">Último Jogo</th><th style="padding: 6px; text-align:center;">Raquetes</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
-                    <tbody id="listaClientesBody"></tbody>
-                </table>
-            </div>
-            <button class="close-btn" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalEstatisticas" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width: 800px; width: 95%;">
-            <h3 style="color:var(--primary); font-size: 1.5rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
-            <div id="statsContent"><p style="color: var(--primary); font-size:0.85rem;">Processando dados...</p></div>
-            <button class="close-btn" style="margin-top: 15px;" onclick="fecharDashboard()">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalManual" class="modal-bg" style="display:none;">
-        <div class="modal-box">
-            <h3 style="color:var(--primary); font-size:1.1rem;" id="tituloModalAgenda">Agendamento</h3><p id="modalInfo" style="margin:8px 0; color:#aaa; font-size:0.8rem;"></p>
-            <input type="text" id="manualNome" placeholder="Nome do Jogador / Turma">
-            <div class="checkbox-wrapper" id="divMensalista"><input type="checkbox" id="checkMensalista" style="width:auto; margin:0;"><label>Mensalista (M)</label></div>
-            <button class="primary-btn" onclick="salvarManual()">SALVAR</button><button class="close-btn" onclick="document.getElementById('modalManual').style.display='none'">Cancelar</button>
-        </div>
-    </div>
-
-    <div id="modalAddBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box">
-            <h3 style="color:var(--danger); font-size:1.1rem;">Bloquear Cliente</h3>
-            <input type="text" id="blNome" placeholder="Nome">
-            <input type="tel" id="blTel" placeholder="Telefone">
-            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button>
-            <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:400px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color:var(--danger); font-size:1.1rem; margin:0;">Lista Negra</h3>
-                <button class="tool-btn" style="border-color:var(--danger); color:var(--danger);" onclick="abrirModalAddBloqueio()">➕ Bloquear</button>
-            </div>
-            <div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div>
-            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
-            <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
-        </div>
-    </div>
-
-    <div id="modalInterdicao" class="modal-bg" style="display:none;">
-        <div class="modal-box" style="max-width:450px;"><h3 style="color:var(--danger); font-size:1.1rem;">Interditar Horários</h3><div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:4px 8px; font-size:0.8rem;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:4px 8px; font-size:0.8rem;">Desmarcar Todos</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
-    </div>
-
-    <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary); font-size:1.2rem;">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.3rem; font-weight:bold; color:var(--primary); margin:15px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
-
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
-
-        let dataAtual = new Date(); 
-        
-        const horas = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; 
-        
-        const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-        let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
-        let chartAcessosInstancia = null; let dadosAcessosGlobais = [];
-        let promocaoAtual = null;
-        let listaMensalidades = [];
-        
-        // VARIÁVEIS GLOBAIS DE PREÇO
-        let precoDiaGlobal = 35; 
-        let precoNoiteGlobal = 40;
-
-        window.onload = function() {
-            let user = localStorage.getItem('adminUser');
-            if(user) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('nomeLogadoDisplay').innerText = "👤 " + user;
-                if(localStorage.getItem('adminMaster') === 'true') document.getElementById('btnGerirAdmins').style.display = 'flex';
-                carregarConfigAdmin(); 
-                
-                // Busca Promoção e depois busca os Preços no Google
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
-                    if(d.sucesso && d.promo) promocaoAtual = d.promo;
-                    
-                    // Agora busca os preços
-                    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_precos" }) })
-                    .then(r2 => r2.json()).then(d2 => {
-                        if(d2.sucesso) {
-                            precoDiaGlobal = parseFloat(d2.precoDia);
-                            precoNoiteGlobal = parseFloat(d2.precoNoite);
-                        }
-                        carregarAgenda(); 
-                    }).catch(() => carregarAgenda());
-                }).catch(()=>carregarAgenda());
-                
-                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
-            }
-        };
-
-        function tentarLogin() {
-            let u = document.getElementById('userInput').value.trim();
-            let p = document.getElementById('passInput').value.trim();
-            if(!u || !p) return alert("Preencha usuário e senha!");
-            let btn = document.getElementById('btnLogin'); btn.innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "login_admin", usuario: u, senha: p }) })
-            .then(r=>r.json()).then(data => {
-                if(data.sucesso) {
-                    localStorage.setItem('adminUser', u); localStorage.setItem('adminMaster', data.mestre); location.reload();
-                } else { alert(data.erro); btn.innerText = "ACESSAR"; }
-            }).catch(e => { alert("Erro de conexão."); btn.innerText = "ACESSAR"; });
-        }
-
-        function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
-
-        function alternarRanking() {
-            if(confirm("Tem certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
-                fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ acao: "toggle_ranking" })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.sucesso) {
-                        if(data.statusAtual === "SIM") {
-                            alert("✅ O Ranking agora está VISÍVEL para os clientes.");
-                        } else {
-                            alert("🚫 O Ranking agora está OCULTO no site.");
-                        }
-                    }
-                }).catch(e => alert("Erro de conexão."));
-            }
-        }
-
-        function aplicarMoldeNaAgenda() {
-            if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsso vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem certeza que deseja aplicar o molde agora?")) {
-                document.getElementById('btnRecarregar').innerText = "Limpando...";
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "executar_limpeza" }) })
-                .then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); location.reload(); }
-                    else { alert("Erro: " + data.erro); document.getElementById('btnRecarregar').innerText = "↻"; }
-                }).catch(e => { alert("Erro de conexão."); document.getElementById('btnRecarregar').innerText = "↻"; });
-            }
-        }
-
-        function abrirModalAdmins() {
-            document.getElementById('modalGerenciarAdmins').style.display = 'flex';
-            document.getElementById('listaAdminsConteudo').innerHTML = "Carregando...";
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_admins" }) }).then(r=>r.json()).then(d => {
-                if(d.sucesso) {
-                    let html = "";
-                    d.lista.forEach(a => { html += `<div class="interdicao-item" style="justify-content:space-between"><span>${a.usuario}</span><button class="btn-icon btn-del" onclick="excluirAdm('${a.usuario}')">🗑️</button></div>`; });
-                    document.getElementById('listaAdminsConteudo').innerHTML = html || "<p>Nenhum admin secundário cadastrado.</p>";
-                }
-            });
-        }
-
-        function salvarNovoAdmin() {
-            let u = document.getElementById('novoAdmUser').value.trim(); let p = document.getElementById('novoAdmPass').value.trim();
-            if(!u || !p) return alert("Preencha usuário e senha.");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_admin", usuario: u, senha: p }) }).then(r=>r.json()).then(d=>{ if(d.sucesso) { document.getElementById('novoAdmUser').value=''; document.getElementById('novoAdmPass').value=''; abrirModalAdmins(); } });
-        }
-
-        function excluirAdm(u) {
-            if(confirm("Excluir o admin " + u + "?")) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_admin", usuario: u }) }).then(() => abrirModalAdmins()); }
-        }
-
-        function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); totalPendentesConhecidos = 0; document.title = "Painel Admin | Arena Vitale"; if(modoGradeFixa) atualizarTelaGradeFixa(); else carregarAgenda(); }
-        function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
-
-        function carregarConfigAdmin() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.dataInicio, data.dataFim); });
-        }
-        function atualizarBotoesConfig(liberada, dIni, dFim) {
-            let btnT = document.getElementById('btnTravaAgenda');
-            if (liberada) { let txt = "🔓 Liberada"; if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; } btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
-            } else { btnT.innerHTML = "🔒 Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
-        }
-
-        function abrirModalCadeado() {
-            document.getElementById('modalCadeado').style.display = 'flex';
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } });
-        }
-        function salvarCadeado() {
-            document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_trava_agenda", status: document.getElementById('cadStatus').value, inicio: document.getElementById('cadInicio').value, fim: document.getElementById('cadFim').value }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } });
-        }
-
-        function abrirModalPromocao() {
-            document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
-            horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; }); document.getElementById('promoHorariosGrid').innerHTML = html;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json()).then(data => {
-                if(data.sucesso && data.promo) {
-                    document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
-                    if (data.promo.limite) { document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Quem usou: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registrado."; } } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
-                    let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
-                }
-            });
-        }
-        function salvarPromocao() {
-            let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value));
-            if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { 
-                if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } 
-            });
-        }
-
-        function abrirGerenciadorClientes() {
-            document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
-            if(clientesCadastrados.length === 0) {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
-                    if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } 
-                }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
-            } else {
-                renderizarTabelaClientes();
-            }
-        }
-
-        function parseDataBR(dataStr) { 
-            if (!dataStr) return null; 
-            let str = dataStr.toString().trim();
-            if (str.includes('T') && str.includes('-')) { let d = new Date(str); if (!isNaN(d.getTime())) return d; }
-            let partesTempo = str.split(' '); let soData = partesTempo[0].replace(/,/g, '').trim(); let partes = soData.split('/'); 
-            if(partes.length === 3) { return new Date(partes[2], partes[1] - 1, partes[0]); }
-            let fallback = new Date(str); return isNaN(fallback.getTime()) ? null : fallback;
-        }
-
-        function renderizarTabelaClientes() {
-            document.getElementById('loadingClientes').style.display = 'none'; 
-            document.getElementById('tabelaClientes').style.display = 'table'; 
-            const tbody = document.getElementById('listaClientesBody'); 
-            tbody.innerHTML = '';
-            
-            let diasFiltro = parseInt(document.getElementById('filtroDias').value); 
-            let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); 
-            let hoje = new Date(); hoje.setHours(0,0,0,0);
-            
-            let clientesLista = [];
-            
-            for(let i = 0; i < clientesCadastrados.length; i++) { 
-                let clienteData = clientesCadastrados[i]; 
-                
-                let nome = clienteData.nome || ""; 
-                let telefone = clienteData.telefone || ""; 
-                let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; 
-                let pontos = parseInt(clienteData.pontos) || 0;     
-                
-                if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
-                
-                let dataUltimo = parseDataBR(ultimoAgendamentoStr);
-                if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { 
-                    let dataTemp = new Date(dataUltimo); dataTemp.setHours(0,0,0,0); 
-                    let diffTime = hoje.getTime() - dataTemp.getTime(); 
-                    let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    if (diasInativo <= diasFiltro) continue;
-                }
-                
-                clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
-            }
-
-            clientesLista.sort((a, b) => {
-                if (!a.dataUltimo && b.dataUltimo) return -1;
-                if (a.dataUltimo && !b.dataUltimo) return 1;
-                if (!a.dataUltimo && !b.dataUltimo) return 0;
-                return a.dataUltimo.getTime() - b.dataUltimo.getTime();
-            });
-
-            clientesLista.forEach(cliente => {
-                let displayData = "Nunca";
-                if (cliente.ultimoAgendamentoStr && cliente.ultimoAgendamentoStr !== "Nunca") {
-                    let strD = cliente.ultimoAgendamentoStr.toString();
-                    if(strD.includes('T')) {
-                        let dO = new Date(strD);
-                        if(!isNaN(dO.getTime())) {
-                            let d = String(dO.getDate()).padStart(2, '0'); let m = String(dO.getMonth() + 1).padStart(2, '0'); let a = dO.getFullYear(); let h = String(dO.getHours()).padStart(2, '0'); let mn = String(dO.getMinutes()).padStart(2, '0');
-                            displayData = `${d}/${m}/${a} às ${h}:${mn}`;
-                        } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); }
-                    } else { displayData = strD.replace('.000Z', ''); }
-                }
-
-                let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
-                let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`;
-                let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
-
-                let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
-                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; 
-                tbody.appendChild(tr);
-            });
-            
-            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
-        }
-
-        function excluirCliente(telefone, nome) {
-            if(confirm(`⚠️ ATENÇÃO: Deseja excluir o cliente ${nome} permanentemente?`)) {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c.telefone != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
-                });
-            }
-        }
-
-        function salvarPontosAdmin(event, telefone) {
-            let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value); if(isNaN(novosPontos)) return alert("Valor inválido.");
-            let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, pontos: novosPontos }) }).then(r => r.json()).then(data => {
-                if(data.sucesso) { 
-                    btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; 
-                    setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); 
-                    let cliente = clientesCadastrados.find(c => c.telefone == telefone); 
-                    if(cliente) cliente.pontos = novosPontos; 
-                } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
-            }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
-        }
-
-        function abrirEstatisticas() {
-            document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">Analisando os dados do banco...</p>';
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json()).then(data => {
-                if(data.sucesso) {
-                    let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
-                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
-                    
-                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').reverse().map(v => {
-                        let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
-                        let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : "";
-                        return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`;
-                    }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
-
-                    let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 
-                        ? s.novosClientesHoje.reverse().map(c => {
-                            let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : "";
-                            return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`;
-                        }).join('') 
-                        : "<div style='padding:5px 0;'>Nenhum novo cadastro hoje.</div>";
-
-                    let qtdNovosHoje = s.novosClientesHoje ? s.novosClientesHoje.length : 0;
-
-                    let html = `
-                    <div class="dash-grid">
-                        <div class="dash-card">
-                            <h4>Visitas Hoje</h4>
-                            <div class="value">👁️ ${s.acessosHoje}</div>
-                            <button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--primary); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Quem Acessou</button>
-                            <div id="listaVisitantes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
-                        </div>
-                        <div class="dash-card">
-                            <h4>Clientes Registrados</h4>
-                            <div class="value">👥 ${s.totalClientes}</div>
-                            <div style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">+${qtdNovosHoje} hoje</div>
-                            <button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--success); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Cadastros Hoje</button>
-                            <div id="listaNovosClientes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div>
-                        </div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturamento da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.2rem;">🎾 ${preferida}</div></div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.1rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div>
-                    </div>`;
-                    html += `<div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 6px; border: 1px solid var(--primary);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h4 style="color:#aaa; font-size:0.8rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4><select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:4px 8px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;"><option value="diario">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select></div><canvas id="graficoAcessos" height="120"></canvas></div>`;
-                    document.getElementById('statsContent').innerHTML = html; setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
-                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas do Banco de Dados.</p>'; }
-            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na conexão com o Google.</p>'; });
-        }
-
-        function atualizarGraficoAcessos() {
-            let tipo = document.getElementById('tipoGraficoAcessos').value; let map = {};
-            dadosAcessosGlobais.forEach(item => {
-                if(!item.data) return; let pts = item.data.toString().split('/'); if(pts.length !== 3) return;
-                let d = new Date(pts[2], pts[1]-1, pts[0]); let key = "";
-                if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } 
-                else if (tipo === 'semanal') { let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7)); var weekNo = Math.ceil(( ( (dCopy - new Date(Date.UTC(dCopy.getUTCFullYear(),0,1))) / 86400000) + 1)/7); key = `Sem. ${weekNo}`; } 
-                else if (tipo === 'mensal') { let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']; key = `${meses[d.getMonth()]} / ${d.getFullYear()}`; }
-                if(!map[key]) map[key] = 0; map[key] += parseInt(item.qtd) || 0;
-            });
-            let labels = Object.keys(map); let values = Object.values(map);
-            if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } 
-            else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
-            if(chartAcessosInstancia) chartAcessosInstancia.destroy(); 
-            const ctx = document.getElementById('graficoAcessos').getContext('2d');
-            chartAcessosInstancia = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Visitas', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointRadius: 4, fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, beginAtZero: true } } } });
-        }
-        function fecharDashboard() { document.getElementById('modalEstatisticas').style.display='none'; }
-
-        function alternarModoGradeFixa() {
-            modoGradeFixa = !modoGradeFixa; const btn = document.getElementById('btnToggleModo');
-            if(modoGradeFixa) {
-                btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
-                document.getElementById('listaQ1').innerHTML = "Carregando molde..."; document.getElementById('listaQ2').innerHTML = "Carregando molde...";
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro."); alternarModoGradeFixa(); } });
-            } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "Monitorando..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
-        }
-
-        function atualizarTelaGradeFixa() {
-            const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerHTML = `<span style='color:var(--primary)'>MOLDE FIXO: ${diasSemana[info.index]}</span>`; document.getElementById('printDate').innerText = "MOLDE: " + diasSemana[info.index];
-            dadosAgenda = []; cachedPadrao.forEach((row, idx) => { if(idx === 0) return; let h = parseInt(row[0]); if(!isNaN(h)) { let colQ1 = 1 + info.index; let colQ2 = 9 + info.index; dadosAgenda.push({ hora: h, q1: row[colQ1]?row[colQ1].toString().trim():"", q2: row[colQ2]?row[colQ2].toString().trim():"" }); } }); renderizarGridFixa();
-        }
-
-        function renderizarGridFixa() {
-            let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotFixoHTML(h, 1, slot.q1); hQ2 += criarSlotFixoHTML(h, 2, slot.q2); });
-            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
-        }
-
-        function criarSlotFixoHTML(h, q, n) {
-            let ocupado = n.length > 0; let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-            let botoes = ocupado ? `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${safeN}')" title="Remover da Grade Fixa">🗑️</button>` : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`;
-            let classe = ocupado ? "fixo-booked" : ""; return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
-        }
-
-        function apagarFixo(h, q, n) {
-             if(confirm(`Remover do Molde Permanente?`)) {
-                let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
-             }
-        }
-
-        async function carregarAgenda(isAuto = false) {
-            if(modoGradeFixa) return; 
-            const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerText = info.texto; document.getElementById('printDate').innerText = info.texto; if(!isAuto) document.getElementById('btnRecarregar').innerText = "↻";
-            try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); }
-        }
-
-        function processarCSV(csv, diaIndex) {
-            const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0; faturamentoDia = 0;
-            
-            let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = [];
-            if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
-                let dataEscolhida = new Date(dataAtual); dataEscolhida.setHours(0,0,0,0);
-                let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]);
-                let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
-                if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
-                    promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0;
-                    horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
-                }
-            }
-
-            rows.forEach((row, idx) => {
-                if(idx === 0) return; let h = parseInt(row[0]);
-                if(!isNaN(h)) {
-                    let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; 
-                    let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
-                    
-                    // NOVA REGRA DE VALORES COM AS VARIÁVEIS GLOBAIS DA NUVEM
-                    let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 5 && h <= 18 ? precoDiaGlobal : precoNoiteGlobal);
-
-                    if(n1) {
-                        ocupados++; 
-                        if(n1.includes("⏳")) pendentesAtuais++;
-                        if(!n1.includes("⛔")) faturamentoDia += vHora;
-                    }
-                    if(n2) {
-                        ocupados++; 
-                        if(n2.includes("⏳")) pendentesAtuais++;
-                        if(!n2.includes("⛔")) faturamentoDia += vHora;
-                    }
-                    
-                    dadosAgenda.push({ hora: h, q1: n1, q2: n2 });
-                }
-            });
-            
-            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100); 
-            document.getElementById('statOcupacao').innerText = porc + "%"; 
-            document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); 
-            renderizarGrid();
-            if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos); 
-            if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; 
-            totalPendentesConhecidos = pendentesAtuais; 
-        }
-
-        function dispararNotificacao(novos) {
-            alertaSom.play().catch(e => console.log("Áudio bloqueado.")); document.title = `(${novos}) NOVO JOGO - Arena Vitale`;
-            const toast = document.getElementById('toastNotification'); toast.querySelector('span').innerText = novos === 1 ? "Nova Solicitação Pendente!" : `${novos} Novas Solicitações Pendentes!`; toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 6000);
-        }
-        function fecharToast() { document.getElementById('toastNotification').classList.remove('show'); }
-
-        function renderizarGrid() {
-            let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2); });
-            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
-        }
-
-        function criarSlotHTML(h, q, n) {
-            n = n ? n.toString() : "";
-            let ocupado = n.length > 0; 
-            let parts = n.split('||');
-            let nomeReal = parts[0].trim();
-            let adminTag = parts.length > 1 ? `<br><small style="color:#555; font-size:0.7rem;">👤 Add por: ${parts[1].trim()}</small>` : "";
-            let isPendente = nomeReal.includes("⏳");
-            let txtN = nomeReal.replace('⏳', '').trim();
-            let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-            
-            let botoes = "";
-            if(ocupado) {
-                if(isPendente) {
-                    botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${safeN}')">🆗</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`;
-                } else {
-                    let isPago = nomeReal.includes('✅');
-                    botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-pay ${isPago?'paid':''}" onclick="togglePago(${h}, ${q}, '${safeN}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`;
-                }
-            } else {
-                botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
-            }
-            
-            let classe = isPendente ? "pending" : (ocupado ? "booked" : ""); 
-            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${nomeReal} ${adminTag}</div><div class="actions">${botoes}</div></div>`;
-        }
-
-        function abrirManual(h, q) { 
-            tempAgendamento = { hora: h, quadra: q }; let ds = diasSemana[formatarData(dataAtual).index];
-            if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } 
-            else { document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento"; document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'flex'; document.getElementById('checkMensalista').checked = false; }
-            document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); 
-        }
-        
-        function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
-        
-        function salvarManual() {
-            let n = document.getElementById('manualNome').value; if(!n) return alert("Indique o Nome.");
-            if(!modoGradeFixa && document.getElementById('checkMensalista').checked) n += " (M)";
-            
-            if(!modoGradeFixa) {
-                let logado = localStorage.getItem('adminUser') || "Admin";
-                n += " || " + logado;
-            }
-
-            fecharModal();
-            if(modoGradeFixa) {
-                let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora); if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) })
-                .then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
-            } else enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
-        }
-        
-        function cancelar(h, q, n) { if(confirm(`Apagar o horário?`)) enviarComando("cancelar", h, q, ""); }
-        function enviarComando(a, h, q, n) {
-            let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
-            if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); renderizarGrid(); 
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) });
-        }
-
-        function abrirWhatsApp(n, h) { let num = prompt(`Número do Cliente:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
-        function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
-        
-        function confirmarAgendamento(h, q, n) { 
-            if(confirm(`Confirmar agendamento?`)) { 
-                let parts = n.split('||');
-                let base = parts[0].replace("⏳", "").trim() + " (Confirmado)";
-                let finalStr = parts.length > 1 ? base + " || " + parts[1].trim() : base;
-                enviarComando("agendar", h, q, finalStr); 
-                if(totalPendentesConhecidos > 0) totalPendentesConhecidos--; fecharToast(); 
-            } 
-        }
-
-        function copiarAgenda() {
-            let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
-            t += `\n*Quadra Padaria do Helder:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
-            navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
-        }
-
-        function abrirModalAddBloqueio() { 
-            document.getElementById('modalAddBlacklist').style.display = 'flex'; 
-        }
-
-        function abrirModalAddBloqueioPreenchido(nome, tel) {
-            document.getElementById('modalGerenciarClientes').style.display = 'none';
-            document.getElementById('blNome').value = nome;
-            document.getElementById('blTel').value = tel;
-            abrirModalAddBloqueio();
-        }
-
-        function adicionarBloqueio() { 
-            const n = document.getElementById('blNome').value; 
-            const t = document.getElementById('blTel').value; 
-            if(!n) return alert("Indique um nome."); 
-            if(confirm(`Bloquear ${n}?`)) { 
-                let btn = document.querySelector('#modalAddBlacklist .primary-btn');
-                let txt = btn.innerText; 
-                btn.innerText = "Aguarde..."; 
-                btn.disabled = true;
-
-                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) })
-                .then(() => {
-                    btn.innerText = txt; 
-                    btn.disabled = false;
-                    document.getElementById('blNome').value=""; 
-                    document.getElementById('blTel').value=""; 
-                    document.getElementById('modalAddBlacklist').style.display='none';
-                    alert(`Cliente ${n} adicionado à Lista Negra com sucesso!`);
-                });
-            } 
-        }
-
-        function abrirGerenciarBlacklist() {
-            document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
-                document.getElementById('loadingBlacklist').style.display = 'none'; let html = "";
-                if(data.lista && data.lista.length > 0) { let isHeader = true; data.lista.forEach((r, idx) => { if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return; let nome = r[0]; let tel = r[1] || "Sem telefone"; html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')">🗑️</button></div>`; }); }
-                if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
-            }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
-        }
-        
-        function removerDaBlacklist(nome) { 
-            if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { 
-                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; 
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); 
-            } 
-        }
-
-        function abrirModalInterdicao() { 
-            document.getElementById('modalInterdicao').style.display = 'flex'; 
-            let html = ""; 
-            horas.forEach(h => { 
-                html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; 
-            }); 
-            document.getElementById('listaInterdicao').innerHTML = html; 
-        }
-        
-        function confirmarInterdicao() { 
-            let sel = []; 
-            document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { 
-                sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); 
-            }); 
-            
-            if(sel.length === 0) return alert("Selecione pelo menos um horário."); 
-            
-            if(confirm(`Interditar ${sel.length} horários?`)) { 
-                let btn = document.querySelector('#modalInterdicao .primary-btn');
-                let txtOriginal = btn.innerText;
-                btn.innerText = "Bloqueando...";
-                btn.disabled = true;
-
-                fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    mode: "no-cors", 
-                    body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) 
-                })
-                .then(() => {
-                    document.getElementById('modalInterdicao').style.display = 'none'; 
-                    btn.innerText = txtOriginal;
-                    btn.disabled = false;
-                    document.getElementById('btnRecarregar').innerText = "Atualizando...";
-                    setTimeout(carregarAgenda, 2000); 
-                })
-                .catch(e => {
-                    document.getElementById('modalInterdicao').style.display = 'none'; 
-                    btn.innerText = txtOriginal;
-                    btn.disabled = false;
-                    setTimeout(carregarAgenda, 2000);
-                });
-            } 
-        }
-
-        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
-        function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
-
-        // --- MÓDULO DE GESTÃO DE MENSALIDADES ---
-        
-        function abrirControleMensalidades() {
-            document.getElementById('modalMensalidades').style.display = 'flex';
-            document.getElementById('loadingMensalidades').style.display = 'block';
-            document.getElementById('tabelaMensalidades').style.display = 'none';
-            
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_mensalidades" }) })
-            .then(r => r.json()).then(data => {
-                if(data.sucesso) {
-                    listaMensalidades = data.lista || [];
-                    renderizarTabelaMensalidades();
-                } else {
-                    document.getElementById('loadingMensalidades').innerText = "Erro ao carregar dados. Verifique o Motor.";
-                }
-            }).catch(e => {
-                document.getElementById('loadingMensalidades').innerText = "Erro de conexão com a planilha.";
-            });
-        }
-
-        function renderizarTabelaMensalidades() {
-            document.getElementById('loadingMensalidades').style.display = 'none';
-            document.getElementById('tabelaMensalidades').style.display = 'table';
-            const tbody = document.getElementById('listaMensalidadesBody');
-            tbody.innerHTML = '';
-            
-            let termo = document.getElementById('pesquisaMensalidade').value.toLowerCase().trim();
-            
-            let hoje = new Date();
-            let mesAtual = hoje.getMonth() + 1;
-            let anoAtual = hoje.getFullYear();
-            let diaAtual = hoje.getDate();
-            let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`;
-
-            listaMensalidades.forEach(aluno => {
-                if (termo && !aluno.nome.toLowerCase().includes(termo) && !aluno.telefone.includes(termo)) return;
-                
-                let statusHTML = "";
-                let estaEmDia = false;
-                
-                if(aluno.ultimoMesPago === mesAnoString) {
-                    estaEmDia = true;
-                    statusHTML = `<span style="color:var(--success); font-weight:bold;">✅ Pago</span>`;
-                } else {
-                    if(diaAtual > parseInt(aluno.vencimento)) {
-                        statusHTML = `<span style="color:var(--danger); font-weight:bold;">❌ Atrasado</span>`;
-                    } else {
-                        statusHTML = `<span style="color:var(--pending); font-weight:bold;">⏳ Pendente</span>`;
-                    }
-                }
-
-                let btnPagar = estaEmDia ? `` : `<button class="tool-btn" style="background:var(--success); color:black; padding:4px 8px; font-size:0.75rem; margin-right: 5px;" onclick="registrarPagamentoMensalidade('${aluno.telefone}')">💲 Baixa</button>`;
-                
-                let btnWa = `<button class="btn-icon btn-wa" style="margin-right: 5px;" onclick="window.open('https://wa.me/55${aluno.telefone}?text=${encodeURIComponent(`Olá ${aluno.nome}, tudo bem? Passando para falar sobre suas aulas de Beach Tennis!`)}', '_blank')">📞</button>`;
-                let btnDel = `<button class="btn-icon btn-del" onclick="excluirAlunoMensalidade('${aluno.telefone}', '${aluno.nome}')">🗑️</button>`;
-
-                let tr = document.createElement('tr');
-                tr.style.borderBottom = "1px solid #333";
-                tr.innerHTML = `
-                    <td style="padding: 6px 4px;"><b>${aluno.nome}</b><br><small style="color:#aaa">${aluno.telefone}</small></td>
-                    <td style="padding: 6px 4px; color:#aaa;">Dia ${aluno.vencimento}</td>
-                    <td style="padding: 6px 4px; text-align:center;">${statusHTML}</td>
-                    <td style="padding: 6px 4px; text-align:center; white-space: nowrap;">
-                        <div style="display:flex; justify-content:center; align-items:center;">${btnWa} ${btnPagar} ${btnDel}</div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            
-            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum aluno encontrado.</td></tr>';
-        }
-
-        function abrirModalAddAluno() {
-            document.getElementById('alunoNome').value = "";
-            document.getElementById('alunoTel').value = "";
-            document.getElementById('alunoVencimento').value = "";
-            document.getElementById('modalAddAluno').style.display = 'flex';
-        }
-
-        function salvarAluno() {
-            let n = document.getElementById('alunoNome').value.trim();
-            let t = document.getElementById('alunoTel').value.replace(/\D/g, ""); 
-            let v = document.getElementById('alunoVencimento').value;
-            
-            if(!n || !t || !v) return alert("Preencha todos os campos!");
-            
-            let btn = document.querySelector('#modalAddAluno .primary-btn');
-            let txtOriginal = btn.innerText;
-            btn.innerText = "Salvando..."; btn.disabled = true;
-
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "salvar_mensalidade", nome: n, telefone: t, vencimento: v }) 
-            }).then(r=>r.json()).then(data => {
-                if(data.sucesso) {
-                    document.getElementById('modalAddAluno').style.display = 'none';
-                    abrirControleMensalidades(); 
-                } else {
-                    alert("Erro do servidor: " + (data.erro || "Desconhecido"));
-                }
-                btn.innerText = txtOriginal; btn.disabled = false;
-            }).catch(e => { alert("Erro de conexão ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; });
-        }
-
-        function registrarPagamentoMensalidade(telefone) {
-            let hoje = new Date();
-            let mesAtual = hoje.getMonth() + 1;
-            let anoAtual = hoje.getFullYear();
-            let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`;
-
-            if(confirm(`Confirmar o pagamento da mensalidade referente a ${mesAnoString}?`)) {
-                document.getElementById('loadingMensalidades').style.display = 'block';
-                document.getElementById('tabelaMensalidades').style.display = 'none';
-                fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    body: JSON.stringify({ acao: "pagar_mensalidade", telefone: telefone, mesRef: mesAnoString }) 
-                }).then(r=>r.json()).then(data => {
-                    if(data.sucesso) abrirControleMensalidades();
-                    else alert("Erro ao registrar pagamento.");
-                }).catch(e => alert("Erro de Conexão."));
-            }
-        }
-
-        function excluirAlunoMensalidade(telefone, nome) {
-            if(confirm(`Deseja remover ${nome} da lista de mensalidades de Beach Tennis?`)) {
-                document.getElementById('loadingMensalidades').style.display = 'block';
-                document.getElementById('tabelaMensalidades').style.display = 'none';
-                fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    body: JSON.stringify({ acao: "excluir_mensalidade", telefone: telefone }) 
-                }).then(r=>r.json()).then(data => {
-                    if(data.sucesso) abrirControleMensalidades();
-                    else alert("Erro ao excluir aluno.");
-                }).catch(e => alert("Erro de Conexão."));
-            }
-        }
-
-        // --- NOVAS FUNÇÕES PARA O MODAL DE PREÇOS ---
-        function abrirModalPrecos() {
-            document.getElementById('modalPrecos').style.display = 'flex';
-            document.getElementById('inputPrecoDia').value = precoDiaGlobal;
-            document.getElementById('inputPrecoNoite').value = precoNoiteGlobal;
-        }
-
-        function salvarPrecos() {
-            let pDia = document.getElementById('inputPrecoDia').value;
-            let pNoite = document.getElementById('inputPrecoNoite').value;
-            
-            if(!pDia || !pNoite) return alert("Preencha os dois valores!");
-            
-            let btn = document.querySelector('#modalPrecos .primary-btn');
-            let txtOriginal = btn.innerText;
-            btn.innerText = "Salvando na Nuvem..."; btn.disabled = true;
-            
-            // Envia para o Google Apps Script
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                body: JSON.stringify({ acao: "salvar_precos", precoDia: pDia, precoNoite: pNoite }) 
-            })
-            .then(r => r.json())
-            .then(data => {
-                btn.innerText = txtOriginal; btn.disabled = false;
-                if(data.sucesso) {
-                    precoDiaGlobal = parseFloat(pDia);
-                    precoNoiteGlobal = parseFloat(pNoite);
-                    document.getElementById('modalPrecos').style.display = 'none';
-                    carregarAgenda(); // Atualiza a tela com os novos valores
-                    alert("Valores atualizados em todos os painéis!");
-                } else {
-                    alert("Erro ao salvar no servidor.");
-                }
-            }).catch(e => { 
-                alert("Erro de conexão."); 
-                btn.innerText = txtOriginal; btn.disabled = false;
-            });
-        }
-    </script>
+    <div id="loginOverlay" class="modal-bg">
+        <div class="login-box">
+            <img src="logo2.png" alt="Arena Vitale" class="logo-img" style="margin: 0 auto 10px auto;">
+            <input type="text" id="userInput" placeholder="Usuário Admin">
+            <input type="password" id="passInput" placeholder="Senha">
+            <button class="primary-btn" id="btnLogin" onclick="tentarLogin()">ACESSAR</button>
+        </div>
+    </div>
+
+    <div id="toastNotification" onclick="fecharToast()">🔔 <span>Nova Solicitação Pendente!</span></div>
+    <div id="printHeader">AGENDA DO DIA <span id="printDate"></span></div>
+
+    <div class="header">
+        <div class="top-row">
+            <img src="logo2.png" alt="Arena Vitale" class="logo-img">
+            <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px;">
+                <span id="nomeLogadoDisplay" style="color: var(--primary); font-weight: bold; font-size: 0.85rem;"></span>
+                <button class="tool-btn btn-logout" onclick="fazerLogout()">Sair 🚪</button>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <button class="tool-btn" id="btnGerirAdmins" onclick="abrirModalAdmins()" style="display:none; border-color:var(--primary); color:var(--primary);">🔐 Contas</button>
+            <button class="tool-btn" id="btnTravaAgenda" onclick="abrirModalCadeado()" style="border-color: #555;">...</button>
+            <button class="tool-btn btn-modo-fixo" id="btnToggleModo" onclick="alternarModoGradeFixa()">📌 Grade Fixa</button>
+            <button class="tool-btn" onclick="aplicarMoldeNaAgenda()" style="border-color: var(--success); color: var(--success);" title="Copia o Molde para a Agenda da Semana">🔄 Sincronizar Molde</button>
+            <button class="tool-btn" onclick="abrirEstatisticas()">📊 Dashboard</button>
+            <button class="tool-btn" onclick="abrirModalPromocao()">🏷️ Promoção</button>
+            <button class="tool-btn" onclick="abrirModalPrecos()" style="border-color: #ffaa00; color: #ffaa00;">💲 Valores</button>
+            
+            <!-- NOVO BOTÃO DE CUPONS -->
+            <button class="tool-btn" onclick="abrirModalCupons()" style="border-color: #ff4d4d; color: #ff4d4d;">🎟️ Cupons</button>
+            
+            <button class="tool-btn" onclick="abrirGerenciadorClientes()">👥 Clientes</button>
+            <button class="tool-btn" onclick="abrirControleMensalidades()" style="border-color: var(--success); color: var(--success);">🎓 Aulas / Mensalidade</button>
+            <button class="tool-btn" onclick="abrirGerenciarBlacklist()">📜 Lista Negra</button>
+            <button class="tool-btn" onclick="abrirModalSorteio()">🎁 Sorteio</button>
+            <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
+            <button class="tool-btn" onclick="alternarRanking()" style="border-color: var(--primary); color: var(--primary);">👁️ Ranking</button>
+            <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar</button>
+            <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
+            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">Ocupação: <span id="statOcupacao">0%</span></div>
+        <div class="stat-item">Faturamento do Dia: <span id="statFaturamento">R$ 0,00</span></div>
+    </div>
+
+    <div class="controls">
+        <button class="nav-btn" onclick="mudarDia(-1)">❮</button>
+        <div class="date-display" id="dateDisplay">...</div>
+        <button class="nav-btn" onclick="mudarDia(1)">❯</button>
+        <button class="nav-btn" id="btnRecarregar" onclick="carregarAgenda()" style="margin-left:10px;">↻</button>
+        <span id="autoRefreshStatus" style="font-size: 0.75rem; color: var(--success); margin-left: 10px;">Monitorando...</span>
+    </div>
+
+    <div class="grid-container">
+        <div class="column"><div class="col-header">🎾 Quadra Chicashoes</div><div id="listaQ1"></div></div>
+        <div class="column"><div class="col-header">🥐 Quadra Padaria do Helder</div><div id="listaQ2"></div></div>
+    </div>
+
+    <div id="modalGerenciarAdmins" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:500px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Gerenciar Administradores</h3>
+            <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                <input type="text" id="novoAdmUser" placeholder="Novo Usuário" style="flex:1; min-width: 120px;">
+                <input type="text" id="novoAdmPass" placeholder="Senha" style="flex:1; min-width: 120px;">
+            </div>
+            <button class="primary-btn" onclick="salvarNovoAdmin()">➕ Adicionar Admin</button>
+            <div class="interdicao-grid" id="listaAdminsConteudo" style="margin-top: 10px;"></div>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarAdmins').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalCadeado" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 400px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Controle da Agenda 🔒</h3>
+            <div style="margin-top: 10px; text-align: left;">
+                <label style="color:#aaa; font-size:0.8rem;">Status Geral:</label>
+                <select id="cadStatus"><option value="SIM">🔓 Liberada</option><option value="NAO">🔒 Bloqueada</option></select>
+            </div>
+            <div style="display: flex; flex-direction:column; gap: 8px; margin-top: 10px;">
+                <div style="text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Data de Início:</label><input type="date" id="cadInicio"></div>
+                <div style="text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Data Fim:</label><input type="date" id="cadFim"></div>
+            </div>
+            <button class="primary-btn" style="margin-top:15px;" onclick="salvarCadeado()">💾 SALVAR</button>
+            <button class="close-btn" onclick="document.getElementById('modalCadeado').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalPromocao" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 500px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Configurar Promoção 🏷️</h3>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap:wrap;"><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Início:</label><input type="date" id="promoInicio"></div><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Fim:</label><input type="date" id="promoFim"></div></div>
+            <div style="display: flex; gap: 10px; margin-top: 5px; flex-wrap:wrap;"><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Valor (R$):</label><input type="number" id="promoValor"></div><div style="flex: 1; min-width:100px; text-align: left;"><label style="font-size: 0.75rem; color: #aaa;">Limite Pessoas:</label><input type="number" id="promoLimite" placeholder="Ilimitado"></div></div>
+            <div id="promoUsosDisplay" style="text-align: left; margin-top: 5px; font-size: 0.8rem; color: var(--success); display: none; background: #1a1a1a; padding: 8px; border-radius: 4px;">✅ Usada <span id="promoUsosCount"></span> vezes.<br><div style="color: #aaa; font-weight: normal; font-size: 0.75rem; word-break: break-all; margin-top:3px;" id="promoListaTelefones"></div></div>
+            <div style="text-align: left; margin-top: 10px;"><label style="font-size: 0.75rem; color: #aaa;">Horários:</label><div class="interdicao-grid" id="promoHorariosGrid" style="max-height: 120px;"></div></div>
+            <button class="primary-btn" onclick="salvarPromocao()">💾 SALVAR</button>
+            <button class="close-btn" onclick="document.getElementById('modalPromocao').style.display='none'">Fechar</button>
+        </div>
+    </div>
+    
+    <div id="modalPrecos" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width: 350px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Ajustar Valores 💲</h3>
+            <div style="text-align: left; margin-top: 15px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Valor Dia (5h às 18h):</label>
+                <input type="number" id="inputPrecoDia" value="35">
+            </div>
+            <div style="text-align: left; margin-top: 10px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Valor Noite (19h às 22h):</label>
+                <input type="number" id="inputPrecoNoite" value="40">
+            </div>
+            <button class="primary-btn" style="margin-top:15px;" onclick="salvarPrecos()">💾 SALVAR VALORES</button>
+            <button class="close-btn" onclick="document.getElementById('modalPrecos').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL DE CUPONS -->
+    <div id="modalCupons" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width:400px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Gerenciar Cupons 🎟️</h3>
+            <p style="font-size:0.75rem; color:#aaa; margin-top:5px;">Crie cupons para os clientes terem descontos (R$).</p>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input type="text" id="novoCupomNome" placeholder="Nome (Ex: VIP10)" style="flex:2; text-transform: uppercase;">
+                <input type="number" id="novoCupomValor" placeholder="Desconto (R$)" style="flex:1;">
+            </div>
+            <button class="primary-btn" onclick="salvarCupom()">➕ CRIAR CUPOM</button>
+            <div id="loadingCupons" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div>
+            <div class="interdicao-grid" id="listaCuponsConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px; max-height:200px;"></div>
+            <button class="close-btn" onclick="document.getElementById('modalCupons').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalMensalidades" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="color:var(--primary); font-size:1.2rem; margin:0;">Controle de Mensalidades 🎾</h3>
+                <button class="tool-btn" style="background:var(--success); color:black;" onclick="abrirModalAddAluno()">➕ Novo Aluno</button>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                <input type="text" id="pesquisaMensalidade" placeholder="🔍 Buscar aluno pelo nome ou telefone..." style="flex: 1; margin:0;" oninput="renderizarTabelaMensalidades()">
+            </div>
+            <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
+                <div id="loadingMensalidades" style="color:var(--primary); font-size:0.85rem;">Carregando alunos...</div>
+                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaMensalidades">
+                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Aluno</th><th style="padding: 6px;">Vencimento</th><th style="padding: 6px; text-align:center;">Status</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
+                    <tbody id="listaMensalidadesBody"></tbody>
+                </table>
+            </div>
+            <button class="close-btn" onclick="document.getElementById('modalMensalidades').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalAddAluno" class="modal-bg" style="display:none; z-index: 4000;">
+        <div class="modal-box" style="max-width: 400px;">
+            <h3 style="color:var(--primary); font-size:1.1rem;">Dados do Aluno (Beach Tennis)</h3>
+            <input type="text" id="alunoNome" placeholder="Nome do Aluno">
+            <input type="tel" id="alunoTel" placeholder="Telefone (Apenas números)">
+            <div style="text-align: left; margin-top:5px;">
+                <label style="font-size: 0.75rem; color: #aaa;">Dia do Vencimento:</label>
+                <input type="number" id="alunoVencimento" min="1" max="31" placeholder="Ex: 10">
+            </div>
+            <button class="primary-btn" onclick="salvarAluno()">💾 SALVAR ALUNO</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddAluno').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+    
+    <div id="modalGerenciarClientes" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 900px; width: 95%;">
+            <h3 style="color:var(--primary); font-size:1.2rem;">Gestão de Clientes</h3>
+            <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="pesquisaCliente" placeholder="🔍 Buscar nome ou telefone..." style="flex: 1; min-width: 150px; margin:0;" oninput="renderizarTabelaClientes()">
+                <input type="number" id="filtroDias" placeholder="Inativo + dias" style="width: 110px; margin:0;">
+                <button class="tool-btn" style="background:var(--primary); color:black; padding:8px;" onclick="renderizarTabelaClientes()">Filtrar</button>
+            </div>
+            <div style="max-height: 350px; overflow-y: auto; background: #111; padding: 8px; border-radius: 5px;">
+                <div id="loadingClientes" style="color:var(--primary); font-size:0.85rem;">Carregando dados...</div>
+                <table style="width: 100%; border-collapse: collapse; color: white; text-align: left; display: none; font-size:0.85rem;" id="tabelaClientes">
+                    <thead><tr style="border-bottom: 2px solid var(--primary); color:var(--primary);"><th style="padding: 6px;">Nome & Contato</th><th style="padding: 6px;">Último Jogo</th><th style="padding: 6px; text-align:center;">Raquetes</th><th style="padding: 6px; text-align:center;">Ações</th></tr></thead>
+                    <tbody id="listaClientesBody"></tbody>
+                </table>
+            </div>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarClientes').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalEstatisticas" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width: 800px; width: 95%;">
+            <h3 style="color:var(--primary); font-size: 1.5rem; margin-bottom: 5px;">Painel de Análise 📊</h3>
+            <div id="statsContent"><p style="color: var(--primary); font-size:0.85rem;">Processando dados...</p></div>
+            <button class="close-btn" style="margin-top: 15px;" onclick="fecharDashboard()">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalManual" class="modal-bg" style="display:none;">
+        <div class="modal-box">
+            <h3 style="color:var(--primary); font-size:1.1rem;" id="tituloModalAgenda">Agendamento</h3><p id="modalInfo" style="margin:8px 0; color:#aaa; font-size:0.8rem;"></p>
+            <input type="text" id="manualNome" placeholder="Nome do Jogador / Turma">
+            <div class="checkbox-wrapper" id="divMensalista"><input type="checkbox" id="checkMensalista" style="width:auto; margin:0;"><label>Mensalista (M)</label></div>
+            <button class="primary-btn" onclick="salvarManual()">SALVAR</button><button class="close-btn" onclick="document.getElementById('modalManual').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="modalAddBlacklist" class="modal-bg" style="display:none;">
+        <div class="modal-box">
+            <h3 style="color:var(--danger); font-size:1.1rem;">Bloquear Cliente</h3>
+            <input type="text" id="blNome" placeholder="Nome">
+            <input type="tel" id="blTel" placeholder="Telefone">
+            <button class="primary-btn" style="background:var(--danger); color:white;" onclick="adicionarBloqueio()">BLOQUEAR</button>
+            <button class="close-btn" onclick="document.getElementById('modalAddBlacklist').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalGerenciarBlacklist" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--danger); font-size:1.1rem; margin:0;">Lista Negra</h3>
+                <button class="tool-btn" style="border-color:var(--danger); color:var(--danger);" onclick="abrirModalAddBloqueio()">➕ Bloquear</button>
+            </div>
+            <div id="loadingBlacklist" style="margin: 10px 0; color: var(--primary); display: none; font-size:0.85rem;">Carregando...</div>
+            <div class="interdicao-grid" id="listaBlacklistConteudo" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+            <button class="close-btn" onclick="document.getElementById('modalGerenciarBlacklist').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modalInterdicao" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="max-width:450px;"><h3 style="color:var(--danger); font-size:1.1rem;">Interditar Horários</h3><div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;"><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=true)" style="padding:4px 8px; font-size:0.8rem;">Marcar Todos</button><button onclick="document.querySelectorAll('.chk-interdicao').forEach(c=>c.checked=false)" style="padding:4px 8px; font-size:0.8rem;">Desmarcar Todos</button></div><div class="interdicao-grid" id="listaInterdicao"></div><button class="primary-btn" style="background:var(--danger); color:white;" onclick="confirmarInterdicao()">⛔ INTERDITAR</button><button class="close-btn" onclick="document.getElementById('modalInterdicao').style.display='none'">Cancelar</button></div>
+    </div>
+
+    <div id="modalSorteio" class="modal-bg" style="display:none;"><div class="modal-box"><h3 style="color:var(--primary); font-size:1.2rem;">Sorteio 🎲</h3><div id="displaySorteio" style="font-size:1.3rem; font-weight:bold; color:var(--primary); margin:15px 0;">❓</div><button id="btnSortear" class="primary-btn" onclick="realizarSorteio()">SORTEAR</button><button class="close-btn" onclick="document.getElementById('modalSorteio').style.display='none'">Fechar</button></div></div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4Dj4kUKuY9Ji7FP-q5dMZLYESHW1XDW7jTCvnM9xl6RnYi8Z6aISv31ytR3klMCCa/exec"; 
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
+
+        let dataAtual = new Date(); 
+        const horas = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; 
+        const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+        let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
+        let chartAcessosInstancia = null; let dadosAcessosGlobais = [];
+        let promocaoAtual = null;
+        let listaMensalidades = [];
+        
+        let precoDiaGlobal = 35; 
+        let precoNoiteGlobal = 40;
+
+        window.onload = function() {
+            let user = localStorage.getItem('adminUser');
+            if(user) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('nomeLogadoDisplay').innerText = "👤 " + user;
+                if(localStorage.getItem('adminMaster') === 'true') document.getElementById('btnGerirAdmins').style.display = 'flex';
+                carregarConfigAdmin(); 
+                
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
+                    if(d.sucesso && d.promo) promocaoAtual = d.promo;
+                    fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_precos" }) })
+                    .then(r2 => r2.json()).then(d2 => {
+                        if(d2.sucesso) { precoDiaGlobal = parseFloat(d2.precoDia); precoNoiteGlobal = parseFloat(d2.precoNoite); }
+                        carregarAgenda(); 
+                    }).catch(() => carregarAgenda());
+                }).catch(()=>carregarAgenda());
+                
+                setInterval(() => { if(!modoGradeFixa) carregarAgenda(true); }, 60000); 
+            }
+        };
+
+        function tentarLogin() {
+            let u = document.getElementById('userInput').value.trim();
+            let p = document.getElementById('passInput').value.trim();
+            if(!u || !p) return alert("Preencha usuário e senha!");
+            let btn = document.getElementById('btnLogin'); btn.innerText = "Aguarde...";
+            fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "login_admin", usuario: u, senha: p }) })
+            .then(r=>r.json()).then(data => {
+                if(data.sucesso) { localStorage.setItem('adminUser', u); localStorage.setItem('adminMaster', data.mestre); location.reload(); } 
+                else { alert(data.erro); btn.innerText = "ACESSAR"; }
+            }).catch(e => { alert("Erro de conexão."); btn.innerText = "ACESSAR"; });
+        }
+
+        function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
+
+        function alternarRanking() {
+            if(confirm("Tem certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "toggle_ranking" }) })
+                .then(r => r.json()).then(data => {
+                    if(data.sucesso) { if(data.statusAtual === "SIM") { alert("✅ O Ranking agora está VISÍVEL para os clientes."); } else { alert("🚫 O Ranking agora está OCULTO no site."); } }
+                }).catch(e => alert("Erro de conexão."));
+            }
+        }
+
+        function aplicarMoldeNaAgenda() {
+            if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsso vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem certeza que deseja aplicar o molde agora?")) {
+                document.getElementById('btnRecarregar').innerText = "Limpando...";
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "executar_limpeza" }) })
+                .then(r => r.json()).then(data => {
+                    if(data.sucesso) { alert("Sucesso! Grade Fixa copiada para a agenda da semana."); location.reload(); }
+                    else { alert("Erro: " + data.erro); document.getElementById('btnRecarregar').innerText = "↻"; }
+                }).catch(e => { alert("Erro de conexão."); document.getElementById('btnRecarregar').innerText = "↻"; });
+            }
+        }
+
+        function abrirModalAdmins() {
+            document.getElementById('modalGerenciarAdmins').style.display = 'flex';
+            document.getElementById('listaAdminsConteudo').innerHTML = "Carregando...";
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_admins" }) }).then(r=>r.json()).then(d => {
+                if(d.sucesso) {
+                    let html = "";
+                    d.lista.forEach(a => { html += `<div class="interdicao-item" style="justify-content:space-between"><span>${a.usuario}</span><button class="btn-icon btn-del" onclick="excluirAdm('${a.usuario}')">🗑️</button></div>`; });
+                    document.getElementById('listaAdminsConteudo').innerHTML = html || "<p>Nenhum admin secundário cadastrado.</p>";
+                }
+            });
+        }
+
+        function salvarNovoAdmin() {
+            let u = document.getElementById('novoAdmUser').value.trim(); let p = document.getElementById('novoAdmPass').value.trim();
+            if(!u || !p) return alert("Preencha usuário e senha.");
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_admin", usuario: u, senha: p }) }).then(r=>r.json()).then(d=>{ if(d.sucesso) { document.getElementById('novoAdmUser').value=''; document.getElementById('novoAdmPass').value=''; abrirModalAdmins(); } });
+        }
+
+        function excluirAdm(u) { if(confirm("Excluir o admin " + u + "?")) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_admin", usuario: u }) }).then(() => abrirModalAdmins()); } }
+
+        function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); totalPendentesConhecidos = 0; document.title = "Painel Admin | Arena Vitale"; if(modoGradeFixa) atualizarTelaGradeFixa(); else carregarAgenda(); }
+        function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
+
+        function carregarConfigAdmin() { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.dataInicio, data.dataFim); }); }
+        function atualizarBotoesConfig(liberada, dIni, dFim) {
+            let btnT = document.getElementById('btnTravaAgenda');
+            if (liberada) { let txt = "🔓 Liberada"; if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; } btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
+            } else { btnT.innerHTML = "🔒 Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
+        }
+
+        function abrirModalCadeado() { document.getElementById('modalCadeado').style.display = 'flex'; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } }); }
+        function salvarCadeado() {
+            document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_trava_agenda", status: document.getElementById('cadStatus').value, inicio: document.getElementById('cadInicio').value, fim: document.getElementById('cadFim').value }) }).then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } });
+        }
+
+        function abrirModalPromocao() {
+            document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
+            horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-promo" value="${h}"> <label>${h}:00h</label></div>`; }); document.getElementById('promoHorariosGrid').innerHTML = html;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r => r.json()).then(data => {
+                if(data.sucesso && data.promo) {
+                    document.getElementById('promoInicio').value = data.promo.inicio; document.getElementById('promoFim').value = data.promo.fim; document.getElementById('promoValor').value = data.promo.valor; document.getElementById('promoLimite').value = data.promo.limite || "";
+                    if (data.promo.limite) { document.getElementById('promoUsosDisplay').style.display = 'block'; document.getElementById('promoUsosCount').innerText = `${data.promo.usos} de ${data.promo.limite}`; if(data.promo.telefones) { document.getElementById('promoListaTelefones').innerText = "Quem usou: " + data.promo.telefones.slice(0, -1).replace(/,/g, ', '); } else { document.getElementById('promoListaTelefones').innerText = "Nenhum uso registrado."; } } else { document.getElementById('promoUsosDisplay').style.display = 'none'; }
+                    let hrs = data.promo.horarios.toString().split(','); document.querySelectorAll('.chk-promo').forEach(chk => { if(hrs.includes(chk.value)) chk.checked = true; });
+                }
+            });
+        }
+        function salvarPromocao() {
+            let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value));
+            if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } });
+        }
+
+        function abrirGerenciadorClientes() {
+            document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
+            if(clientesCadastrados.length === 0) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
+            } else { renderizarTabelaClientes(); }
+        }
+
+        function parseDataBR(dataStr) { 
+            if (!dataStr) return null; let str = dataStr.toString().trim();
+            if (str.includes('T') && str.includes('-')) { let d = new Date(str); if (!isNaN(d.getTime())) return d; }
+            let partesTempo = str.split(' '); let soData = partesTempo[0].replace(/,/g, '').trim(); let partes = soData.split('/'); 
+            if(partes.length === 3) { return new Date(partes[2], partes[1] - 1, partes[0]); }
+            let fallback = new Date(str); return isNaN(fallback.getTime()) ? null : fallback;
+        }
+
+        function renderizarTabelaClientes() {
+            document.getElementById('loadingClientes').style.display = 'none'; document.getElementById('tabelaClientes').style.display = 'table'; 
+            const tbody = document.getElementById('listaClientesBody'); tbody.innerHTML = '';
+            let diasFiltro = parseInt(document.getElementById('filtroDias').value); let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); 
+            let hoje = new Date(); hoje.setHours(0,0,0,0); let clientesLista = [];
+            
+            for(let i = 0; i < clientesCadastrados.length; i++) { 
+                let clienteData = clientesCadastrados[i]; let nome = clienteData.nome || ""; let telefone = clienteData.telefone || ""; let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; let pontos = parseInt(clienteData.pontos) || 0;     
+                if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
+                let dataUltimo = parseDataBR(ultimoAgendamentoStr);
+                if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { let dataTemp = new Date(dataUltimo); dataTemp.setHours(0,0,0,0); let diffTime = hoje.getTime() - dataTemp.getTime(); let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24)); if (diasInativo <= diasFiltro) continue; }
+                clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
+            }
+            clientesLista.sort((a, b) => { if (!a.dataUltimo && b.dataUltimo) return -1; if (a.dataUltimo && !b.dataUltimo) return 1; if (!a.dataUltimo && !b.dataUltimo) return 0; return a.dataUltimo.getTime() - b.dataUltimo.getTime(); });
+            clientesLista.forEach(cliente => {
+                let displayData = "Nunca";
+                if (cliente.ultimoAgendamentoStr && cliente.ultimoAgendamentoStr !== "Nunca") {
+                    let strD = cliente.ultimoAgendamentoStr.toString();
+                    if(strD.includes('T')) { let dO = new Date(strD); if(!isNaN(dO.getTime())) { let d = String(dO.getDate()).padStart(2, '0'); let m = String(dO.getMonth() + 1).padStart(2, '0'); let a = dO.getFullYear(); let h = String(dO.getHours()).padStart(2, '0'); let mn = String(dO.getMinutes()).padStart(2, '0'); displayData = `${d}/${m}/${a} às ${h}:${mn}`; } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); } } else { displayData = strD.replace('.000Z', ''); }
+                }
+                let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`; let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`; let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
+                let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
+                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; tbody.appendChild(tr);
+            });
+            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
+        }
+
+        function excluirCliente(telefone, nome) {
+            if(confirm(`⚠️ ATENÇÃO: Deseja excluir o cliente ${nome} permanentemente?`)) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
+                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c.telefone != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
+                });
+            }
+        }
+
+        function salvarPontosAdmin(event, telefone) {
+            let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value); if(isNaN(novosPontos)) return alert("Valor inválido.");
+            let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, pontos: novosPontos }) }).then(r => r.json()).then(data => {
+                if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c.telefone == telefone); if(cliente) cliente.pontos = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
+            }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
+        }
+
+        function abrirEstatisticas() {
+            document.getElementById('modalEstatisticas').style.display = 'flex'; document.getElementById('statsContent').innerHTML = '<p style="color:var(--primary); margin: 20px 0;">Analisando os dados do banco...</p>';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_estatisticas" }) }).then(r => r.json()).then(data => {
+                if(data.sucesso) {
+                    let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
+                    let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
+                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').reverse().map(v => { let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : ""; let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : ""; return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`; }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
+                    let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 ? s.novosClientesHoje.reverse().map(c => { let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : ""; return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`; }).join('') : "<div style='padding:5px 0;'>Nenhum novo cadastro hoje.</div>";
+                    let qtdNovosHoje = s.novosClientesHoje ? s.novosClientesHoje.length : 0;
+                    let html = `<div class="dash-grid"><div class="dash-card"><h4>Visitas Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div><button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--primary); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Quem Acessou</button><div id="listaVisitantes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlVisitantes}</div></div><div class="dash-card"><h4>Clientes Registrados</h4><div class="value">👥 ${s.totalClientes}</div><div style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">+${qtdNovosHoje} hoje</div><button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--success); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Cadastros Hoje</button><div id="listaNovosClientes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturamento da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.2rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.1rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div></div>`;
+                    html += `<div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 6px; border: 1px solid var(--primary);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h4 style="color:#aaa; font-size:0.8rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4><select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:4px 8px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;"><option value="diario">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select></div><canvas id="graficoAcessos" height="120"></canvas></div>`;
+                    document.getElementById('statsContent').innerHTML = html; setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
+                } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas do Banco de Dados.</p>'; }
+            }).catch(e => { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro na conexão com o Google.</p>'; });
+        }
+
+        function atualizarGraficoAcessos() {
+            let tipo = document.getElementById('tipoGraficoAcessos').value; let map = {};
+            dadosAcessosGlobais.forEach(item => {
+                if(!item.data) return; let pts = item.data.toString().split('/'); if(pts.length !== 3) return; let d = new Date(pts[2], pts[1]-1, pts[0]); let key = "";
+                if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } else if (tipo === 'semanal') { let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7)); var weekNo = Math.ceil(( ( (dCopy - new Date(Date.UTC(dCopy.getUTCFullYear(),0,1))) / 86400000) + 1)/7); key = `Sem. ${weekNo}`; } else if (tipo === 'mensal') { let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']; key = `${meses[d.getMonth()]} / ${d.getFullYear()}`; }
+                if(!map[key]) map[key] = 0; map[key] += parseInt(item.qtd) || 0;
+            });
+            let labels = Object.keys(map); let values = Object.values(map);
+            if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
+            if(chartAcessosInstancia) chartAcessosInstancia.destroy(); const ctx = document.getElementById('graficoAcessos').getContext('2d');
+            chartAcessosInstancia = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Visitas', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointRadius: 4, fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, beginAtZero: true } } } });
+        }
+        function fecharDashboard() { document.getElementById('modalEstatisticas').style.display='none'; }
+
+        function alternarModoGradeFixa() {
+            modoGradeFixa = !modoGradeFixa; const btn = document.getElementById('btnToggleModo');
+            if(modoGradeFixa) { btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)"; document.getElementById('listaQ1').innerHTML = "Carregando molde..."; document.getElementById('listaQ2').innerHTML = "Carregando molde..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro."); alternarModoGradeFixa(); } });
+            } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "Monitorando..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
+        }
+
+        function atualizarTelaGradeFixa() { const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerHTML = `<span style='color:var(--primary)'>MOLDE FIXO: ${diasSemana[info.index]}</span>`; document.getElementById('printDate').innerText = "MOLDE: " + diasSemana[info.index]; dadosAgenda = []; cachedPadrao.forEach((row, idx) => { if(idx === 0) return; let h = parseInt(row[0]); if(!isNaN(h)) { let colQ1 = 1 + info.index; let colQ2 = 9 + info.index; dadosAgenda.push({ hora: h, q1: row[colQ1]?row[colQ1].toString().trim():"", q2: row[colQ2]?row[colQ2].toString().trim():"" }); } }); renderizarGridFixa(); }
+
+        function renderizarGridFixa() { let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotFixoHTML(h, 1, slot.q1); hQ2 += criarSlotFixoHTML(h, 2, slot.q2); }); document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2; }
+
+        function criarSlotFixoHTML(h, q, n) { let ocupado = n.length > 0; let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let botoes = ocupado ? `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${safeN}')" title="Remover da Grade Fixa">🗑️</button>` : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`; let classe = ocupado ? "fixo-booked" : ""; return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`; }
+
+        function apagarFixo(h, q, n) { if(confirm(`Remover do Molde Permanente?`)) { let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa(); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); }); } }
+
+        async function carregarAgenda(isAuto = false) { if(modoGradeFixa) return; const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerText = info.texto; document.getElementById('printDate').innerText = info.texto; if(!isAuto) document.getElementById('btnRecarregar').innerText = "↻"; try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); } }
+
+        function processarCSV(csv, diaIndex) {
+            const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0; faturamentoDia = 0;
+            let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = [];
+            if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
+                let dataEscolhida = new Date(dataAtual); dataEscolhida.setHours(0,0,0,0); let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]); let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
+                if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) { promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0; horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : []; }
+            }
+
+            rows.forEach((row, idx) => {
+                if(idx === 0) return; let h = parseInt(row[0]);
+                if(!isNaN(h)) {
+                    let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; 
+                    let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
+                    let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 5 && h <= 18 ? precoDiaGlobal : precoNoiteGlobal);
+
+                    if(n1) { ocupados++; if(n1.includes("⏳")) pendentesAtuais++; if(!n1.includes("⛔")) faturamentoDia += vHora; }
+                    if(n2) { ocupados++; if(n2.includes("⏳")) pendentesAtuais++; if(!n2.includes("⛔")) faturamentoDia += vHora; }
+                    dadosAgenda.push({ hora: h, q1: n1, q2: n2 });
+                }
+            });
+            
+            let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100); 
+            document.getElementById('statOcupacao').innerText = porc + "%"; document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); 
+            renderizarGrid();
+            if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos); 
+            if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; 
+            totalPendentesConhecidos = pendentesAtuais; 
+        }
+
+        function dispararNotificacao(novos) { alertaSom.play().catch(e => console.log("Áudio bloqueado.")); document.title = `(${novos}) NOVO JOGO - Arena Vitale`; const toast = document.getElementById('toastNotification'); toast.querySelector('span').innerText = novos === 1 ? "Nova Solicitação Pendente!" : `${novos} Novas Solicitações Pendentes!`; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 6000); }
+        function fecharToast() { document.getElementById('toastNotification').classList.remove('show'); }
+
+        function renderizarGrid() { let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2); }); document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2; }
+
+        function criarSlotHTML(h, q, n) {
+            n = n ? n.toString() : ""; let ocupado = n.length > 0; let parts = n.split('||'); let nomeReal = parts[0].trim(); let adminTag = parts.length > 1 ? `<br><small style="color:#555; font-size:0.7rem;">👤 Add por: ${parts[1].trim()}</small>` : ""; let isPendente = nomeReal.includes("⏳"); let txtN = nomeReal.replace('⏳', '').trim(); let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let botoes = "";
+            if(ocupado) { if(isPendente) { botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${safeN}')">🆗</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`; } else { let isPago = nomeReal.includes('✅'); botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-pay ${isPago?'paid':''}" onclick="togglePago(${h}, ${q}, '${safeN}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`; } } else { botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`; }
+            let classe = isPendente ? "pending" : (ocupado ? "booked" : ""); return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${nomeReal} ${adminTag}</div><div class="actions">${botoes}</div></div>`;
+        }
+
+        function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; let ds = diasSemana[formatarData(dataAtual).index]; if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } else { document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento"; document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'flex'; document.getElementById('checkMensalista').checked = false; } document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
+        function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
+        
+        function salvarManual() {
+            let n = document.getElementById('manualNome').value; if(!n) return alert("Indique o Nome.");
+            if(!modoGradeFixa && document.getElementById('checkMensalista').checked) n += " (M)";
+            if(!modoGradeFixa) { let logado = localStorage.getItem('adminUser') || "Admin"; n += " || " + logado; }
+            fecharModal();
+            if(modoGradeFixa) { let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora); if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; } renderizarGridFixa(); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); }); } else enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
+        }
+        
+        function cancelar(h, q, n) { if(confirm(`Apagar o horário?`)) enviarComando("cancelar", h, q, ""); }
+        function enviarComando(a, h, q, n) { let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; } if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); renderizarGrid(); fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) }); }
+
+        function abrirWhatsApp(n, h) { let num = prompt(`Número do Cliente:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
+        function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
+        function confirmarAgendamento(h, q, n) { if(confirm(`Confirmar agendamento?`)) { let parts = n.split('||'); let base = parts[0].replace("⏳", "").trim() + " (Confirmado)"; let finalStr = parts.length > 1 ? base + " || " + parts[1].trim() : base; enviarComando("agendar", h, q, finalStr); if(totalPendentesConhecidos > 0) totalPendentesConhecidos--; fecharToast(); } }
+
+        function copiarAgenda() {
+            let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            t += `\n*Quadra Padaria do Helder:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q2 ? (s.q2.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
+            navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
+        }
+
+        function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
+        function abrirModalAddBloqueioPreenchido(nome, tel) { document.getElementById('modalGerenciarClientes').style.display = 'none'; document.getElementById('blNome').value = nome; document.getElementById('blTel').value = tel; abrirModalAddBloqueio(); }
+        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { let btn = document.querySelector('#modalAddBlacklist .primary-btn'); let txt = btn.innerText; btn.innerText = "Aguarde..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }).then(() => { btn.innerText = txt; btn.disabled = false; document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; alert(`Cliente ${n} adicionado à Lista Negra com sucesso!`); }); } }
+
+        function abrirGerenciarBlacklist() {
+            document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_blacklist" }) }).then(r => r.json()).then(data => {
+                document.getElementById('loadingBlacklist').style.display = 'none'; let html = "";
+                if(data.lista && data.lista.length > 0) { let isHeader = true; data.lista.forEach((r, idx) => { if(isHeader && idx === 0 && (r[0] === 'Nome' || r[0] === 'Nome do Cliente')) return; let nome = r[0]; let tel = r[1] || "Sem telefone"; html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;"><span style="font-size: 0.95rem;"><b>${nome}</b> <br><small style="color:#aaa">${tel}</small></span><button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="removerDaBlacklist('${nome}')">🗑️</button></div>`; }); }
+                if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
+            }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
+        }
+        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
+
+        function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
+        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione pelo menos um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { let btn = document.querySelector('#modalInterdicao .primary-btn'); let txtOriginal = btn.innerText; btn.innerText = "Bloqueando..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }).then(() => { document.getElementById('modalInterdicao').style.display = 'none'; btn.innerText = txtOriginal; btn.disabled = false; document.getElementById('btnRecarregar').innerText = "Atualizando..."; setTimeout(carregarAgenda, 2000); }).catch(e => { document.getElementById('modalInterdicao').style.display = 'none'; btn.innerText = txtOriginal; btn.disabled = false; setTimeout(carregarAgenda, 2000); }); } }
+
+        function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
+        function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
+
+        function abrirControleMensalidades() {
+            document.getElementById('modalMensalidades').style.display = 'flex'; document.getElementById('loadingMensalidades').style.display = 'block'; document.getElementById('tabelaMensalidades').style.display = 'none';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_mensalidades" }) }).then(r => r.json()).then(data => { if(data.sucesso) { listaMensalidades = data.lista || []; renderizarTabelaMensalidades(); } else { document.getElementById('loadingMensalidades').innerText = "Erro ao carregar dados. Verifique o Motor."; } }).catch(e => { document.getElementById('loadingMensalidades').innerText = "Erro de conexão com a planilha."; });
+        }
+
+        function renderizarTabelaMensalidades() {
+            document.getElementById('loadingMensalidades').style.display = 'none'; document.getElementById('tabelaMensalidades').style.display = 'table'; const tbody = document.getElementById('listaMensalidadesBody'); tbody.innerHTML = '';
+            let termo = document.getElementById('pesquisaMensalidade').value.toLowerCase().trim(); let hoje = new Date(); let mesAtual = hoje.getMonth() + 1; let anoAtual = hoje.getFullYear(); let diaAtual = hoje.getDate(); let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`;
+            listaMensalidades.forEach(aluno => {
+                if (termo && !aluno.nome.toLowerCase().includes(termo) && !aluno.telefone.includes(termo)) return;
+                let statusHTML = ""; let estaEmDia = false;
+                if(aluno.ultimoMesPago === mesAnoString) { estaEmDia = true; statusHTML = `<span style="color:var(--success); font-weight:bold;">✅ Pago</span>`; } else { if(diaAtual > parseInt(aluno.vencimento)) { statusHTML = `<span style="color:var(--danger); font-weight:bold;">❌ Atrasado</span>`; } else { statusHTML = `<span style="color:var(--pending); font-weight:bold;">⏳ Pendente</span>`; } }
+                let btnPagar = estaEmDia ? `` : `<button class="tool-btn" style="background:var(--success); color:black; padding:4px 8px; font-size:0.75rem; margin-right: 5px;" onclick="registrarPagamentoMensalidade('${aluno.telefone}')">💲 Baixa</button>`;
+                let btnWa = `<button class="btn-icon btn-wa" style="margin-right: 5px;" onclick="window.open('https://wa.me/55${aluno.telefone}?text=${encodeURIComponent(`Olá ${aluno.nome}, tudo bem? Passando para falar sobre suas aulas de Beach Tennis!`)}', '_blank')">📞</button>`; let btnDel = `<button class="btn-icon btn-del" onclick="excluirAlunoMensalidade('${aluno.telefone}', '${aluno.nome}')">🗑️</button>`;
+                let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333"; tr.innerHTML = `<td style="padding: 6px 4px;"><b>${aluno.nome}</b><br><small style="color:#aaa">${aluno.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">Dia ${aluno.vencimento}</td><td style="padding: 6px 4px; text-align:center;">${statusHTML}</td><td style="padding: 6px 4px; text-align:center; white-space: nowrap;"><div style="display:flex; justify-content:center; align-items:center;">${btnWa} ${btnPagar} ${btnDel}</div></td>`; tbody.appendChild(tr);
+            });
+            if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum aluno encontrado.</td></tr>';
+        }
+
+        function abrirModalAddAluno() { document.getElementById('alunoNome').value = ""; document.getElementById('alunoTel').value = ""; document.getElementById('alunoVencimento').value = ""; document.getElementById('modalAddAluno').style.display = 'flex'; }
+        function salvarAluno() { let n = document.getElementById('alunoNome').value.trim(); let t = document.getElementById('alunoTel').value.replace(/\D/g, ""); let v = document.getElementById('alunoVencimento').value; if(!n || !t || !v) return alert("Preencha todos os campos!"); let btn = document.querySelector('#modalAddAluno .primary-btn'); let txtOriginal = btn.innerText; btn.innerText = "Salvando..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_mensalidade", nome: n, telefone: t, vencimento: v }) }).then(r=>r.json()).then(data => { if(data.sucesso) { document.getElementById('modalAddAluno').style.display = 'none'; abrirControleMensalidades(); } else { alert("Erro do servidor: " + (data.erro || "Desconhecido")); } btn.innerText = txtOriginal; btn.disabled = false; }).catch(e => { alert("Erro de conexão ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }); }
+        function registrarPagamentoMensalidade(telefone) { let hoje = new Date(); let mesAtual = hoje.getMonth() + 1; let anoAtual = hoje.getFullYear(); let mesAnoString = `${mesAtual.toString().padStart(2, '0')}/${anoAtual}`; if(confirm(`Confirmar o pagamento da mensalidade referente a ${mesAnoString}?`)) { document.getElementById('loadingMensalidades').style.display = 'block'; document.getElementById('tabelaMensalidades').style.display = 'none'; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "pagar_mensalidade", telefone: telefone, mesRef: mesAnoString }) }).then(r=>r.json()).then(data => { if(data.sucesso) abrirControleMensalidades(); else alert("Erro ao registrar pagamento."); }).catch(e => alert("Erro de Conexão.")); } }
+        function excluirAlunoMensalidade(telefone, nome) { if(confirm(`Deseja remover ${nome} da lista de mensalidades de Beach Tennis?`)) { document.getElementById('loadingMensalidades').style.display = 'block'; document.getElementById('tabelaMensalidades').style.display = 'none'; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_mensalidade", telefone: telefone }) }).then(r=>r.json()).then(data => { if(data.sucesso) abrirControleMensalidades(); else alert("Erro ao excluir aluno."); }).catch(e => alert("Erro de Conexão.")); } }
+
+        function abrirModalPrecos() { document.getElementById('modalPrecos').style.display = 'flex'; document.getElementById('inputPrecoDia').value = precoDiaGlobal; document.getElementById('inputPrecoNoite').value = precoNoiteGlobal; }
+        function salvarPrecos() { let pDia = document.getElementById('inputPrecoDia').value; let pNoite = document.getElementById('inputPrecoNoite').value; if(!pDia || !pNoite) return alert("Preencha os dois valores!"); let btn = document.querySelector('#modalPrecos .primary-btn'); let txtOriginal = btn.innerText; btn.innerText = "Salvando na Nuvem..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_precos", precoDia: pDia, precoNoite: pNoite }) }).then(r => r.json()).then(data => { btn.innerText = txtOriginal; btn.disabled = false; if(data.sucesso) { precoDiaGlobal = parseFloat(pDia); precoNoiteGlobal = parseFloat(pNoite); document.getElementById('modalPrecos').style.display = 'none'; carregarAgenda(); alert("Valores atualizados em todos os painéis!"); } else { alert("Erro ao salvar no servidor."); } }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; }); }
+
+        // --- SISTEMA DE CUPONS ---
+        function abrirModalCupons() {
+            document.getElementById('modalCupons').style.display = 'flex';
+            carregarCupons();
+        }
+        function carregarCupons() {
+            document.getElementById('loadingCupons').style.display = 'block';
+            document.getElementById('listaCuponsConteudo').innerHTML = '';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_cupons" }) })
+            .then(r=>r.json()).then(data => {
+                document.getElementById('loadingCupons').style.display = 'none';
+                let html = "";
+                if(data.sucesso && data.lista.length > 0) {
+                    data.lista.forEach(c => {
+                        html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;">
+                            <span style="font-size: 0.95rem; color: var(--primary);"><b>${c.nome}</b> <br><small style="color:#aaa">Desconto: R$ ${c.desconto},00</small></span>
+                            <button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="excluirCupom('${c.nome}')">🗑️</button>
+                        </div>`;
+                    });
+                } else { html = "<p style='color:#ccc;'>Nenhum cupom ativo.</p>"; }
+                document.getElementById('listaCuponsConteudo').innerHTML = html;
+            });
+        }
+        function salvarCupom() {
+            let nome = document.getElementById('novoCupomNome').value.toUpperCase().trim();
+            let valor = document.getElementById('novoCupomValor').value;
+            if(!nome || !valor) return alert("Preencha o nome e o valor de desconto!");
+            let btn = document.querySelector('#modalCupons .primary-btn'); btn.innerText = "Salvando..."; btn.disabled = true;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cupom", cupom: nome, desconto: valor }) })
+            .then(r=>r.json()).then(data=>{
+                btn.innerText = "➕ CRIAR CUPOM"; btn.disabled = false;
+                if(data.sucesso) { document.getElementById('novoCupomNome').value=''; document.getElementById('novoCupomValor').value=''; carregarCupons(); }
+            });
+        }
+        function excluirCupom(nome) {
+            if(confirm(`Excluir o cupom ${nome}?`)) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cupom", cupom: nome }) })
+                .then(()=>carregarCupons());
+            }
+        }
+    </script>
 </body>
 </html>
