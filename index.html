@@ -641,7 +641,6 @@
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
-        // FUNÇÃO ATUALIZADA PARA PREPARAR AGENDAMENTO E RESETAR CUPONS
         function prepararAgendamento() { 
             const h = parseInt(document.getElementById('selectHora').value); 
             const pag = document.getElementById('selectPagamento').value; 
@@ -689,7 +688,6 @@
             abrirModal(h, (h + Math.ceil(duracaoSelecionada)) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
         }
 
-        // NOVA FUNÇÃO: APLICAR CUPOM
         function aplicarCupom() {
             let cod = document.getElementById('inputCupom').value.trim().toUpperCase();
             if(!cod) return alert("Digite o código do cupom!");
@@ -727,7 +725,7 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // FUNÇÃO ATUALIZADA: ENVIA OS DADOS DO CUPOM NO WHATSAPP E REDIRECIONA
+        // FUNÇÃO ATUALIZADA: REDIRECIONAMENTO INSTANTÂNEO PARA O WHATSAPP
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
@@ -746,49 +744,53 @@
                 usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
                 localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                 
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) });
+                // Salva no background
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) }).catch(e => console.log(e));
             } else {
                 nomeFinal = usuarioLogado.nome;
                 telefoneFinal = usuarioLogado.phone;
             }
 
-            // ALTERAÇÃO: Usa o novo ID para não travar o botão do cupom
             const btn = document.getElementById('btnFinalizarAgendamento'); 
-            btn.innerText = "Aguarde..."; 
+            btn.innerText = "Redirecionando..."; 
             btn.disabled = true;
+
+            // Monta a mensagem na hora
+            let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
+            let mod = document.getElementById('selectModalidade').options[document.getElementById('selectModalidade').selectedIndex].text;
             
+            let msg = "*SOLICITAÇÃO DE RESERVA*\n";
+            msg += "👤 Nome: " + nomeFinal + "\n";
+            msg += "🏟️ Quadra: " + nomeQuadra + "\n";
+            msg += "🏆 Modalidade: " + mod + "\n";
+            msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
+            msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
+            
+            if (cupomAplicado) {
+                msg += "🎟️ Cupom Utilizado: " + cupomAplicado + " (- R$ " + valorDescontoCupom + ",00)\n";
+            }
+
+            msg += "💰 Valor Final: R$ " + tempValor + ",00\n";
+            msg += "💳 Pagamento: " + pag + "\n\n";
+            msg += "✅ *Termos de cancelamento aceitos.*\n\n";
+            msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
+
+            // Dispara as requisições em background sem esperar a resposta
             fetch(SCRIPT_URL, { 
                 method: "POST", 
                 body: JSON.stringify({ acao: "agendar", nome: nomeFinal, telefone: telefoneFinal, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
-            })
-            .then(res => res.text())
-            .then(txt => {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "adicionar_ponto", telefone: telefoneFinal }) });
-                
-                let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
-                let mod = document.getElementById('selectModalidade').options[document.getElementById('selectModalidade').selectedIndex].text;
-                
-                let msg = "*SOLICITAÇÃO DE RESERVA*\n";
-                msg += "👤 Nome: " + nomeFinal + "\n";
-                msg += "🏟️ Quadra: " + nomeQuadra + "\n";
-                msg += "🏆 Modalidade: " + mod + "\n";
-                msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
-                msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
-                
-                if (cupomAplicado) {
-                    msg += "🎟️ Cupom Utilizado: " + cupomAplicado + " (- R$ " + valorDescontoCupom + ",00)\n";
-                }
+            }).catch(e => console.log(e));
 
-                msg += "💰 Valor Final: R$ " + tempValor + ",00\n";
-                msg += "💳 Pagamento: " + pag + "\n\n";
-                msg += "✅ *Termos de cancelamento aceitos.*\n\n";
-                msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
-                
-                window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-                
-                setTimeout(() => { location.reload(); }, 1500);
-            })
-            .catch(e => { alert("Erro de conexão."); btn.disabled = false; btn.innerText = "Ir para WhatsApp"; });
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "adicionar_ponto", telefone: telefoneFinal }) 
+            }).catch(e => console.log(e));
+            
+            // Redireciona na mesma hora
+            window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+            
+            // Recarrega a tela depois de 2 segundos
+            setTimeout(() => { location.reload(); }, 2000);
         }
 
         function mudarPasso(passoDestino) {
