@@ -188,7 +188,6 @@
                 <li><a onclick="navegarPara('tela-fidelidade')" style="color: var(--primary);">Fidelidade ⭐</a></li>
                 <li><a onclick="navegarPara('tela-local')">Onde Estamos</a></li>
                 <li><a onclick="navegarPara('tela-parceiros')">Nossos Parceiros</a></li>
-                <!-- Menu dinâmico de Login/Sair gerado pelo JS -->
                 <li id="navAuthItem"></li>
             </ul>
         </div>
@@ -234,7 +233,6 @@
     <div id="tela-agendamento" class="secao-conteudo">
         <h2 class="section-title">Agendamento</h2>
         <div class="agenda-box">
-            <!-- Barra de Progresso Visual -->
             <div class="progresso-container">
                 <div class="ponto-progresso ativo" id="dot-1">1</div>
                 <div class="ponto-progresso" id="dot-2">2</div>
@@ -323,6 +321,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE CADASTRO COM CUPOM ADICIONADO -->
     <div id="modalCadastro" class="modal-overlay">
         <div class="modal-content">
             <h3>🎾 Confirmar Reserva</h3>
@@ -335,20 +334,31 @@
                 <input type="tel" id="cadTelefone" class="modal-input">
             </div>
             
-            <!-- Campo de Senha que só aparece para quem não está logado -->
             <div class="form-group" id="containerSenhaModal" style="display:none; margin-top: 10px;">
                 <label style="color: var(--primary);">Crie uma Senha (para acessos futuros):</label>
                 <input type="password" id="cadSenhaModal" class="modal-input" placeholder="Mínimo 4 caracteres">
             </div>
             
-            <div class="terms-box">
+            <!-- NOVO CAMPO DE CUPOM -->
+            <div class="form-group" style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px dashed var(--primary);">
+                <label style="color: var(--primary); font-size: 0.9rem;">Tem um Cupom de Desconto?</label>
+                <div style="display:flex; gap:8px; margin-top:5px;">
+                    <input type="text" id="inputCupom" class="modal-input" placeholder="Código (Ex: VIP10)" style="margin:0; text-transform: uppercase;">
+                    <button class="btn-confirm" id="btnAplicarCupom" style="margin:0; flex: 0.4; padding: 12px 10px;" onclick="aplicarCupom()">Aplicar</button>
+                </div>
+                <div id="msgCupom" style="margin-top: 5px; font-size: 0.85rem; font-weight: bold;"></div>
+            </div>
+
+            <h3 id="resumoValorModal" style="text-align: center; margin-top: 15px; color: white;">Total: R$ 0,00</h3>
+            
+            <div class="terms-box" style="margin-top: 10px;">
                 ⚠️ <strong>POLÍTICA DE CANCELAMENTO</strong><br><br>
                 • Cancelamentos realizados com antecedência mínima de 3 (três) horas não terão cobrança.<br><br>
                 • Menos de 3 horas: cobrança de 50% sobre o <strong>valor total das horas marcadas</strong>.<br><br>
                 • <strong>O usuário que realiza o agendamento é o único responsável</strong> pelo pagamento integral da reserva.<br><br>
                 • O não comparecimento sem aviso prévio resultará na <strong>cobrança da taxa de 50%</strong>.
             </div>
-            <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos e valores.</label></div>
+            <div class="checkbox-container"><input type="checkbox" id="checkTermos"><label for="checkTermos">Concordo com os termos.</label></div>
             <div class="modal-buttons"><button class="btn-cancel" onclick="fecharModal()">Cancelar</button><button class="btn-confirm" onclick="enviarAgendamento()">Ir para WhatsApp</button></div>
         </div>
     </div>
@@ -371,9 +381,12 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
         const whatsappNumber = "5588988229008";
 
-        // VARIÁVEIS GLOBAIS DE PREÇO (Iniciam com um padrão, mas serão atualizadas pelo Google)
         let precoDiaGlobal = 35;
         let precoNoiteGlobal = 40;
+
+        // NOVAS VARIÁVEIS DE CUPOM
+        let cupomAplicado = ""; 
+        let valorDescontoCupom = 0;
 
         let usuarioLogado = null; let promocaoAtual = null; let usouPromoFlag = false;
         let agendaStatusGeral = "SIM"; let agendaDataInicio = ""; let agendaDataFim = ""; 
@@ -385,7 +398,6 @@
         window.onload = function() {
             if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function(registrations) { for (let registration of registrations) { registration.unregister(); } }); }
 
-            // BUSCA A PROMOÇÃO E DEPOIS BUSCA OS PREÇOS SALVOS NA NUVEM
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_promocao" }) })
             .then(r => r.json()).then(data => { 
                 if(data.sucesso) {
@@ -394,22 +406,15 @@
                     agendaDataInicio = data.agendaInicio || "";
                     agendaDataFim = data.agendaFim || "";
                 }
-                
-                // Agora puxamos os preços atualizados
                 fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_precos" }) })
                 .then(r2 => r2.json()).then(d2 => {
-                    if(d2.sucesso) {
-                        precoDiaGlobal = parseFloat(d2.precoDia);
-                        precoNoiteGlobal = parseFloat(d2.precoNoite);
-                    }
+                    if(d2.sucesso) { precoDiaGlobal = parseFloat(d2.precoDia); precoNoiteGlobal = parseFloat(d2.precoNoite); }
                 }).catch(e => console.log(e));
-
             }).catch(e => console.log(e));
 
             atualizarRelogio(); document.getElementById('dateDisplay').innerText = formatarDataHeader(dataVisualizada).texto;
             carregarDadosDoDia(); carregarClima();
 
-            // Verificação de usuário salvo
             const savedUser = localStorage.getItem('usuarioArenaVitale');
             if(savedUser) {
                 usuarioLogado = JSON.parse(savedUser);
@@ -435,10 +440,7 @@
 
         function buscarPontosNoServidor() {
             const grid = document.getElementById('stampGrid');
-            if(!usuarioLogado) {
-                if(grid) grid.innerHTML = '<p style="grid-column: span 5; color: #aaa; text-align:center;">Faça login ou seu primeiro agendamento para acumular raquetes.</p>';
-                return;
-            }
+            if(!usuarioLogado) { if(grid) grid.innerHTML = '<p style="grid-column: span 5; color: #aaa; text-align:center;">Faça login ou seu primeiro agendamento para acumular raquetes.</p>'; return; }
             fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ acao: "buscar_pontos", telefone: usuarioLogado.phone }) })
             .then(res => res.json()).then(data => { if(data.sucesso) { localStorage.setItem('pontosVitale', data.pontos); renderizarFidelidade(); } }).catch(e => console.log(e));
         }
@@ -446,9 +448,7 @@
         function renderizarFidelidade() {
             const grid = document.getElementById('stampGrid'); if(!grid) return; grid.innerHTML = '';
             let pontosAtuais = parseInt(localStorage.getItem('pontosVitale')) || 0;
-            for(let i=1; i<=10; i++) {
-                const box = document.createElement('div'); if(i<=pontosAtuais) { box.className = 'stamp-box stamped'; box.innerHTML = '🎾'; } else { box.className = 'stamp-box'; box.innerHTML = i; } grid.appendChild(box);
-            }
+            for(let i=1; i<=10; i++) { const box = document.createElement('div'); if(i<=pontosAtuais) { box.className = 'stamp-box stamped'; box.innerHTML = '🎾'; } else { box.className = 'stamp-box'; box.innerHTML = i; } grid.appendChild(box); }
             if(pontosAtuais>=10) document.getElementById('btnResgatar').style.display = 'block'; else if(document.getElementById('btnResgatar')) document.getElementById('btnResgatar').style.display = 'none';
         }
 
@@ -468,18 +468,11 @@
         function enviarCodigoRecuperacao() {
             telefoneRecuperacao = document.getElementById('recPhone').value.replace(/\D/g, "");
             if(telefoneRecuperacao.length !== 11) return alert("Digite o número correto com DDD (11 dígitos).");
-            
             const btn = document.querySelector('#etapa1-rec button'); btn.innerText = "Aguardando..."; btn.disabled = true;
-            
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "recuperar_senha", telefone: telefoneRecuperacao }) })
             .then(r => r.json()).then(data => {
                 btn.innerText = "GERAR CÓDIGO"; btn.disabled = false;
-                if(data.sucesso) {
-                    codigoRecuperacao = data.codigo;
-                    alert("⚠️ CÓDIGO GERADO ⚠️\n\nO seu código de recuperação é: " + codigoRecuperacao + "\n\n(Futuramente, este código será enviado para o seu WhatsApp).");
-                    document.getElementById('etapa1-rec').style.display = 'none';
-                    document.getElementById('etapa2-rec').style.display = 'block';
-                } else { alert("Erro: " + data.erro); }
+                if(data.sucesso) { codigoRecuperacao = data.codigo; alert("⚠️ CÓDIGO GERADO ⚠️\n\nO seu código de recuperação é: " + codigoRecuperacao + "\n\n(Futuramente, este código será enviado para o seu WhatsApp)."); document.getElementById('etapa1-rec').style.display = 'none'; document.getElementById('etapa2-rec').style.display = 'block'; } else { alert("Erro: " + data.erro); }
             }).catch(e => { btn.innerText = "GERAR CÓDIGO"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
@@ -494,7 +487,6 @@
 
         function abrirTelaLogin() { document.getElementById('tela-auth').style.display = 'flex'; }
         function fecharTelaLogin() { document.getElementById('tela-auth').style.display = 'none'; }
-        
         function mostrarCadastro() { document.getElementById('box-login').style.display='none'; document.getElementById('box-cadastro').style.display='block'; }
         function mostrarLogin() { document.getElementById('box-cadastro').style.display='none'; document.getElementById('box-recuperar').style.display='none'; document.getElementById('box-login').style.display='block'; }
         function mostrarRecuperar() { document.getElementById('box-login').style.display='none'; document.getElementById('box-recuperar').style.display='block'; }
@@ -559,18 +551,9 @@
 
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                
-                // NOVA LÓGICA DE PREÇOS (Puxando as variáveis do Google)
-                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { 
-                    total += valorPromo; 
-                    usouPromoFlag = true; 
-                } 
-                else if (hAtual >= 5 && hAtual <= 18) { 
-                    total += precoDiaGlobal; // Valor Dia
-                } 
-                else { 
-                    total += precoNoiteGlobal; // Valor Noite
-                }
+                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { total += valorPromo; usouPromoFlag = true; } 
+                else if (hAtual >= 5 && hAtual <= 18) { total += precoDiaGlobal; } 
+                else { total += precoNoiteGlobal; }
             } return total;
         }
 
@@ -653,10 +636,24 @@
 
         function liberarBotao() { document.getElementById('btnAgendar').style.display = document.getElementById('selectHora').value ? 'block' : 'none'; atualizarPrecoDisplay(); }
         
+        // FUNÇÃO ATUALIZADA PARA PREPARAR AGENDAMENTO E RESETAR CUPONS
         function prepararAgendamento() { 
             const h = parseInt(document.getElementById('selectHora').value); 
             const pag = document.getElementById('selectPagamento').value; 
             let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
+            
+            // Reseta o cupom sempre que abrir o modal
+            cupomAplicado = ""; 
+            valorDescontoCupom = 0;
+            if(document.getElementById('inputCupom')) {
+                document.getElementById('inputCupom').value = "";
+                document.getElementById('inputCupom').disabled = false;
+            }
+            if(document.getElementById('btnAplicarCupom')) {
+                document.getElementById('btnAplicarCupom').disabled = false;
+                document.getElementById('btnAplicarCupom').innerText = "Aplicar";
+            }
+            if(document.getElementById('msgCupom')) document.getElementById('msgCupom').innerText = "";
             
             const inputNome = document.getElementById('cadNomeCompleto');
             const inputTel = document.getElementById('cadTelefone');
@@ -672,7 +669,7 @@
             } else {
                 inputNome.value = ""; 
                 inputTel.value = ""; 
-                inputSenha.value = "";
+                if(inputSenha) inputSenha.value = "";
                 inputNome.disabled = false;
                 inputTel.disabled = false;
                 inputNome.placeholder = "Seu Nome e Sobrenome";
@@ -680,12 +677,52 @@
                 containerSenha.style.display = 'block';
             }
             
+            if(document.getElementById('resumoValorModal')) {
+                document.getElementById('resumoValorModal').innerText = "Total: R$ " + valTotal.toFixed(2).replace('.', ',');
+            }
+
             abrirModal(h, (h + Math.ceil(duracaoSelecionada)) + ":00", formatarDataHeader(dataVisualizada).texto, valTotal); 
+        }
+
+        // NOVA FUNÇÃO: APLICAR CUPOM
+        function aplicarCupom() {
+            let cod = document.getElementById('inputCupom').value.trim().toUpperCase();
+            if(!cod) return alert("Digite o código do cupom!");
+            
+            let btn = document.getElementById('btnAplicarCupom');
+            btn.innerText = "..."; btn.disabled = true;
+            
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "validar_cupom", cupom: cod }) })
+            .then(r=>r.json()).then(data => {
+                if(data.sucesso) {
+                    cupomAplicado = cod;
+                    valorDescontoCupom = parseFloat(data.desconto);
+                    
+                    let novoValor = tempValor - valorDescontoCupom;
+                    if(novoValor < 0) novoValor = 0; 
+                    tempValor = novoValor; 
+                    
+                    document.getElementById('msgCupom').innerText = `✅ Cupom de R$ ${data.desconto},00 aplicado!`;
+                    document.getElementById('msgCupom').style.color = "var(--success)";
+                    document.getElementById('resumoValorModal').innerText = "Total com Desconto: R$ " + tempValor.toFixed(2).replace('.',',');
+                    
+                    document.getElementById('inputCupom').disabled = true;
+                    btn.innerText = "OK";
+                } else {
+                    document.getElementById('msgCupom').innerText = `❌ ${data.erro}`;
+                    document.getElementById('msgCupom').style.color = "var(--danger)";
+                    btn.innerText = "Aplicar"; btn.disabled = false;
+                }
+            }).catch(e => {
+                document.getElementById('msgCupom').innerText = "Erro ao verificar.";
+                btn.innerText = "Aplicar"; btn.disabled = false;
+            });
         }
         
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
+        // FUNÇÃO ATUALIZADA: ENVIA OS DADOS DO CUPOM NO WHATSAPP E REDIRECIONA
         function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
@@ -729,7 +766,12 @@
                 msg += "🏆 Modalidade: " + mod + "\n";
                 msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
                 msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
-                msg += "💰 Valor: R$ " + tempValor + ",00\n";
+                
+                if (cupomAplicado) {
+                    msg += "🎟️ Cupom Utilizado: " + cupomAplicado + " (- R$ " + valorDescontoCupom + ",00)\n";
+                }
+
+                msg += "💰 Valor Final: R$ " + tempValor + ",00\n";
                 msg += "💳 Pagamento: " + pag + "\n\n";
                 msg += "✅ *Termos de cancelamento aceitos.*\n\n";
                 msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
