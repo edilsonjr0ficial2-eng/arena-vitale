@@ -546,9 +546,18 @@
 
             for (let i = 0; i < duracao; i++) {
                 let hAtual = horaInicio + i;
-                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { total += valorPromo; usouPromoFlag = true; } 
-                else if (hAtual >= 5 && hAtual <= 16) { total += 35; } 
-                else { total += (pagamento === 'cartao') ? 50 : 45; }
+                
+                // NOVA LÓGICA DE PREÇOS (Sem diferença de método de pagamento)
+                if (promoAtivaNesteDia && horasPromo.includes(hAtual)) { 
+                    total += valorPromo; 
+                    usouPromoFlag = true; 
+                } 
+                else if (hAtual >= 5 && hAtual <= 18) { 
+                    total += 35; // Das 5h até as 18h
+                } 
+                else { 
+                    total += 40; // Das 19h em diante
+                }
             } return total;
         }
 
