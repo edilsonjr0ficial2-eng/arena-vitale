@@ -515,7 +515,11 @@
             .then(res => res.text()).then(text => { btn.innerText = "ENTRAR"; btn.disabled = false; try { const data = JSON.parse(text); if (data.erro) alert("❌ " + data.erro); else if (data.sucesso) { usuarioLogado = { nome: data.nome, phone: data.telefone }; localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado)); location.reload(); } } catch(e) { alert("⚠️ Erro no servidor."); } }).catch(e => { btn.innerText = "ENTRAR"; btn.disabled = false; alert("Erro de conexão."); });
         }
 
-        function fazerLogout() { localStorage.removeItem('usuarioArenaVitale'); location.reload(); }
+        function fazerLogout() { 
+            localStorage.removeItem('usuarioArenaVitale'); 
+            localStorage.removeItem('pontosVitale');
+            location.reload(); 
+        }
 
         function realizarCadastro() {
             const nome = document.getElementById('cadNome').value; const phone = document.getElementById('cadPhone').value; const pass = document.getElementById('cadPass').value; const btn = document.getElementById('btnCadastrar');
@@ -801,12 +805,16 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // FUNÇÃO ATUALIZADA: GARANTE O PONTO DO FIDELIDADE E VAI PRO ZAP
+        // FUNÇÃO ATUALIZADA: GARANTE O CADASTRO ANTES DOS PONTOS
         async function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
             let nomeFinal = "";
             let telefoneFinal = "";
+
+            const btn = document.getElementById('btnFinalizarAgendamento'); 
+            btn.innerText = "Aguarde um instante..."; 
+            btn.disabled = true;
 
             if (!usuarioLogado) {
                 nomeFinal = document.getElementById('cadNomeCompleto').value;
@@ -814,32 +822,40 @@
                 let senhaDigitada = document.getElementById('cadSenhaModal').value;
 
                 if (!nomeFinal || telefoneFinal.length !== 11 || !senhaDigitada) {
+                    btn.innerText = "Ir para WhatsApp";
+                    btn.disabled = false;
                     return alert("⚠️ Por favor, preencha seu Nome, seu Telefone correto (11 dígitos) e crie uma senha.");
                 }
 
                 usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
                 localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                 
-                // Salva o cadastro do usuário novato em background
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) }).catch(e => console.log(e));
+                // Zera os pontos pois é um usuário novo
+                pontosAtuais = 0; 
+                localStorage.setItem('pontosVitale', 0);
+                
+                try {
+                    // AWAIT AQUI É CRUCIAL! Espera o cliente ser salvo antes de dar os pontos.
+                    await fetch(SCRIPT_URL, { 
+                        method: "POST", 
+                        body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) 
+                    });
+                } catch(e) { console.log(e); }
+                
             } else {
                 nomeFinal = usuarioLogado.nome;
                 telefoneFinal = usuarioLogado.phone;
             }
 
-            const btn = document.getElementById('btnFinalizarAgendamento'); 
-            btn.innerText = "Aguarde um instante..."; 
-            btn.disabled = true;
-
             try {
-                // CALCULA OS PONTOS (Ganha pontos por duração, gasta se tiver usando hora grátis)
+                // CALCULA OS PONTOS
                 let pontosGanhosNestaReserva = Math.ceil(duracaoSelecionada);
                 let saldoPontosFinal = pontosAtuais + pontosGanhosNestaReserva;
                 if (usandoHoraGratis) {
                     saldoPontosFinal -= 10;
                 }
 
-                // 1. Manda a reserva pra Agenda (espera 1 segundinho)
+                // 1. Manda a reserva pra Agenda
                 await fetch(SCRIPT_URL, { 
                     method: "POST", 
                     body: JSON.stringify({ acao: "agendar", nome: nomeFinal, telefone: telefoneFinal, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
@@ -881,9 +897,7 @@
                 msg += "✅ *Termos de cancelamento aceitos.*\n\n";
                 msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
                 
-                // Redireciona!
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-                
                 setTimeout(() => { location.reload(); }, 2000);
 
             } catch (error) {
