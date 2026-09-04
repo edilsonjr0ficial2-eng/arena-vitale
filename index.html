@@ -613,12 +613,11 @@
         function mudarQuadra(id, btn) { quadraSelecionada = id; nomeQuadra = id === 1 ? "Quadra Chicashoes" : "Quadra Padaria do Helder"; document.querySelectorAll('.btn-court').forEach(b => b.classList.remove('active')); btn.classList.add('active'); carregarDadosDoDia(); }
         
         function setDuracao(horas, btn) { 
-            // TRAVA DE OBRIGATORIEDADE DA HORA GRÁTIS
             if (pontosAtuais >= 10 && horas < 2) {
                 alert("🎁 Parabéns! Você tem 10 pontos na Fidelidade.\n\nO uso da sua Hora Grátis é automático e obrigatório. Para isso, a duração do jogo deve ser de no mínimo 2 horas.\n\nAjustamos para 2h para você!");
                 horas = 2;
                 document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.btn-duration')[1].classList.add('active'); // O botão [1] é o de 2h
+                document.querySelectorAll('.btn-duration')[1].classList.add('active'); 
                 btn = null;
             } else {
                 document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active')); 
@@ -656,7 +655,7 @@
             if (horaAtual >= 23) { dataLimite.setDate(dataLimite.getDate() + 7); } else { dataLimite.setDate(dataLimite.getDate() + 6); }
             dataLimite.setHours(23, 59, 59, 999);
 
-            if (dataAlvo > dataLimite) { return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automaticamente todos os dias após as 23h."); }
+            if (dataAlvo > dataLimite) { return alert("📅 A agenda é liberada dia após dia!\n\nAté o momento, o agendamento está liberado até " + formatarDataHeader(dataLimite).texto + ".\n\nNovos dias são liberados automatically todos os dias após as 23h."); }
             if (agendaStatusGeral === "NAO") return alert("🔒 A agenda está temporariamente bloqueada pela administração.");
 
             if (agendaDataInicio) { let p = agendaDataInicio.split('-'); let dIni = new Date(p[0], p[1]-1, p[2]); dIni.setHours(0,0,0,0); if (dataAlvo < dIni) { if (delta > 0) alert(`🔒 A agenda está liberada apenas a partir do dia ${p[2]}/${p[1]}/${p[0]}.`); return; } }
@@ -693,8 +692,20 @@
                     let nomeOcupante = ocupacaoAtual.nome; let horaFimOcupacao = h + 1;
                     while (horaFimOcupacao <= 22) { let proxOcupacao = horariosOcupadosDoDia.find(item => item.hora === horaFimOcupacao); if (proxOcupacao && proxOcupacao.nome === nomeOcupante) { horaFimOcupacao++; } else { break; } }
                     
-                    let option = document.createElement('option'); let displayTexto = "INDISPONÍVEL"; let nl = nomeOcupante.toLowerCase().trim();
-                    if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { displayTexto = "INDISPONÍVEL"; } else if (nomeOcupante.includes("⏳")) { displayTexto = "Agendamento Pendente"; } else { displayTexto = "Agendamento Confirmado"; }
+                    let option = document.createElement('option'); 
+                    let displayTexto = "INDISPONÍVEL"; 
+                    let nl = nomeOcupante.toLowerCase().trim();
+                    
+                    // ALTERAÇÃO PARA A LETRA (M) DA MENSALIDADE
+                    if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { 
+                        displayTexto = "INDISPONÍVEL"; 
+                    } else if (nomeOcupante.includes("⏳")) { 
+                        displayTexto = "Agendamento Pendente"; 
+                    } else if (nl.includes("(m)") || nl.includes("( m )")) {
+                        displayTexto = "Mensalista (M)";
+                    } else { 
+                        displayTexto = "Agendamento Confirmado"; 
+                    }
 
                     option.text = `Início: ${h}:00 | Encerra: ${horaFimOcupacao}:00 - ⛔ ${displayTexto}`; option.value = h; option.disabled = true; select.appendChild(option); h = horaFimOcupacao; 
                 } else {
@@ -719,7 +730,6 @@
             const pag = document.getElementById('selectPagamento').value; 
             let valTotal = calcularValorTotal(h, duracaoSelecionada, pag); 
             
-            // Reseta o cupom sempre que abrir o modal
             cupomAplicado = ""; 
             valorDescontoCupom = 0;
             if(document.getElementById('inputCupom')) {
@@ -756,7 +766,6 @@
             
             if(document.getElementById('resumoValorModal')) {
                 document.getElementById('resumoValorModal').innerText = "Total: R$ " + valTotal.toFixed(2).replace('.', ',');
-                // SE TIVER HORA GRÁTIS, AVISA NO MODAL
                 if (usandoHoraGratis) {
                     document.getElementById('resumoValorModal').innerHTML += `<br><span style="font-size:0.8rem; color:var(--success);">🎁 Hora Grátis Descontada (- R$ ${valorDescontoFidelidade},00)</span>`;
                 }
@@ -805,7 +814,7 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // FUNÇÃO ATUALIZADA: GARANTE O CADASTRO ANTES DOS PONTOS
+        // FUNÇÃO DE AGENDAR CORRIGIDA (ESPERA O NOVO CADASTRO)
         async function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
@@ -817,7 +826,7 @@
             btn.disabled = true;
 
             if (!usuarioLogado) {
-                nomeFinal = document.getElementById('cadNomeCompleto').value;
+                nomeFinal = document.getElementById('cadNomeCompleto').value.trim();
                 telefoneFinal = document.getElementById('cadTelefone').value.replace(/\D/g, "");
                 let senhaDigitada = document.getElementById('cadSenhaModal').value;
 
@@ -830,17 +839,17 @@
                 usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
                 localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                 
-                // Zera os pontos pois é um usuário novo
+                // Força os pontos a ZERO para clientes novos! (corrige o bug dos testes antigos no celular)
                 pontosAtuais = 0; 
                 localStorage.setItem('pontosVitale', 0);
                 
                 try {
-                    // AWAIT AQUI É CRUCIAL! Espera o cliente ser salvo antes de dar os pontos.
+                    // AWAIT AQUI: O site só continua DEPOIS que o Google confirmar que salvou a linha do cliente.
                     await fetch(SCRIPT_URL, { 
                         method: "POST", 
                         body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) 
                     });
-                } catch(e) { console.log(e); }
+                } catch(e) { console.log("Aviso no cadastro."); }
                 
             } else {
                 nomeFinal = usuarioLogado.nome;
@@ -848,7 +857,7 @@
             }
 
             try {
-                // CALCULA OS PONTOS
+                // CALCULA OS PONTOS EXATOS: Ganha as horas jogadas
                 let pontosGanhosNestaReserva = Math.ceil(duracaoSelecionada);
                 let saldoPontosFinal = pontosAtuais + pontosGanhosNestaReserva;
                 if (usandoHoraGratis) {
@@ -867,7 +876,7 @@
                     body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefoneFinal, pontos: saldoPontosFinal }) 
                 });
 
-                // Atualiza o local storage
+                // Atualiza a memoria do celular com os pontos certinhos
                 localStorage.setItem('pontosVitale', saldoPontosFinal);
 
                 // 3. Monta a mensagem e abre o WhatsApp
@@ -892,7 +901,7 @@
                 msg += "💰 Valor Final: R$ " + tempValor + ",00\n";
                 msg += "💳 Pagamento: " + pag + "\n\n";
                 
-                msg += "⭐ Saldo de Pontos: " + saldoPontosFinal + " raquetes\n\n";
+                msg += "⭐ Saldo de Pontos: " + saldoPontosFinal + " raquete(s)\n\n";
 
                 msg += "✅ *Termos de cancelamento aceitos.*\n\n";
                 msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
@@ -908,11 +917,10 @@
         }
 
         function mudarPasso(passoDestino) {
-            // TRAVA DE SEGURANÇA: Ao tentar ir pro passo 3 com 10 pontos marcando só 1 hora
             if (passoDestino === 3 && pontosAtuais >= 10 && duracaoSelecionada < 2) {
                 duracaoSelecionada = 2;
                 document.querySelectorAll('.btn-duration').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.btn-duration')[1].classList.add('active'); // O botão [1] é o de 2h
+                document.querySelectorAll('.btn-duration')[1].classList.add('active'); 
             }
 
             for (let i = 1; i <= 4; i++) {
