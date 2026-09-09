@@ -80,9 +80,6 @@
             .slot-content { font-size: 0.85rem; white-space: normal; overflow: visible; word-break: break-word; } 
             .btn-icon { font-size: 1.2rem; padding: 6px; } 
         }
-
-        @media print { body { background: white; color: black; } .header, .controls, .actions, .toolbar, #loginOverlay { display: none !important; } .column { border: 1px solid #000; background: white; margin-bottom:20px; } .col-header { background: #eee !important; color: black !important; } .slot-content { color: black; } #printHeader { display: block !important; font-weight:bold; font-size:1.2rem; margin-bottom:10px; text-align:center;} }
-        #printHeader { display: none; }
     </style>
 </head>
 <body>
@@ -124,7 +121,6 @@
             <button class="tool-btn" onclick="abrirModalInterdicao()">⛔ Interditar</button>
             <button class="tool-btn" onclick="copiarAgenda()">📋 Copiar</button>
             <button class="tool-btn" onclick="window.open('index.html', '_blank')">🌐 Ver Site</button>
-            <button class="tool-btn" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
@@ -326,9 +322,7 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTlYbHI9mgBo8JbEzXjCddY-w5LJqZdFQDiKy1XkJS5m4mkRPoj0CCgTN5WldIRH-ciFxev14TRijP/pub?output=csv";
 
         let dataAtual = new Date(); 
-        
         const horas = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]; 
-        
         const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         let dadosAgenda = []; let tempAgendamento = {}; let faturamentoDia = 0; let totalPendentesConhecidos = 0; const alertaSom = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
         let modoGradeFixa = false; let cachedPadrao = []; let clientesCadastrados = [];
@@ -353,13 +347,9 @@
                 
                 fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_promocao" }) }).then(r=>r.json()).then(d=>{
                     if(d.sucesso && d.promo) promocaoAtual = d.promo;
-                    
                     fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_precos" }) })
                     .then(r2 => r2.json()).then(d2 => {
-                        if(d2.sucesso) {
-                            precoDiaGlobal = parseFloat(d2.precoDia);
-                            precoNoiteGlobal = parseFloat(d2.precoNoite);
-                        }
+                        if(d2.sucesso) { precoDiaGlobal = parseFloat(d2.precoDia); precoNoiteGlobal = parseFloat(d2.precoNoite); }
                         carregarAgenda(); 
                     }).catch(() => carregarAgenda());
                 }).catch(()=>carregarAgenda());
@@ -375,25 +365,12 @@
             let btn = document.getElementById('btnLogin'); btn.innerText = "Aguarde...";
             fetch(SCRIPT_URL, { method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({ acao: "login_admin", usuario: u, senha: p }) })
             .then(r=>r.json()).then(data => {
-                if(data.sucesso) {
-                    localStorage.setItem('adminUser', u); localStorage.setItem('adminMaster', data.mestre); location.reload();
-                } else { alert(data.erro); btn.innerText = "ACESSAR"; }
+                if(data.sucesso) { localStorage.setItem('adminUser', u); localStorage.setItem('adminMaster', data.mestre); location.reload(); } 
+                else { alert(data.erro); btn.innerText = "ACESSAR"; }
             }).catch(e => { alert("Erro de conexão."); btn.innerText = "ACESSAR"; });
         }
 
         function fazerLogout() { localStorage.removeItem('adminUser'); localStorage.removeItem('adminMaster'); location.reload(); }
-
-        function alternarRanking() {
-            if(confirm("Tem certeza que deseja alterar a visibilidade do Ranking no site dos clientes?")) {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "toggle_ranking" }) })
-                .then(r => r.json()).then(data => {
-                    if(data.sucesso) {
-                        if(data.statusAtual === "SIM") { alert("✅ O Ranking agora está VISÍVEL para os clientes."); }
-                        else { alert("🚫 O Ranking agora está OCULTO no site."); }
-                    }
-                }).catch(e => alert("Erro de conexão."));
-            }
-        }
 
         function aplicarMoldeNaAgenda() {
             if(confirm("⚠️ ATENÇÃO ⚠️\n\nIsso vai APAGAR todos os agendamentos da semana atual e substituí-los pela Grade Fixa.\n\nTem certeza que deseja aplicar o molde agora?")) {
@@ -418,37 +395,21 @@
             });
         }
 
-        function salvarNovoAdmin() {
-            let u = document.getElementById('novoAdmUser').value.trim(); let p = document.getElementById('novoAdmPass').value.trim();
-            if(!u || !p) return alert("Preencha usuário e senha.");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_admin", usuario: u, senha: p }) }).then(r=>r.json()).then(d=>{ if(d.sucesso) { document.getElementById('novoAdmUser').value=''; document.getElementById('novoAdmPass').value=''; abrirModalAdmins(); } });
-        }
-
-        function excluirAdm(u) {
-            if(confirm("Excluir o admin " + u + "?")) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_admin", usuario: u }) }).then(() => abrirModalAdmins()); }
-        }
+        function salvarNovoAdmin() { let u = document.getElementById('novoAdmUser').value.trim(); let p = document.getElementById('novoAdmPass').value.trim(); if(!u || !p) return alert("Preencha usuário e senha."); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_admin", usuario: u, senha: p }) }).then(r=>r.json()).then(d=>{ if(d.sucesso) { document.getElementById('novoAdmUser').value=''; document.getElementById('novoAdmPass').value=''; abrirModalAdmins(); } }); }
+        function excluirAdm(u) { if(confirm("Excluir o admin " + u + "?")) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_admin", usuario: u }) }).then(() => abrirModalAdmins()); } }
 
         function mudarDia(delta) { dataAtual.setDate(dataAtual.getDate() + delta); totalPendentesConhecidos = 0; document.title = "Painel Admin | Arena Vitale"; if(modoGradeFixa) atualizarTelaGradeFixa(); else carregarAgenda(); }
         function formatarData(date) { let diaIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; let dia = String(date.getDate()).padStart(2, '0'); let mes = String(date.getMonth() + 1).padStart(2, '0'); return { texto: `${diasSemana[diaIndex]} - ${dia}/${mes}`, index: diaIndex }; }
 
-        function carregarConfigAdmin() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.dataInicio, data.dataFim); });
-        }
+        function carregarConfigAdmin() { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) atualizarBotoesConfig(data.liberada, data.dataInicio, data.dataFim); }); }
         function atualizarBotoesConfig(liberada, dIni, dFim) {
             let btnT = document.getElementById('btnTravaAgenda');
             if (liberada) { let txt = "🔓 Liberada"; if(dIni && dFim) { let p1 = dIni.split('-'); let p2 = dFim.split('-'); txt += ` (${p1[2]}/${p1[1]} a ${p2[2]}/${p2[1]})`; } btnT.innerHTML = txt; btnT.style.color = "var(--success)"; btnT.style.borderColor = "var(--success)"; 
             } else { btnT.innerHTML = "🔒 Bloqueada"; btnT.style.color = "var(--danger)"; btnT.style.borderColor = "var(--danger)"; }
         }
 
-        function abrirModalCadeado() {
-            document.getElementById('modalCadeado').style.display = 'flex';
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } });
-        }
-        function salvarCadeado() {
-            document.getElementById('btnTravaAgenda').innerText = "Aguarde...";
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_trava_agenda", status: document.getElementById('cadStatus').value, inicio: document.getElementById('cadInicio').value, fim: document.getElementById('cadFim').value }) })
-            .then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } });
-        }
+        function abrirModalCadeado() { document.getElementById('modalCadeado').style.display = 'flex'; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "buscar_config_admin" }) }).then(r => r.json()).then(data => { if(data.sucesso) { document.getElementById('cadStatus').value = data.liberada ? "SIM" : "NAO"; document.getElementById('cadInicio').value = data.dataInicio || ""; document.getElementById('cadFim').value = data.dataFim || ""; } }); }
+        function salvarCadeado() { document.getElementById('btnTravaAgenda').innerText = "Aguarde..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_trava_agenda", status: document.getElementById('cadStatus').value, inicio: document.getElementById('cadInicio').value, fim: document.getElementById('cadFim').value }) }).then(r => r.json()).then(data => { if (data.sucesso) { carregarConfigAdmin(); document.getElementById('modalCadeado').style.display='none'; } }); }
 
         function abrirModalPromocao() {
             document.getElementById('modalPromocao').style.display = 'flex'; let html = "";
@@ -461,28 +422,12 @@
                 }
             });
         }
-        function salvarPromocao() {
-            let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value));
-            if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário.");
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { 
-                if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } 
-            });
-        }
+        function salvarPromocao() { let i = document.getElementById('promoInicio').value; let f = document.getElementById('promoFim').value; let v = document.getElementById('promoValor').value; let l = document.getElementById('promoLimite').value; let s = []; document.querySelectorAll('.chk-promo:checked').forEach(chk => s.push(chk.value)); if(!i || !f || !v || s.length === 0) return alert("Preencha as datas, o valor e selecione pelo menos um horário."); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_promocao", inicio: i, fim: f, valor: v, horarios: s.join(','), limite: l }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert("Promoção ativada!"); location.reload(); } }); }
 
-        function abrirGerenciadorClientes() {
-            document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none';
-            if(clientesCadastrados.length === 0) {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { 
-                    if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } 
-                }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; });
-            } else {
-                renderizarTabelaClientes();
-            }
-        }
+        function abrirGerenciadorClientes() { document.getElementById('modalGerenciarClientes').style.display = 'flex'; document.getElementById('loadingClientes').style.display = 'block'; document.getElementById('tabelaClientes').style.display = 'none'; if(clientesCadastrados.length === 0) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_clientes" }) }).then(r => r.json()).then(data => { if(data.sucesso) { clientesCadastrados = data.lista; renderizarTabelaClientes(); } }).catch(e => { alert("Erro ao carregar clientes."); document.getElementById('modalGerenciarClientes').style.display='none'; }); } else { renderizarTabelaClientes(); } }
 
         function parseDataBR(dataStr) { 
-            if (!dataStr) return null; 
-            let str = dataStr.toString().trim();
+            if (!dataStr) return null; let str = dataStr.toString().trim();
             if (str.includes('T') && str.includes('-')) { let d = new Date(str); if (!isNaN(d.getTime())) return d; }
             let partesTempo = str.split(' '); let soData = partesTempo[0].replace(/,/g, '').trim(); let partes = soData.split('/'); 
             if(partes.length === 3) { return new Date(partes[2], partes[1] - 1, partes[0]); }
@@ -490,85 +435,37 @@
         }
 
         function renderizarTabelaClientes() {
-            document.getElementById('loadingClientes').style.display = 'none'; 
-            document.getElementById('tabelaClientes').style.display = 'table'; 
-            const tbody = document.getElementById('listaClientesBody'); 
-            tbody.innerHTML = '';
-            
-            let diasFiltro = parseInt(document.getElementById('filtroDias').value); 
-            let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); 
-            let hoje = new Date(); hoje.setHours(0,0,0,0);
-            let clientesLista = [];
-            
+            document.getElementById('loadingClientes').style.display = 'none'; document.getElementById('tabelaClientes').style.display = 'table'; const tbody = document.getElementById('listaClientesBody'); tbody.innerHTML = ''; let diasFiltro = parseInt(document.getElementById('filtroDias').value); let termoPesquisa = document.getElementById('pesquisaCliente').value.toLowerCase().trim(); let hoje = new Date(); hoje.setHours(0,0,0,0); let clientesLista = [];
             for(let i = 0; i < clientesCadastrados.length; i++) { 
-                let clienteData = clientesCadastrados[i]; 
-                let nome = clienteData.nome || ""; 
-                let telefone = clienteData.telefone || ""; 
-                let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; 
-                let pontos = parseInt(clienteData.pontos) || 0;     
-                
+                let clienteData = clientesCadastrados[i]; let nome = clienteData.nome || ""; let telefone = clienteData.telefone || ""; let ultimoAgendamentoStr = clienteData.ultimoAgendamento || ""; let pontos = parseInt(clienteData.pontos) || 0;     
                 if (termoPesquisa && !nome.toString().toLowerCase().includes(termoPesquisa) && !telefone.toString().includes(termoPesquisa)) { continue; }
-                
                 let dataUltimo = parseDataBR(ultimoAgendamentoStr);
-                if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { 
-                    let dataTemp = new Date(dataUltimo); dataTemp.setHours(0,0,0,0); 
-                    let diffTime = hoje.getTime() - dataTemp.getTime(); 
-                    let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                    if (diasInativo <= diasFiltro) continue;
-                }
+                if(!isNaN(diasFiltro) && diasFiltro > 0 && dataUltimo) { let dataTemp = new Date(dataUltimo); dataTemp.setHours(0,0,0,0); let diffTime = hoje.getTime() - dataTemp.getTime(); let diasInativo = Math.floor(diffTime / (1000 * 60 * 60 * 24)); if (diasInativo <= diasFiltro) continue; }
                 clientesLista.push({ nome, telefone, ultimoAgendamentoStr, pontos, dataUltimo });
             }
-
-            clientesLista.sort((a, b) => {
-                if (!a.dataUltimo && b.dataUltimo) return -1;
-                if (a.dataUltimo && !b.dataUltimo) return 1;
-                if (!a.dataUltimo && !b.dataUltimo) return 0;
-                return a.dataUltimo.getTime() - b.dataUltimo.getTime();
-            });
-
+            clientesLista.sort((a, b) => { if (!a.dataUltimo && b.dataUltimo) return -1; if (a.dataUltimo && !b.dataUltimo) return 1; if (!a.dataUltimo && !b.dataUltimo) return 0; return a.dataUltimo.getTime() - b.dataUltimo.getTime(); });
             clientesLista.forEach(cliente => {
                 let displayData = "Nunca";
                 if (cliente.ultimoAgendamentoStr && cliente.ultimoAgendamentoStr !== "Nunca") {
                     let strD = cliente.ultimoAgendamentoStr.toString();
-                    if(strD.includes('T')) {
-                        let dO = new Date(strD);
-                        if(!isNaN(dO.getTime())) {
-                            let d = String(dO.getDate()).padStart(2, '0'); let m = String(dO.getMonth() + 1).padStart(2, '0'); let a = dO.getFullYear(); let h = String(dO.getHours()).padStart(2, '0'); let mn = String(dO.getMinutes()).padStart(2, '0');
-                            displayData = `${d}/${m}/${a} às ${h}:${mn}`;
-                        } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); }
-                    } else { displayData = strD.replace('.000Z', ''); }
+                    if(strD.includes('T')) { let dO = new Date(strD); if(!isNaN(dO.getTime())) { let d = String(dO.getDate()).padStart(2, '0'); let m = String(dO.getMonth() + 1).padStart(2, '0'); let a = dO.getFullYear(); let h = String(dO.getHours()).padStart(2, '0'); let mn = String(dO.getMinutes()).padStart(2, '0'); displayData = `${d}/${m}/${a} às ${h}:${mn}`; } else { displayData = strD.replace('T', ' às ').replace('.000Z', '').replace('Z', ''); } } else { displayData = strD.replace('.000Z', ''); }
                 }
-
-                let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`;
-                let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`;
-                let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
-
+                let btnWa = `<button class="btn-icon btn-wa" onclick="window.open('https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(`Olá ${cliente.nome}, tudo bem? Sentimos sua falta na Arena Vitale!`)}', '_blank')">📞</button>`; let btnDel = `<button class="btn-icon btn-del" onclick="excluirCliente('${cliente.telefone}', '${cliente.nome.toString().replace(/'/g, "\\'")}')">🗑️</button>`; let btnBlock = `<button class="btn-icon" style="color:var(--danger);" onclick="abrirModalAddBloqueioPreenchido('${cliente.nome.toString().replace(/'/g, "\\'")}', '${cliente.telefone}')" title="Adicionar à Lista Negra">🚫</button>`;
                 let tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #333";
-                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; 
-                tbody.appendChild(tr);
+                tr.innerHTML = `<td style="padding: 6px 4px;"><b>${cliente.nome}</b><br><small style="color:#aaa">${cliente.telefone}</small></td><td style="padding: 6px 4px; color:#aaa;">${displayData}</td><td style="padding: 6px 4px; text-align:center;"><input type="number" id="pts_${cliente.telefone}" value="${cliente.pontos}" style="width: 45px; padding: 4px; margin: 0; text-align: center; border-color: var(--primary);"></td><td style="padding: 6px 4px; white-space: nowrap; text-align:center;">${btnWa}<button class="tool-btn" style="background: var(--primary); color: black; display: inline-block; padding:4px 8px; font-size:0.75rem;" onclick="salvarPontosAdmin(event, '${cliente.telefone}')">Salvar</button>${btnBlock}${btnDel}</td>`; tbody.appendChild(tr);
             });
-            
             if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">Nenhum cliente encontrado.</td></tr>'; 
         }
 
         function excluirCliente(telefone, nome) {
-            if(confirm(`⚠️ ATENÇÃO: Deseja excluir o cliente ${nome} permanentemente?`)) {
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => {
-                    if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c.telefone != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); }
-                });
-            }
+            if(confirm(`⚠️ ATENÇÃO: Deseja excluir o cliente ${nome} permanentemente?`)) { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cliente", telefone: telefone }) }).then(r => r.json()).then(data => { if(data.sucesso) { alert(`Cliente apagado.`); clientesCadastrados = clientesCadastrados.filter(c => c.telefone != telefone); renderizarTabelaClientes(); } else { alert("Erro ao excluir."); } }); }
         }
 
         function salvarPontosAdmin(event, telefone) {
             let novosPontos = parseInt(document.getElementById(`pts_${telefone}`).value); if(isNaN(novosPontos)) return alert("Valor inválido.");
             let btn = event.target; let txtOriginal = btn.innerText; btn.innerText = "..."; btn.disabled = true;
             fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefone, pontos: novosPontos }) }).then(r => r.json()).then(data => {
-                if(data.sucesso) { 
-                    btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; 
-                    setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); 
-                    let cliente = clientesCadastrados.find(c => c.telefone == telefone); 
-                    if(cliente) cliente.pontos = novosPontos; 
-                } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
+                if(data.sucesso) { btn.innerText = "Salvo!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = txtOriginal; btn.disabled = false; btn.style.background = "var(--primary)"; }, 2000); let cliente = clientesCadastrados.find(c => c.telefone == telefone); if(cliente) cliente.pontos = novosPontos; } else { alert("Erro ao salvar."); btn.innerText = txtOriginal; btn.disabled = false; }
             }).catch(e => { alert("Erro de conexão."); btn.innerText = txtOriginal; btn.disabled = false; });
         }
 
@@ -578,41 +475,10 @@
                 if(data.sucesso) {
                     let s = data.stats; dadosAcessosGlobais = s.historicoAcessos || [];
                     let arrayHoras = Object.keys(s.fluxo).map(h => ({hora: h, qtd: s.fluxo[h]})); arrayHoras.sort((a,b) => b.qtd - a.qtd); let topHoras = arrayHoras.slice(0, 3).map(h => `${h.hora}h (${h.qtd} jgs)`).join(' | '); let preferida = s.q1 > s.q2 ? "Chicashoes" : (s.q2 > s.q1 ? "Padaria Helder" : "Iguais");
-                    
-                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').reverse().map(v => {
-                        let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : "";
-                        let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : "";
-                        return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`;
-                    }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
-
-                    let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 
-                        ? s.novosClientesHoje.reverse().map(c => {
-                            let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : "";
-                            return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`;
-                        }).join('') 
-                        : "<div style='padding:5px 0;'>Nenhum novo cadastro hoje.</div>";
-
+                    let htmlVisitantes = s.visitantesHoje ? s.visitantesHoje.split('||').filter(v=>v.trim()!=='').reverse().map(v => { let text = v.trim(); let phoneMatch = text.match(/\(([^)]+)\)/); let phone = phoneMatch ? phoneMatch[1].replace(/\D/g, '') : ""; let btnWa = phone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${phone}?text=${encodeURIComponent('Olá! Vimos que você acessou o site da Arena Vitale. Que tal aproveitar e garantir o seu horário com a gente? Temos as melhores quadras te esperando! 🎾')}', '_blank')" title="Mandar Mensagem Promocional">📞</button>` : ""; return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>👤 ${text}</span>${btnWa}</div>`; }).join('') : "<div style='padding:5px 0;'>Nenhum cliente logado.</div>";
+                    let htmlNovosClientes = s.novosClientesHoje && s.novosClientesHoje.length > 0 ? s.novosClientesHoje.reverse().map(c => { let btnWa = c.telefone ? `<button class="btn-icon btn-wa" style="font-size:1.1rem; background:#222; border-radius:50%; padding:4px; margin-left:8px; border:1px solid #444;" onclick="window.open('https://wa.me/55${c.telefone}?text=${encodeURIComponent('Olá ' + c.nome + '! Seja muito bem-vindo(a) à Arena Vitale! 🎾')}', '_blank')" title="Mandar Mensagem de Boas-vindas">📞</button>` : ""; return `<div style="padding:6px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;"><span>🌟 ${c.nome}</span>${btnWa}</div>`; }).join('') : "<div style='padding:5px 0;'>Nenhum novo cadastro hoje.</div>";
                     let qtdNovosHoje = s.novosClientesHoje ? s.novosClientesHoje.length : 0;
-
-                    let html = `
-                    <div class="dash-grid">
-                        <div class="dash-card">
-                            <h4>Visitas Hoje</h4>
-                            <div class="value">👁️ ${s.acessosHoje}</div>
-                            <button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--primary); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Quem Acessou</button>
-                            <div id="listaVisitantes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlVisitantes}</div>
-                        </div>
-                        <div class="dash-card">
-                            <h4>Clientes Registrados</h4>
-                            <div class="value">👥 ${s.totalClientes}</div>
-                            <div style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">+${qtdNovosHoje} hoje</div>
-                            <button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--success); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Cadastros Hoje</button>
-                            <div id="listaNovosClientes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div>
-                        </div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturamento da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.2rem;">🎾 ${preferida}</div></div>
-                        <div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.1rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div>
-                    </div>`;
+                    let html = `<div class="dash-grid"><div class="dash-card"><h4>Visitas Hoje</h4><div class="value">👁️ ${s.acessosHoje}</div><button onclick="let el=document.getElementById('listaVisitantes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--primary); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Quem Acessou</button><div id="listaVisitantes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlVisitantes}</div></div><div class="dash-card"><h4>Clientes Registrados</h4><div class="value">👥 ${s.totalClientes}</div><div style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">+${qtdNovosHoje} hoje</div><button onclick="let el=document.getElementById('listaNovosClientes'); el.style.display=el.style.display==='none'?'block':'none';" style="margin-top:8px; background:var(--success); color:black; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; width:100%;">Ver Cadastros Hoje</button><div id="listaNovosClientes" style="display:none; margin-top:8px; max-height:120px; overflow-y:auto; background:#111; padding:8px; border-radius:4px; font-size:0.75rem; color:#ccc; text-align:left;">${htmlNovosClientes}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Faturamento da Semana</h4><div class="value">R$ ${s.recTotal.toFixed(2).replace('.',',')}</div><div style="display:flex; justify-content: space-around; margin-top:10px;"><div class="sub">✅ Conf.: R$ ${s.recConf.toFixed(2).replace('.',',')}</div><div class="sub pending">⏳ Pend.: R$ ${s.recPend.toFixed(2).replace('.',',')}</div></div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Quadra Favorita</h4><div class="value" style="font-size:1.2rem;">🎾 ${preferida}</div></div><div class="dash-card" style="grid-column: 1 / -1;"><h4>Horários de Pico (Top 3)</h4><div class="value" style="font-size:1.1rem; color:var(--primary); margin-top:5px;">${topHoras || "Sem dados"}</div></div></div>`;
                     html += `<div style="margin-top: 15px; background: #1a1a1a; padding: 10px; border-radius: 6px; border: 1px solid var(--primary);"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><h4 style="color:#aaa; font-size:0.8rem; text-transform:uppercase; margin:0;">📈 Gráfico de Visitas</h4><select id="tipoGraficoAcessos" onchange="atualizarGraficoAcessos()" style="width:auto; padding:4px 8px; margin:0; background:#222; color:white; border:1px solid var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8rem;"><option value="diario">Diário</option><option value="semanal">Semanal</option><option value="mensal">Mensal</option></select></div><canvas id="graficoAcessos" height="120"></canvas></div>`;
                     document.getElementById('statsContent').innerHTML = html; setTimeout(() => { atualizarGraficoAcessos(); }, 100); 
                 } else { document.getElementById('statsContent').innerHTML = '<p style="color:var(--danger)">Erro ao carregar as estatísticas do Banco de Dados.</p>'; }
@@ -622,72 +488,39 @@
         function atualizarGraficoAcessos() {
             let tipo = document.getElementById('tipoGraficoAcessos').value; let map = {};
             dadosAcessosGlobais.forEach(item => {
-                if(!item.data) return; let pts = item.data.toString().split('/'); if(pts.length !== 3) return;
-                let d = new Date(pts[2], pts[1]-1, pts[0]); let key = "";
-                if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } 
-                else if (tipo === 'semanal') { let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7)); var weekNo = Math.ceil(( ( (dCopy - new Date(Date.UTC(dCopy.getUTCFullYear(),0,1))) / 86400000) + 1)/7); key = `Sem. ${weekNo}`; } 
-                else if (tipo === 'mensal') { let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']; key = `${meses[d.getMonth()]} / ${d.getFullYear()}`; }
+                if(!item.data) return; let pts = item.data.toString().split('/'); if(pts.length !== 3) return; let d = new Date(pts[2], pts[1]-1, pts[0]); let key = "";
+                if(tipo === 'diario') { key = `${pts[0]}/${pts[1]}`; } else if (tipo === 'semanal') { let dCopy = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); dCopy.setUTCDate(dCopy.getUTCDate() + 4 - (dCopy.getUTCDay()||7)); var weekNo = Math.ceil(( ( (dCopy - new Date(Date.UTC(dCopy.getUTCFullYear(),0,1))) / 86400000) + 1)/7); key = `Sem. ${weekNo}`; } else if (tipo === 'mensal') { let meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']; key = `${meses[d.getMonth()]} / ${d.getFullYear()}`; }
                 if(!map[key]) map[key] = 0; map[key] += parseInt(item.qtd) || 0;
             });
             let labels = Object.keys(map); let values = Object.values(map);
-            if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } 
-            else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
-            if(chartAcessosInstancia) chartAcessosInstancia.destroy(); 
-            const ctx = document.getElementById('graficoAcessos').getContext('2d');
+            if(tipo === 'diario' && labels.length > 14) { labels = labels.slice(-14); values = values.slice(-14); } else if (tipo === 'semanal' && labels.length > 12) { labels = labels.slice(-12); values = values.slice(-12); }
+            if(chartAcessosInstancia) chartAcessosInstancia.destroy(); const ctx = document.getElementById('graficoAcessos').getContext('2d');
             chartAcessosInstancia = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Visitas', data: values, borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', borderWidth: 2, pointBackgroundColor: '#fff', pointRadius: 4, fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#ccc' } }, y: { ticks: { color: '#ccc', stepSize: 1 }, beginAtZero: true } } } });
         }
         function fecharDashboard() { document.getElementById('modalEstatisticas').style.display='none'; }
 
         function alternarModoGradeFixa() {
             modoGradeFixa = !modoGradeFixa; const btn = document.getElementById('btnToggleModo');
-            if(modoGradeFixa) {
-                btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)";
-                document.getElementById('listaQ1').innerHTML = "Carregando molde..."; document.getElementById('listaQ2').innerHTML = "Carregando molde...";
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro."); alternarModoGradeFixa(); } });
+            if(modoGradeFixa) { btn.classList.add('ativo'); btn.innerText = "🔙 Voltar para Agenda Normal"; document.getElementById('autoRefreshStatus').innerText = "Modo Fixo"; document.getElementById('autoRefreshStatus').style.color = "var(--pending)"; document.getElementById('listaQ1').innerHTML = "Carregando molde..."; document.getElementById('listaQ2').innerHTML = "Carregando molde..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) { cachedPadrao = data.lista; atualizarTelaGradeFixa(); } else { alert("Erro."); alternarModoGradeFixa(); } });
             } else { btn.classList.remove('ativo'); btn.innerText = "📌 Grade Fixa (Molde)"; document.getElementById('autoRefreshStatus').innerText = "Monitorando..."; document.getElementById('autoRefreshStatus').style.color = "var(--success)"; carregarAgenda(); }
         }
 
-        function atualizarTelaGradeFixa() {
-            const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerHTML = `<span style='color:var(--primary)'>MOLDE FIXO: ${diasSemana[info.index]}</span>`; document.getElementById('printDate').innerText = "MOLDE: " + diasSemana[info.index];
-            dadosAgenda = []; cachedPadrao.forEach((row, idx) => { if(idx === 0) return; let h = parseInt(row[0]); if(!isNaN(h)) { let colQ1 = 1 + info.index; let colQ2 = 9 + info.index; dadosAgenda.push({ hora: h, q1: row[colQ1]?row[colQ1].toString().trim():"", q2: row[colQ2]?row[colQ2].toString().trim():"" }); } }); renderizarGridFixa();
-        }
+        function atualizarTelaGradeFixa() { const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerHTML = `<span style='color:var(--primary)'>MOLDE FIXO: ${diasSemana[info.index]}</span>`; document.getElementById('printDate').innerText = "MOLDE: " + diasSemana[info.index]; dadosAgenda = []; cachedPadrao.forEach((row, idx) => { if(idx === 0) return; let h = parseInt(row[0]); if(!isNaN(h)) { let colQ1 = 1 + info.index; let colQ2 = 9 + info.index; dadosAgenda.push({ hora: h, q1: row[colQ1]?row[colQ1].toString().trim():"", q2: row[colQ2]?row[colQ2].toString().trim():"" }); } }); renderizarGridFixa(); }
 
-        function renderizarGridFixa() {
-            let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotFixoHTML(h, 1, slot.q1); hQ2 += criarSlotFixoHTML(h, 2, slot.q2); });
-            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
-        }
+        function renderizarGridFixa() { let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotFixoHTML(h, 1, slot.q1); hQ2 += criarSlotFixoHTML(h, 2, slot.q2); }); document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2; }
 
-        function criarSlotFixoHTML(h, q, n) {
-            let ocupado = n.length > 0; let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-            let botoes = ocupado ? `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${safeN}')" title="Remover da Grade Fixa">🗑️</button>` : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`;
-            let classe = ocupado ? "fixo-booked" : ""; return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`;
-        }
+        function criarSlotFixoHTML(h, q, n) { let ocupado = n.length > 0; let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let botoes = ocupado ? `<button class="btn-icon btn-del" onclick="apagarFixo(${h}, ${q}, '${safeN}')" title="Remover da Grade Fixa">🗑️</button>` : `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})" title="Adicionar Horário Fixo">➕</button>`; let classe = ocupado ? "fixo-booked" : ""; return `<div class="slot slot-fixo"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${n || "Livre"}</div><div class="actions">${botoes}</div></div>`; }
 
-        function apagarFixo(h, q, n) {
-             if(confirm(`Remover do Molde Permanente?`)) {
-                let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
-             }
-        }
+        function apagarFixo(h, q, n) { if(confirm(`Remover do Molde Permanente?`)) { let i = dadosAgenda.findIndex(d => d.hora === h); if(i !== -1) { if(q === 1) dadosAgenda[i].q1 = ""; else dadosAgenda[i].q2 = ""; } renderizarGridFixa(); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: "", diaIndex: formatarData(dataAtual).index, hora: h, quadra: q }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); }); } }
 
-        async function carregarAgenda(isAuto = false) {
-            if(modoGradeFixa) return; 
-            const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerText = info.texto; document.getElementById('printDate').innerText = info.texto; if(!isAuto) document.getElementById('btnRecarregar').innerText = "↻";
-            try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); }
-        }
+        async function carregarAgenda(isAuto = false) { if(modoGradeFixa) return; const info = formatarData(dataAtual); document.getElementById('dateDisplay').innerText = info.texto; document.getElementById('printDate').innerText = info.texto; if(!isAuto) document.getElementById('btnRecarregar').innerText = "↻"; try { const r = await fetch(SHEET_URL + '&t=' + new Date().getTime()); const csv = await r.text(); processarCSV(csv, info.index); } catch (e) { console.error(e); } }
 
         function processarCSV(csv, diaIndex) {
             const rows = csv.split('\n').map(r => r.split(',')); dadosAgenda = []; let ocupados = 0; let pendentesAtuais = 0; faturamentoDia = 0;
-            
             let promoAtivaNesteDia = false; let valorPromo = 0; let horasPromo = [];
             if (promocaoAtual && promocaoAtual.inicio && promocaoAtual.fim) {
-                let dataEscolhida = new Date(dataAtual); dataEscolhida.setHours(0,0,0,0);
-                let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]);
-                let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
-                if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) {
-                    promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0;
-                    horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : [];
-                }
+                let dataEscolhida = new Date(dataAtual); dataEscolhida.setHours(0,0,0,0); let pIni = promocaoAtual.inicio.split('-'); let dataIni = new Date(pIni[0], pIni[1]-1, pIni[2]); let pFim = promocaoAtual.fim.split('-'); let dataFim = new Date(pFim[0], pFim[1]-1, pFim[2]);
+                if (dataEscolhida >= dataIni && dataEscolhida <= dataFim) { promoAtivaNesteDia = true; valorPromo = parseFloat(promocaoAtual.valor) || 0; horasPromo = promocaoAtual.horarios ? promocaoAtual.horarios.toString().split(',').map(Number) : []; }
             }
 
             rows.forEach((row, idx) => {
@@ -695,28 +528,16 @@
                 if(!isNaN(h)) {
                     let n1 = row[1 + diaIndex] ? row[1 + diaIndex].replace(/[\r\n"]/g, '').trim() : ""; 
                     let n2 = row[9 + diaIndex] ? row[9 + diaIndex].replace(/[\r\n"]/g, '').trim() : "";
-                    
-                    // NOVA REGRA DE VALORES COM AS VARIÁVEIS GLOBAIS DA NUVEM
                     let vHora = (promoAtivaNesteDia && horasPromo.includes(h)) ? valorPromo : (h >= 5 && h <= 18 ? precoDiaGlobal : precoNoiteGlobal);
 
-                    if(n1) {
-                        ocupados++; 
-                        if(n1.includes("⏳")) pendentesAtuais++;
-                        if(!n1.includes("⛔")) faturamentoDia += vHora;
-                    }
-                    if(n2) {
-                        ocupados++; 
-                        if(n2.includes("⏳")) pendentesAtuais++;
-                        if(!n2.includes("⛔")) faturamentoDia += vHora;
-                    }
-                    
+                    if(n1) { ocupados++; if(n1.includes("⏳")) pendentesAtuais++; if(!n1.includes("⛔")) faturamentoDia += vHora; }
+                    if(n2) { ocupados++; if(n2.includes("⏳")) pendentesAtuais++; if(!n2.includes("⛔")) faturamentoDia += vHora; }
                     dadosAgenda.push({ hora: h, q1: n1, q2: n2 });
                 }
             });
             
             let total = horas.length * 2; let porc = Math.round((ocupados / total) * 100); 
-            document.getElementById('statOcupacao').innerText = porc + "%"; 
-            document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); 
+            document.getElementById('statOcupacao').innerText = porc + "%"; document.getElementById('statFaturamento').innerText = "R$ " + faturamentoDia.toFixed(2).replace('.', ','); 
             renderizarGrid();
             if (pendentesAtuais > totalPendentesConhecidos) dispararNotificacao(pendentesAtuais - totalPendentesConhecidos); 
             if (pendentesAtuais === 0) document.title = "Painel Admin | Arena Vitale"; 
@@ -734,55 +555,19 @@
                     icon: "logo2.png",
                     vibrate: [200, 100, 200]
                 });
-            } else if ("Notification" in window && Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        new Notification("Arena Vitale", { body: "Nova solicitação pendente!", icon: "logo2.png" });
-                    }
-                });
             }
         }
-
         function fecharToast() { document.getElementById('toastNotification').classList.remove('show'); }
 
-        function renderizarGrid() {
-            let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2); });
-            document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2;
-        }
+        function renderizarGrid() { let hQ1 = ""; let hQ2 = ""; horas.forEach(h => { let slot = dadosAgenda.find(d => d.hora === h) || { q1: "", q2: "" }; hQ1 += criarSlotHTML(h, 1, slot.q1); hQ2 += criarSlotHTML(h, 2, slot.q2); }); document.getElementById('listaQ1').innerHTML = hQ1; document.getElementById('listaQ2').innerHTML = hQ2; }
 
         function criarSlotHTML(h, q, n) {
-            n = n ? n.toString() : "";
-            let ocupado = n.length > 0; 
-            let parts = n.split('||');
-            let nomeReal = parts[0].trim();
-            let adminTag = parts.length > 1 ? `<br><small style="color:#555; font-size:0.7rem;">👤 Add por: ${parts[1].trim()}</small>` : "";
-            let isPendente = nomeReal.includes("⏳");
-            let txtN = nomeReal.replace('⏳', '').trim();
-            let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-            
-            let botoes = "";
-            if(ocupado) {
-                if(isPendente) {
-                    botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${safeN}')">🆗</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`;
-                } else {
-                    let isPago = nomeReal.includes('✅');
-                    botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-pay ${isPago?'paid':''}" onclick="togglePago(${h}, ${q}, '${safeN}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`;
-                }
-            } else {
-                botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`;
-            }
-            
-            let classe = isPendente ? "pending" : (ocupado ? "booked" : ""); 
-            return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${nomeReal} ${adminTag}</div><div class="actions">${botoes}</div></div>`;
+            n = n ? n.toString() : ""; let ocupado = n.length > 0; let parts = n.split('||'); let nomeReal = parts[0].trim(); let adminTag = parts.length > 1 ? `<br><small style="color:#555; font-size:0.7rem;">👤 Add por: ${parts[1].trim()}</small>` : ""; let isPendente = nomeReal.includes("⏳"); let txtN = nomeReal.replace('⏳', '').trim(); let safeN = n.replace(/'/g, "\\'").replace(/"/g, "&quot;"); let botoes = "";
+            if(ocupado) { if(isPendente) { botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-confirm" onclick="confirmarAgendamento(${h}, ${q}, '${safeN}')">🆗</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`; } else { let isPago = nomeReal.includes('✅'); botoes = `<button class="btn-icon btn-wa" onclick="abrirWhatsApp('${txtN}', ${h})">📞</button><button class="btn-icon btn-pay ${isPago?'paid':''}" onclick="togglePago(${h}, ${q}, '${safeN}')">💲</button><button class="btn-icon btn-del" onclick="cancelar(${h}, ${q}, '${safeN}')">🗑️</button>`; } } else { botoes = `<button class="btn-icon btn-add" onclick="abrirManual(${h}, ${q})">➕</button>`; }
+            let classe = isPendente ? "pending" : (ocupado ? "booked" : ""); return `<div class="slot"><span class="time-label">${h}:00</span><div class="slot-content ${classe}">${nomeReal} ${adminTag}</div><div class="actions">${botoes}</div></div>`;
         }
 
-        function abrirManual(h, q) { 
-            tempAgendamento = { hora: h, quadra: q }; let ds = diasSemana[formatarData(dataAtual).index];
-            if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } 
-            else { document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento"; document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'flex'; document.getElementById('checkMensalista').checked = false; }
-            document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); 
-        }
-        
+        function abrirManual(h, q) { tempAgendamento = { hora: h, quadra: q }; let ds = diasSemana[formatarData(dataAtual).index]; if(modoGradeFixa) { document.getElementById('tituloModalAgenda').innerText = "Adicionar Fixo"; document.getElementById('modalInfo').innerText = `MOLDE: ${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'none'; } else { document.getElementById('tituloModalAgenda').innerText = "Novo Agendamento"; document.getElementById('modalInfo').innerText = `${ds} às ${h}:00 - Q${q}`; document.getElementById('divMensalista').style.display = 'flex'; document.getElementById('checkMensalista').checked = false; } document.getElementById('manualNome').value = ""; document.getElementById('modalManual').style.display = 'flex'; document.getElementById('manualNome').focus(); }
         function fecharModal() { document.getElementById('modalManual').style.display = 'none'; }
         
         function salvarManual() {
@@ -791,39 +576,17 @@
             n = mod + " " + n; // Adiciona o emoji na frente
             
             if(!modoGradeFixa && document.getElementById('checkMensalista').checked) n += " (M)";
-            
-            if(!modoGradeFixa) {
-                let logado = localStorage.getItem('adminUser') || "Admin";
-                n += " || " + logado;
-            }
-
+            if(!modoGradeFixa) { let logado = localStorage.getItem('adminUser') || "Admin"; n += " || " + logado; }
             fecharModal();
-            if(modoGradeFixa) {
-                let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora); if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; } renderizarGridFixa();
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) })
-                .then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); });
-            } else enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
+            if(modoGradeFixa) { let i = dadosAgenda.findIndex(d => d.hora === tempAgendamento.hora); if(i !== -1) { if(tempAgendamento.quadra === 1) dadosAgenda[i].q1 = n; else dadosAgenda[i].q2 = n; } renderizarGridFixa(); fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_padrao", nome: n, diaIndex: formatarData(dataAtual).index, hora: tempAgendamento.hora, quadra: tempAgendamento.quadra }) }).then(() => { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_padrao" }) }).then(r => r.json()).then(data => { if(data.sucesso) cachedPadrao = data.lista; }); }); } else enviarComando("agendar", tempAgendamento.hora, tempAgendamento.quadra, n);
         }
         
         function cancelar(h, q, n) { if(confirm(`Apagar o horário?`)) enviarComando("cancelar", h, q, ""); }
-        function enviarComando(a, h, q, n) {
-            let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; }
-            if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); renderizarGrid(); 
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) });
-        }
+        function enviarComando(a, h, q, n) { let i = dadosAgenda.findIndex(d => d.hora === h); if(i === -1) { dadosAgenda.push({hora:h, q1:"", q2:""}); i = dadosAgenda.length-1; } if(q === 1) dadosAgenda[i].q1 = (a === "agendar" ? n : ""); else dadosAgenda[i].q2 = (a === "agendar" ? n : ""); renderizarGrid(); fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: a, nome: n, diaIndex: formatarData(dataAtual).index, hora: h, quadra: q, duracao: 1, adminOverride: true }) }); }
 
         function abrirWhatsApp(n, h) { let num = prompt(`Número do Cliente:`, ""); if(num) window.open(`https://wa.me/55${num}?text=${encodeURIComponent(`Olá ${n}, a confirmar o seu horário das ${h}h na Arena Vitale.`)}`, '_blank'); }
         function togglePago(h, q, n) { let nv = n.includes("✅") ? n.replace(/ ?✅/g, "") : n + " ✅"; enviarComando("agendar", h, q, nv); }
-        
-        function confirmarAgendamento(h, q, n) { 
-            if(confirm(`Confirmar agendamento?`)) { 
-                let parts = n.split('||');
-                let base = parts[0].replace("⏳", "").trim() + " (Confirmado)";
-                let finalStr = parts.length > 1 ? base + " || " + parts[1].trim() : base;
-                enviarComando("agendar", h, q, finalStr); 
-                if(totalPendentesConhecidos > 0) totalPendentesConhecidos--; fecharToast(); 
-            } 
-        }
+        function confirmarAgendamento(h, q, n) { if(confirm(`Confirmar agendamento?`)) { let parts = n.split('||'); let base = parts[0].replace("⏳", "").trim() + " (Confirmado)"; let finalStr = parts.length > 1 ? base + " || " + parts[1].trim() : base; enviarComando("agendar", h, q, finalStr); if(totalPendentesConhecidos > 0) totalPendentesConhecidos--; fecharToast(); } }
 
         function copiarAgenda() {
             let t = `📅 *Agenda (${formatarData(dataAtual).texto})*\n\n*Quadra Chicashoes:*\n`; horas.forEach(h => { let s = dadosAgenda.find(d => d.hora === h); let st = s && s.q1 ? (s.q1.includes("⏳") ? "⏳ Pendente" : "❌ Ocupado") : "✅ Livre"; t += `${h}h - ${st}\n`; });
@@ -831,38 +594,9 @@
             navigator.clipboard.writeText(t).then(() => alert("Copiado com sucesso!"));
         }
 
-        function abrirModalAddBloqueio() { 
-            document.getElementById('modalAddBlacklist').style.display = 'flex'; 
-        }
-
-        function abrirModalAddBloqueioPreenchido(nome, tel) {
-            document.getElementById('modalGerenciarClientes').style.display = 'none';
-            document.getElementById('blNome').value = nome;
-            document.getElementById('blTel').value = tel;
-            abrirModalAddBloqueio();
-        }
-
-        function adicionarBloqueio() { 
-            const n = document.getElementById('blNome').value; 
-            const t = document.getElementById('blTel').value; 
-            if(!n) return alert("Indique um nome."); 
-            if(confirm(`Bloquear ${n}?`)) { 
-                let btn = document.querySelector('#modalAddBlacklist .primary-btn');
-                let txt = btn.innerText; 
-                btn.innerText = "Aguarde..."; 
-                btn.disabled = true;
-
-                fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) })
-                .then(() => {
-                    btn.innerText = txt; 
-                    btn.disabled = false;
-                    document.getElementById('blNome').value=""; 
-                    document.getElementById('blTel').value=""; 
-                    document.getElementById('modalAddBlacklist').style.display='none';
-                    alert(`Cliente ${n} adicionado à Lista Negra com sucesso!`);
-                });
-            } 
-        }
+        function abrirModalAddBloqueio() { document.getElementById('modalAddBlacklist').style.display = 'flex'; }
+        function abrirModalAddBloqueioPreenchido(nome, tel) { document.getElementById('modalGerenciarClientes').style.display = 'none'; document.getElementById('blNome').value = nome; document.getElementById('blTel').value = tel; abrirModalAddBloqueio(); }
+        function adicionarBloqueio() { const n = document.getElementById('blNome').value; const t = document.getElementById('blTel').value; if(!n) return alert("Indique um nome."); if(confirm(`Bloquear ${n}?`)) { let btn = document.querySelector('#modalAddBlacklist .primary-btn'); let txt = btn.innerText; btn.innerText = "Aguarde..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloquear", nome: n, telefone: t }) }).then(() => { btn.innerText = txt; btn.disabled = false; document.getElementById('blNome').value=""; document.getElementById('blTel').value=""; document.getElementById('modalAddBlacklist').style.display='none'; alert(`Cliente ${n} adicionado à Lista Negra com sucesso!`); }); } }
 
         function abrirGerenciarBlacklist() {
             document.getElementById('modalGerenciarBlacklist').style.display = 'flex'; document.getElementById('loadingBlacklist').style.display = 'block'; document.getElementById('listaBlacklistConteudo').innerHTML = '';
@@ -872,57 +606,10 @@
                 if(html === "") html = "<p style='color:#ccc;'>A lista negra está vazia.</p>"; document.getElementById('listaBlacklistConteudo').innerHTML = html;
             }).catch(e => { document.getElementById('loadingBlacklist').style.display = 'none'; document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--danger)'>Erro ao carregar os dados.</p>"; });
         }
-        
-        function removerDaBlacklist(nome) { 
-            if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { 
-                document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; 
-                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); 
-            } 
-        }
+        function removerDaBlacklist(nome) { if(confirm(`Tem certeza que deseja remover da Lista Negra?`)) { document.getElementById('listaBlacklistConteudo').innerHTML = "<p style='color:var(--primary)'>Removendo...</p>"; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "remover_blacklist", nome: nome }) }).then(() => abrirGerenciarBlacklist()); } }
 
-        function abrirModalInterdicao() { 
-            document.getElementById('modalInterdicao').style.display = 'flex'; 
-            let html = ""; 
-            horas.forEach(h => { 
-                html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; 
-            }); 
-            document.getElementById('listaInterdicao').innerHTML = html; 
-        }
-        
-        function confirmarInterdicao() { 
-            let sel = []; 
-            document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { 
-                sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); 
-            }); 
-            
-            if(sel.length === 0) return alert("Selecione pelo menos um horário."); 
-            
-            if(confirm(`Interditar ${sel.length} horários?`)) { 
-                let btn = document.querySelector('#modalInterdicao .primary-btn');
-                let txtOriginal = btn.innerText;
-                btn.innerText = "Bloqueando...";
-                btn.disabled = true;
-
-                fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    mode: "no-cors", 
-                    body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) 
-                })
-                .then(() => {
-                    document.getElementById('modalInterdicao').style.display = 'none'; 
-                    btn.innerText = txtOriginal;
-                    btn.disabled = false;
-                    document.getElementById('btnRecarregar').innerText = "Atualizando...";
-                    setTimeout(carregarAgenda, 2000); 
-                })
-                .catch(e => {
-                    document.getElementById('modalInterdicao').style.display = 'none'; 
-                    btn.innerText = txtOriginal;
-                    btn.disabled = false;
-                    setTimeout(carregarAgenda, 2000);
-                });
-            } 
-        }
+        function abrirModalInterdicao() { document.getElementById('modalInterdicao').style.display = 'flex'; let html = ""; horas.forEach(h => { html += `<div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="1"> <label>${h}:00 - Quadra Chicashoes</label></div><div class="interdicao-item"><input type="checkbox" class="chk-interdicao" data-hora="${h}" data-quadra="2"> <label>${h}:00 - Quadra Padaria do Helder</label></div>`; }); document.getElementById('listaInterdicao').innerHTML = html; }
+        function confirmarInterdicao() { let sel = []; document.querySelectorAll('.chk-interdicao:checked').forEach(chk => { sel.push({ hora: chk.getAttribute('data-hora'), quadra: chk.getAttribute('data-quadra') }); }); if(sel.length === 0) return alert("Selecione pelo menos um horário."); if(confirm(`Interditar ${sel.length} horários?`)) { let btn = document.querySelector('#modalInterdicao .primary-btn'); let txtOriginal = btn.innerText; btn.innerText = "Bloqueando..."; btn.disabled = true; fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ acao: "bloqueio_lote", itens: sel, diaIndex: formatarData(dataAtual).index }) }).then(() => { document.getElementById('modalInterdicao').style.display = 'none'; btn.innerText = txtOriginal; btn.disabled = false; document.getElementById('btnRecarregar').innerText = "Atualizando..."; setTimeout(carregarAgenda, 2000); }).catch(e => { document.getElementById('modalInterdicao').style.display = 'none'; btn.innerText = txtOriginal; btn.disabled = false; setTimeout(carregarAgenda, 2000); }); } }
 
         function abrirModalSorteio() { document.getElementById('modalSorteio').style.display = 'flex'; }
         function realizarSorteio() { const btn = document.getElementById('btnSortear'); const display = document.getElementById('displaySorteio'); btn.disabled = true; btn.innerText = "Sorteando..."; fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "sortear_cliente" }) }).then(r => r.json()).then(data => { if (data.erro) { display.innerText = "Erro"; alert(data.erro); } else { let v = data.vencedor; display.innerHTML = `🎉 ${v.nome} 🎉<br><span style="font-size:1rem;color:#ccc;">${v.telefone}</span>`; } btn.disabled = false; btn.innerText = "SORTEAR NOVAMENTE"; }); }
@@ -1220,6 +907,85 @@
                     if(data.sucesso) abrirControleMensalidades();
                     else alert("Erro ao excluir aluno.");
                 }).catch(e => alert("Erro de Conexão."));
+            }
+        }
+
+        // --- PREÇOS E CUPONS ---
+        function abrirModalPrecos() {
+            document.getElementById('modalPrecos').style.display = 'flex';
+            document.getElementById('inputPrecoDia').value = precoDiaGlobal;
+            document.getElementById('inputPrecoNoite').value = precoNoiteGlobal;
+        }
+
+        function salvarPrecos() {
+            let pDia = document.getElementById('inputPrecoDia').value;
+            let pNoite = document.getElementById('inputPrecoNoite').value;
+            
+            if(!pDia || !pNoite) return alert("Preencha os dois valores!");
+            
+            let btn = document.querySelector('#modalPrecos .primary-btn');
+            let txtOriginal = btn.innerText;
+            btn.innerText = "Salvando na Nuvem..."; btn.disabled = true;
+            
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ acao: "salvar_precos", precoDia: pDia, precoNoite: pNoite }) 
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.innerText = txtOriginal; btn.disabled = false;
+                if(data.sucesso) {
+                    precoDiaGlobal = parseFloat(pDia);
+                    precoNoiteGlobal = parseFloat(pNoite);
+                    document.getElementById('modalPrecos').style.display = 'none';
+                    carregarAgenda(); 
+                    alert("Valores atualizados em todos os painéis!");
+                } else {
+                    alert("Erro ao salvar no servidor.");
+                }
+            }).catch(e => { 
+                alert("Erro de conexão."); 
+                btn.innerText = txtOriginal; btn.disabled = false;
+            });
+        }
+
+        function abrirModalCupons() {
+            document.getElementById('modalCupons').style.display = 'flex';
+            carregarCupons();
+        }
+        function carregarCupons() {
+            document.getElementById('loadingCupons').style.display = 'block';
+            document.getElementById('listaCuponsConteudo').innerHTML = '';
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "listar_cupons" }) })
+            .then(r=>r.json()).then(data => {
+                document.getElementById('loadingCupons').style.display = 'none';
+                let html = "";
+                if(data.sucesso && data.lista && data.lista.length > 0) {
+                    data.lista.forEach(c => {
+                        html += `<div class="interdicao-item" style="justify-content: space-between; background: #333; border-radius: 5px; padding: 10px;">
+                            <span style="font-size: 0.95rem; color: var(--primary);"><b>${c.nome}</b> <br><small style="color:#aaa">Desconto: R$ ${c.desconto},00</small></span>
+                            <button class="btn-icon btn-del" style="font-size: 1.2rem;" onclick="excluirCupom('${c.nome}')">🗑️</button>
+                        </div>`;
+                    });
+                } else { html = "<p style='color:#ccc;'>Nenhum cupom ativo.</p>"; }
+                document.getElementById('listaCuponsConteudo').innerHTML = html;
+            });
+        }
+        function salvarCupom() {
+            let nome = document.getElementById('novoCupomNome').value.toUpperCase().trim();
+            let valor = document.getElementById('novoCupomValor').value;
+            if(!nome || !valor) return alert("Preencha o nome e o valor de desconto!");
+            let btn = document.querySelector('#modalCupons .primary-btn'); btn.innerText = "Salvando..."; btn.disabled = true;
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "salvar_cupom", cupom: nome, desconto: valor }) })
+            .then(r=>r.json()).then(data=>{
+                btn.innerText = "➕ CRIAR CUPOM"; btn.disabled = false;
+                if(data.sucesso) { document.getElementById('novoCupomNome').value=''; document.getElementById('novoCupomValor').value=''; carregarCupons(); }
+            });
+        }
+        function excluirCupom(nome) {
+            if(confirm(`Excluir o cupom ${nome}?`)) {
+                fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ acao: "excluir_cupom", cupom: nome }) })
+                .then(()=>carregarCupons());
             }
         }
     </script>
