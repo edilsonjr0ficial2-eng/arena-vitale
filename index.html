@@ -589,13 +589,11 @@
                 
                 total += vHora;
 
-                // Salva o valor da primeira hora como desconto fidelidade se aplicável
                 if (i === 0 && pontosAtuais >= 10) {
                     valorDescontoFidelidade = vHora;
                 }
             } 
             
-            // Abate a hora grátis do total
             if (pontosAtuais >= 10) {
                 total -= valorDescontoFidelidade;
                 usandoHoraGratis = true;
@@ -696,7 +694,6 @@
                     let displayTexto = "INDISPONÍVEL"; 
                     let nl = nomeOcupante.toLowerCase().trim();
                     
-                    // ALTERAÇÃO PARA A LETRA (M) DA MENSALIDADE
                     if (nl === 'x' || nl === 'ok' || nl.includes('indisponivel') || nl.includes('bloqueado') || nl.includes('interditado') || nl.includes('⛔')) { 
                         displayTexto = "INDISPONÍVEL"; 
                     } else if (nomeOcupante.includes("⏳")) { 
@@ -814,7 +811,6 @@
         function abrirModal(hora, fim, infoDia, valor) { tempHora = hora; tempFim = fim; tempInfoDia = infoDia; tempValor = valor; document.getElementById('modalCadastro').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modalCadastro').style.display = 'none'; }
 
-        // FUNÇÃO DE AGENDAR CORRIGIDA (ESPERA O NOVO CADASTRO)
         async function enviarAgendamento() {
             if(!document.getElementById('checkTermos').checked) return alert("Aceite os termos.");
             
@@ -839,12 +835,10 @@
                 usuarioLogado = { nome: nomeFinal, phone: telefoneFinal };
                 localStorage.setItem('usuarioArenaVitale', JSON.stringify(usuarioLogado));
                 
-                // Força os pontos a ZERO para clientes novos! (corrige o bug dos testes antigos no celular)
                 pontosAtuais = 0; 
                 localStorage.setItem('pontosVitale', 0);
                 
                 try {
-                    // AWAIT AQUI: O site só continua DEPOIS que o Google confirmar que salvou a linha do cliente.
                     await fetch(SCRIPT_URL, { 
                         method: "POST", 
                         body: JSON.stringify({ acao: "salvar_cliente", nome: nomeFinal, telefone: telefoneFinal, senha: senhaDigitada }) 
@@ -857,17 +851,24 @@
             }
 
             try {
-                // CALCULA OS PONTOS EXATOS: Ganha as horas jogadas
                 let pontosGanhosNestaReserva = Math.ceil(duracaoSelecionada);
                 let saldoPontosFinal = pontosAtuais + pontosGanhosNestaReserva;
                 if (usandoHoraGratis) {
                     saldoPontosFinal -= 10;
                 }
 
-                // 1. Manda a reserva pra Agenda
+                // -------------------------------------------------------------
+                // NOVO: PEGA O EMOJI DA MODALIDADE E COLA NO NOME PARA A AGENDA
+                // -------------------------------------------------------------
+                let modSelect = document.getElementById('selectModalidade');
+                let modText = modSelect.options[modSelect.selectedIndex].text;
+                let emojiModalidade = modText.split(' ')[0]; // Pega a bolinha 🎾, ⚽ ou 🏐
+                let nomeParaAgenda = emojiModalidade + " " + nomeFinal;
+
+                // 1. Manda a reserva pra Agenda (já com o Emoji!)
                 await fetch(SCRIPT_URL, { 
                     method: "POST", 
-                    body: JSON.stringify({ acao: "agendar", nome: nomeFinal, telefone: telefoneFinal, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
+                    body: JSON.stringify({ acao: "agendar", nome: nomeParaAgenda, telefone: telefoneFinal, diaIndex: formatarDataHeader(dataVisualizada).index, hora: tempHora, quadra: quadraSelecionada, duracao: duracaoSelecionada, status: 'pendente', usouPromo: usouPromoFlag }) 
                 });
 
                 // 2. Manda atualizar o saldo de pontos na nuvem
@@ -876,17 +877,15 @@
                     body: JSON.stringify({ acao: "ajustar_pontos", telefone: telefoneFinal, pontos: saldoPontosFinal }) 
                 });
 
-                // Atualiza a memoria do celular com os pontos certinhos
                 localStorage.setItem('pontosVitale', saldoPontosFinal);
 
                 // 3. Monta a mensagem e abre o WhatsApp
                 let pag = document.getElementById('selectPagamento').options[document.getElementById('selectPagamento').selectedIndex].text;
-                let mod = document.getElementById('selectModalidade').options[document.getElementById('selectModalidade').selectedIndex].text;
                 
                 let msg = "*SOLICITAÇÃO DE RESERVA*\n";
                 msg += "👤 Nome: " + nomeFinal + "\n";
                 msg += "🏟️ Quadra: " + nomeQuadra + "\n";
-                msg += "🏆 Modalidade: " + mod + "\n";
+                msg += "🏆 Modalidade: " + modText + "\n";
                 msg += "📅 Data: " + formatarDataHeader(dataVisualizada).texto + "\n";
                 msg += "⏰ Horário: " + tempHora + ":00 às " + tempFim + "\n";
                 
@@ -906,6 +905,8 @@
                 msg += "✅ *Termos de cancelamento aceitos.*\n\n";
                 msg += "⚠️ *Aviso:* O site pode levar alguns minutos para atualizar a tela, mas não se preocupe! Assim que confirmarmos sua mensagem por aqui, seu horário estará 100% garantido!";
                 
+                alert("⚠️ ATENÇÃO: Falta só mais um passo!\n\nVocê será redirecionado para o WhatsApp agora.\n\nVocê PRECISA apertar o botão de ENVIAR a mensagem lá no aplicativo para garantir a reserva da sua quadra!");
+
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
                 setTimeout(() => { location.reload(); }, 2000);
 
